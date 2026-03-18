@@ -1,6 +1,7 @@
 # 🎨 Colorlog: WPF 기반 정밀 퍼스널 컬러 및 피부 분석 시스템
 
-> **대림대학교 소프트웨어학부 응용SW전공 2026 졸업 작품** > 윈도우 데스크톱 환경에 최적화된 고성능 비전 엔진 기반의 뷰티 진단 솔루션
+> **대림대학교 소프트웨어학부 응용SW전공 2026 졸업 작품**
+> 윈도우 데스크톱 환경에 최적화된 고성능 비전 엔진 기반의 뷰티 진단 솔루션
 
 ---
 
@@ -19,8 +20,8 @@
 
 ## 🛠 3. 기술 스택 (Tech Stack)
 ### **Framework & Language**
-- **Language**: C# 12.0
-- **Framework**: .NET 8.0 / WPF (Windows Presentation Foundation)
+- **Language**: C# 12.0 / .NET 8.0
+- **UI Framework**: WPF (Windows Presentation Foundation)
 - **Pattern**: MVVM (Model-View-ViewModel)
 
 ### **Computer Vision & Library**
@@ -30,19 +31,22 @@
 - **Communication**: CommunityToolkit.Mvvm (WeakReferenceMessenger)
 
 ## 📂 4. 시스템 구조 (System Architecture)
-
-- **View (XAML)**: 고해상도 대시보드 UI 및 실시간 영상 출력 전용 컨트롤
-- **ViewModel**: 분석 로직과 UI 간의 실시간 데이터 바인딩 및 상태 제어
-- **Vision Logic**: 웹캠 프레임 캡처 -> 영상 보정 -> 특징점 추출 -> 색상 분석 파이프라인
-- **Model**: 사용자 진단 데이터 및 제품 매칭 데이터 정의
+### **Analysis Pipeline**
+1. **Preprocessing**: 웹캠 프레임 캡처 및 노이즈 제거
+2. **Calibration**: 주변 광원에 따른 실시간 화이트 밸런스 및 노출 보정
+3. **Detection**: Dlib을 활용한 안면 68개 특징점 매핑
+4. **Analysis**: 특정 ROI(관심 영역) 내 픽셀 분석 및 컬러 판별 로직 가동
+5. **Output**: 분석 결과 시각화 및 데이터베이스 저장
 
 ## 👥 5. 팀원 소개 (Team Members)
-| 이름 | 역할 | 담당 업무 |
+| 이름 | 역할 | 주요 담당 업무 (Main Responsibilities) |
 | :--- | :---: | :--- |
-| **연성은** | **팀장** | **시스템 아키텍처 설계, 전체 로직 통합, WPF/MVVM 구조 설계** |
-| 이재형 | 팀원 | OpenCVSharp 기반 비전 엔진 구현, 안면 특징점 추출 최적화 |
-| 박시은 | 팀원 | UI/UX 디자인 (XAML), SQLite 데이터베이스 스키마 설계 |
-| 조한슬 | 팀원 | 피부 분석 알고리즘 리서치, 컬러 데이터셋 구축 및 QA |
+| **연성은** | **팀장** | **시스템 아키텍처 및 로직 통합 총괄**, 알고리즘 설계 및 WPF UI/UX 구조 관리, **전체 코드 리뷰 및 통합 테스트(QA) 주관** |
+| **이재형** | **팀원** | **비전 엔진 심화 개발**, OpenCVSharp/Dlib 안면 인식 알고리즘 구현, **알고리즘 정밀도 및 성능 최적화 테스트(QA)** |
+| **박시은** | **팀원** | **백엔드 및 데이터 관리**, SQLite DB 설계 및 데이터 연동, **데이터 정밀도 검증 및 시스템 예외 처리(QA)** |
+| **조한슬** | **팀원** | **프론트엔드 인터페이스 구현**, WPF XAML 분석 결과 시각화, **UI/UX 사용성 테스트 및 시나리오 검증(QA)** |
+
+> **※ 공통 사항**: 프로젝트 초기 단계에서는 전 팀원이 'C# 기반 안면 특징점 추출 엔진' 구축을 위한 R&D 및 공동 코딩을 수행함.
 
 ---
 © 2026 두쫀쿠 Team. All rights reserved.
