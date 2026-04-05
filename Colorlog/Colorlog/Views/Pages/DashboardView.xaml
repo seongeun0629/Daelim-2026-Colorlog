@@ -9,6 +9,6 @@
       Title="DashboardView">
 
     <Grid>
-        
+        <TextBlock Text="대시보드" FontSize="24" FontWeight="Bold" Margin="20"/>
     </Grid>
 </Page>

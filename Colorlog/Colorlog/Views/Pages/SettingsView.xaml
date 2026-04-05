@@ -9,6 +9,6 @@
       Title="SettingsView">
 
     <Grid>
-        
+        <TextBlock Text="설정" FontSize="24" FontWeight="Bold" Margin="20"/>
     </Grid>
 </Page>

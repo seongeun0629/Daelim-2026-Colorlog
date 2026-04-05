@@ -49,7 +49,54 @@
             </Setter.Value>
         </Setter>
     </Style>
-<!--섹션 타이틀-->
+
+<!-- 필터 버튼 (토글) -->
+    <Style x:Key="FilterToggleStyle" TargetType="ToggleButton">
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Margin" Value="0,0,8,0"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="border" Background="Transparent" CornerRadius="15" 
+                        BorderBrush="{StaticResource DividerBrush}" BorderThickness="1"
+                        Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="FadeInStyle" TargetType="FrameworkElement">
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="Opacity" Value="0"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsChecked, ElementName=RbMakeup}" Value="True">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             To="1" Duration="0:0:0.3"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!--섹션 타이틀-->
     <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="20"/>
         <Setter Property="FontWeight" Value="Bold"/>

@@ -4,13 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Colorlog"
+        xmlns:views="clr-namespace:Colorlog.Views.Pages"
+        xmlns:viewmodel ="clr-namespace:Colorlog.ViewModels"
         mc:Ignorable="d"
         Title="Colorlog" Height="800" Width="1280"
         MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundBrush}">
 
+    <Window.DataContext>
+        <viewmodel:MainViewModel/>
+    </Window.DataContext>
+    
     <Window.Resources>
+        <DataTemplate x:Name="BeautyLogPage" DataType="{x:Type viewmodel:BeautyLogViewModel}">
+            <views:BeautyLogView/>
+        </DataTemplate>
+        
         <Storyboard x:Key="OpenSidebar">
             <DoubleAnimation Storyboard.TargetName="SidebarBorder"
                          Storyboard.TargetProperty="Width"
@@ -47,7 +57,9 @@
                     <TextBlock Text="Colorlog" FontSize="28" FontWeight="Black" 
                            Foreground="{StaticResource PrimaryBrush}"/>
                 </StackPanel>
-                <ListBox x:Name="SidebarListBox" BorderThickness="0" Background="Transparent" Margin="10,0" SelectedIndex="0">
+                <ListBox x:Name="SidebarListBox" BorderThickness="0"
+                         Background="Transparent" Margin="10,0" SelectedIndex="0"
+                         SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Template">
@@ -72,35 +84,35 @@
                         </Style>
                     </ListBox.ItemContainerStyle>
 
-                    <ListBoxItem>
+                    <ListBoxItem Tag="Dashboard">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🏠" Margin="0,0,15,0" FontSize="18"/>
                             <TextBlock Text="나의 컬러 홈" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem>
+                    <ListBoxItem Tag="LiveAnalysis">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="✨" Margin="0,0,15,0" FontSize="18"/>
                             <TextBlock Text="실시간 컬러 분석" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem>
+                    <ListBoxItem Tag="History">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📅" Margin="0,0,15,0" FontSize="18"/>
                             <TextBlock Text="컬러 히스토리" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem>
+                    <ListBoxItem Tag="BeautyLog">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="💄" Margin="0,0,15,0" FontSize="18"/>
                             <TextBlock Text="퍼스널 뷰티템" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem>
+                    <ListBoxItem Tag="Settings">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="⚙️" Margin="0,0,15,0" FontSize="18"/>
                             <TextBlock Text="서비스 설정" VerticalAlignment="Center" FontSize="15"/>
@@ -126,7 +138,7 @@
             </StackPanel>
 
             <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="20">
-                <ContentControl Content="{Binding CurrentView}"/>
+                <ContentControl x:Name ="ContentArea" Content="{Binding CurrentView}"/>
             </Border>
         </Grid>
     </Grid>

@@ -1,14 +1,57 @@
-﻿<Page x:Class="Colorlog.Views.Pages.BeautyLogView"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:Colorlog.Views.Pages"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="BeautyLogView">
+﻿<UserControl x:Class="Colorlog.Views.Pages.BeautyLogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1000">
 
-    <Grid>
-        
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,20"
+                Background="#F2F2F7" CornerRadius="20" Padding="4">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="RbMakeup" Content="🎨 색조 메이크업" 
+                             GroupName="BeautyTabs" IsChecked="True"
+                             Style="{StaticResource FilterToggleStyle}"/>
+
+                <RadioButton x:Name="RbSkinCare" Content="🧴 기초 스킨케어" 
+                             GroupName="BeautyTabs"
+                             Style="{StaticResource FilterToggleStyle}"
+                             Margin="4,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <ScrollViewer Style="{StaticResource FadeInStyle}">
+                <StackPanel>
+                    <TextBlock Text="✨ OO님의 톤에 어울리는 색조 화장품 추천!" FontSize="18" FontWeight="Bold" Margin="10,0,0,15"/>
+                    <ItemsControl ItemsSource="{Binding MakeupItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+
+            <ScrollViewer Style="{StaticResource FadeInStyle}">
+                <StackPanel>
+                    <TextBlock Text="💧 수부지 피부를 위한 기초 케어 화장품 추천!" FontSize="18" FontWeight="Bold" Margin="10,0,0,15"/>
+                    <ItemsControl ItemsSource="{Binding SkinCareItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
-</Page>
+</UserControl>

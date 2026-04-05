@@ -9,6 +9,6 @@
       Title="HistoryView">
 
     <Grid>
-        
+        <TextBlock Text="히스토리" FontSize="24" FontWeight="Bold" Margin="20"/>
     </Grid>
 </Page>

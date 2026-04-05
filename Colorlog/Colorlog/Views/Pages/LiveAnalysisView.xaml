@@ -9,6 +9,6 @@
       Title="LiveAnalysisView">
 
     <Grid>
-        
+        <TextBlock Text="실시간 분석" FontSize="24" FontWeight="Bold" Margin="20"/>
     </Grid>
 </Page>
