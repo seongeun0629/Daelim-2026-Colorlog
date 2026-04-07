@@ -1,0 +1,2 @@
+def get_face_roi(face_landmarks, w, h):
+    return int(min(lm.x * w for lm in face_landmarks)), int(min(lm.y * h for lm in face_landmarks)), int(max(lm.x * w for lm in face_landmarks)), int(max(lm.y * h for lm in face_landmarks))
