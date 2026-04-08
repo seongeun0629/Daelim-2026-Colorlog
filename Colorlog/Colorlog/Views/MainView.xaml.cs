@@ -12,29 +12,15 @@ using System.Windows.Shapes;
 
 namespace Colorlog.Views
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainView : Window
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainView : Window
     {
         public MainView()
         {
             InitializeComponent();
         }
-        bool isSidebarOpen = false;
-        private void BtnToggle_Click(object sender, RoutedEventArgs e)
-        {
-            if (isSidebarOpen)
-            {
-                ((Storyboard)this.FindResource("CloseSidebar")).Begin();
-            }
-            else
-            {
-                ((Storyboard)this.FindResource("OpenSidebar")).Begin();
-            }
-            isSidebarOpen = !isSidebarOpen; 
-        }
-
         private void exitProgram(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();

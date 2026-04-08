@@ -12,46 +12,71 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,20"
-                Background="#F2F2F7" CornerRadius="20" Padding="4">
-            <StackPanel Orientation="Horizontal">
-                <RadioButton x:Name="RbMakeup" Content="🎨 색조 메이크업" 
-                             GroupName="BeautyTabs" IsChecked="True"
-                             Style="{StaticResource FilterToggleStyle}"/>
 
-                <RadioButton x:Name="RbSkinCare" Content="🧴 기초 스킨케어" 
-                             GroupName="BeautyTabs"
-                             Style="{StaticResource FilterToggleStyle}"
-                             Margin="4,0,0,0"/>
-            </StackPanel>
-        </Border>
+<!--헤더-->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Dashboard" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+            <TextBlock Text="실시간 톤 · 피부 상태 · 케어 로그를 한눈에" FontSize="13" Foreground="{StaticResource MutedTextBrush}" Margin="0,6,0,0"/>
+        </StackPanel>
 
         <Grid Grid.Row="1">
-            <ScrollViewer Style="{StaticResource FadeInStyle}">
-                <StackPanel>
-                    <TextBlock Text="✨ OO님의 톤에 어울리는 색조 화장품 추천!" FontSize="18" FontWeight="Bold" Margin="10,0,0,15"/>
-                    <ItemsControl ItemsSource="{Binding MakeupItems}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+<!--필터 토글버튼-->        
+            <Border  HorizontalAlignment="Left" Grid.Row="0"
+                    Background="White" CornerRadius="20,20,0,0" Padding="4" >
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,-1">
+                    <RadioButton x:Name="RbMakeup" Content="🎨 색조 메이크업" 
+                                 GroupName="BeautyTabs" IsChecked="True"
+                                 Style="{StaticResource FilterToggleStyle}"/>
+
+                    <RadioButton x:Name="RbSkinCare" Content="🧴 기초 스킨케어" 
+                                 GroupName="BeautyTabs"
+                                 Style="{StaticResource FilterToggleStyle}"
+                                 Margin="4,0,0,0"/>
                 </StackPanel>
+            </Border>
+        
+<!--콘텐츠 영역-->        
+            <Border Grid.Row="2" HorizontalAlignment="Left" Margin="0,0,0,20" Style="{StaticResource CardStyle}" Width="910" CornerRadius="0,30,30,30"
+                    BorderThickness="1">
+            
+                <Grid Grid.Row="1">
+                        <StackPanel>
+                            <TextBlock Text="✨ OO님의 톤에 어울리는 색조 화장품 추천!" FontSize="18" FontWeight="Bold" Margin="10,0,0,15"/>
+                            <ItemsControl ItemsSource="{Binding MakeupItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                    
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock Text="💧 수부지 피부를 위한 기초 케어 화장품 추천!" FontSize="18" FontWeight="Bold" Margin="10,0,0,15"/>
+                            <ItemsControl ItemsSource="{Binding SkinCareItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+        <!--        <Grid Grid.Row="2">
+            <ScrollViewer Style="{StaticResource FadeInStyle}">
+
+                <TextBlock Text="컨텐츠영역"/>
             </ScrollViewer>
 
-            <ScrollViewer Style="{StaticResource FadeInStyle}">
-                <StackPanel>
-                    <TextBlock Text="💧 수부지 피부를 위한 기초 케어 화장품 추천!" FontSize="18" FontWeight="Bold" Margin="10,0,0,15"/>
-                    <ItemsControl ItemsSource="{Binding SkinCareItems}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                </StackPanel>
-            </ScrollViewer>
         </Grid>
+        -->
     </Grid>
 </UserControl>

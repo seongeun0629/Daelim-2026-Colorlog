@@ -29,6 +29,8 @@ namespace Colorlog.ViewModels
         private readonly BeautyLogViewModel _beautyLogViewModel;
         private readonly SettingsViewModel _settingsViewModel;
 
+        [ObservableProperty]
+        private bool _isSidebarExpanded = true;
         public MainViewModel()
         {
             _dashboardViewModel = new DashboardViewModel();
@@ -61,6 +63,14 @@ namespace Colorlog.ViewModels
                 _ => CurrentView
             };
         }
+
+        [RelayCommand]
+        private void ToggleSidebar()
+        {
+            IsSidebarExpanded = !IsSidebarExpanded;
+        }
+
+
 
     }
 }

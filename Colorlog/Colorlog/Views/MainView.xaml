@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Colorlog"
         xmlns:views="clr-namespace:Colorlog.Views.Pages"
         xmlns:viewmodel ="clr-namespace:Colorlog.ViewModels"
+        xmlns:conv="clr-namespace:Colorlog.Converter"
         mc:Ignorable="d"
         Title="Colorlog" Height="800" Width="1280"
         MinHeight="600" MinWidth="900"
@@ -15,131 +16,197 @@
     <Window.DataContext>
         <viewmodel:MainViewModel/>
     </Window.DataContext>
-    
+
     <Window.Resources>
+
+        <conv:BoolToHAlignConverter x:Key="BoolToHAlignConverter"/>
+        
         <DataTemplate x:Name="BeautyLogPage" DataType="{x:Type viewmodel:BeautyLogViewModel}">
             <views:BeautyLogView/>
         </DataTemplate>
-        
+
         <Storyboard x:Key="OpenSidebar">
-            <DoubleAnimation Storyboard.TargetName="SidebarBorder"
-                         Storyboard.TargetProperty="Width"
-                         From="0" To="260" Duration="0:0:0.3">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Width" To="260" Duration="0:0:0.2"/>
+
         </Storyboard>
 
         <Storyboard x:Key="CloseSidebar">
-            <DoubleAnimation Storyboard.TargetName="SidebarBorder"
-                         Storyboard.TargetProperty="Width"
-                         From="260" To="0" Duration="0:0:0.3">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Width" To="80" Duration="0:0:0.2"/>
+
         </Storyboard>
     </Window.Resources>
-    
+    <!--사이드바-->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" x:Name="SidebarBorder" Width="0"
-            Background="{StaticResource SidebarBrush}" 
-            BorderThickness="0,0,1,0" BorderBrush="{StaticResource DividerBrush}"
-            Canvas.ZIndex="10" HorizontalAlignment="Left">
-            <DockPanel Width="260">
-                <StackPanel DockPanel.Dock="Top" Margin="30,40,30,40">
-                    <TextBlock Text="Colorlog" FontSize="28" FontWeight="Black" 
-                           Foreground="{StaticResource PrimaryBrush}"/>
+        <Border Grid.Column="0" x:Name="SidebarBorder" Width="260" 
+            Padding="0,20, 0, 24" BorderThickness="0,1.5,1.5,1.5"
+            Canvas.ZIndex="10" HorizontalAlignment="Left" CornerRadius="30" Margin="20">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource CloseSidebar}"/>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource OpenSidebar}"/>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <Border.Background>
+                <SolidColorBrush Color="White" Opacity="0.6"/>
+            </Border.Background>
+
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#CCFFFFFF" Offset="0"/>
+                    <GradientStop Color="#22FFFFFF" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" 
+                      ShadowDepth="0" 
+                      Opacity="0.12" 
+                      />
+            </Border.Effect>
+
+            <Grid x:Name="SidebarContentGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 사이드바 헤더 -->
+                <Grid Grid.Row="0" Margin="0,0,0,24" Height="50">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ToggleButton x:Name="SidebarToggleButton" Content="☰"
+                            Grid.Column="0" HorizontalAlignment="Center" Margin="0,2,0,0"
+                            Style="{StaticResource SidebarToggleButtonStyle}"
+                            ToolTip="사이드바 접기/펼치기" Width="40" Height="40"
+                            IsChecked="{Binding IsSidebarExpanded, Mode=TwoWay}"  
+                            VerticalAlignment="Center"/>
+
+                    <StackPanel x:Name="SidebarBrandText" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource SidebarLabelStyle}" Text="Colorlog" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                        <TextBlock Style="{StaticResource SidebarLabelStyle}" Text="Personal color studio" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Margin="0,2,0,0"/>
+                    </StackPanel>
+
+                    
+                </Grid>
+                <!--메뉴-->
+                <StackPanel Grid.Row="1" Margin="0,0,0,20" >
+                    <ListBox x:Name="SidebarListBox" BorderThickness="0"
+                         Background="Transparent" Margin="10,0" SelectedValuePath="Tag"
+                         SelectedIndex="0"
+                         SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                         >
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="border" CornerRadius="10" Margin="5,4" Padding="0,15" Background="Transparent">
+                                                <ContentPresenter VerticalAlignment="Center"
+                                                                  HorizontalAlignment="{Binding DataContext.IsSidebarExpanded, 
+                                                                  RelativeSource={RelativeSource AncestorType=Window}, 
+                                                                  Converter={StaticResource BoolToHAlignConverter}}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SelectedBgBrush}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SelectedBgBrush}"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                                                    <Setter Property="FontWeight" Value="Bold"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                
+                            </Style>
+                            
+                        </ListBox.ItemContainerStyle>
+
+                        <ListBoxItem Tag="Dashboard" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🏠" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="나의 컬러 홈" Style="{StaticResource SidebarLabelStyle}" 
+                                           VerticalAlignment="Center" 
+                                           FontSize="15"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem Tag="LiveAnalysis" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="✨" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="실시간 컬러 분석" Style="{StaticResource SidebarLabelStyle}" 
+                                           VerticalAlignment="Center" 
+                                           FontSize="15"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem Tag="History" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📅" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="컬러 히스토리" Style="{StaticResource SidebarLabelStyle}" 
+                                           VerticalAlignment="Center" 
+                                           FontSize="15"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem Tag="BeautyLog" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="💄" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="퍼스널 뷰티템" Style="{StaticResource SidebarLabelStyle}" 
+                                           VerticalAlignment="Center" 
+                                           FontSize="15"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem Tag="Settings" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⚙️" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="서비스 설정" Style="{StaticResource SidebarLabelStyle}" 
+                                           VerticalAlignment="Center" 
+                                           FontSize="15"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                    </ListBox>
                 </StackPanel>
-                <ListBox x:Name="SidebarListBox" BorderThickness="0"
-                         Background="Transparent" Margin="10,0" SelectedIndex="0"
-                         SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <Border x:Name="border" CornerRadius="10" Margin="5,4" Padding="20,15" Background="Transparent">
-                                            <ContentPresenter VerticalAlignment="Center"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="border" Property="Background" Value="{StaticResource SelectedBgBrush}"/>
-                                            </Trigger>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="border" Property="Background" Value="{StaticResource SelectedBgBrush}"/>
-                                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
-                                                <Setter Property="FontWeight" Value="Bold"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
 
-                    <ListBoxItem Tag="Dashboard">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🏠" Margin="0,0,15,0" FontSize="18"/>
-                            <TextBlock Text="나의 컬러 홈" VerticalAlignment="Center" FontSize="15"/>
-                        </StackPanel>
-                    </ListBoxItem>
-
-                    <ListBoxItem Tag="LiveAnalysis">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="✨" Margin="0,0,15,0" FontSize="18"/>
-                            <TextBlock Text="실시간 컬러 분석" VerticalAlignment="Center" FontSize="15"/>
-                        </StackPanel>
-                    </ListBoxItem>
-
-                    <ListBoxItem Tag="History">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📅" Margin="0,0,15,0" FontSize="18"/>
-                            <TextBlock Text="컬러 히스토리" VerticalAlignment="Center" FontSize="15"/>
-                        </StackPanel>
-                    </ListBoxItem>
-
-                    <ListBoxItem Tag="BeautyLog">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="💄" Margin="0,0,15,0" FontSize="18"/>
-                            <TextBlock Text="퍼스널 뷰티템" VerticalAlignment="Center" FontSize="15"/>
-                        </StackPanel>
-                    </ListBoxItem>
-
-                    <ListBoxItem Tag="Settings">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚙️" Margin="0,0,15,0" FontSize="18"/>
-                            <TextBlock Text="서비스 설정" VerticalAlignment="Center" FontSize="15"/>
-                        </StackPanel>
-                    </ListBoxItem>
-                </ListBox>
-            </DockPanel>
+                <!--사이드바 Bottom 영역-->
+                <StackPanel x:Name="SidebarBottomActions" Style="{StaticResource SidebarBottomActionsStyle}" Grid.Row="2" Margin="20,0,20,0" VerticalAlignment="Bottom">
+                    <Button Content="진단 시작" Style="{StaticResource AccentPillButtonStyle}" HorizontalAlignment="Stretch"/>
+                    <Button Content="진단 중지" Style="{StaticResource AccentOutlinePillButtonStyle}" Margin="0,12,0,0" HorizontalAlignment="Stretch"/>
+                    <TextBlock Text="© 2026 Colorlog Inc." FontSize="12" Foreground="{StaticResource MutedTextBrush}" Margin="0,12,0,0"/>
+                </StackPanel>
+            </Grid>
         </Border>
-        
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20">
-                <Button x:Name="BtnToggle" Content="☰" FontSize="20" 
-                        Background="Transparent" BorderBrush="Transparent"
-                        Cursor="Hand" Click="BtnToggle_Click" Margin="0,0,20,0"/>
+        <!--메인 영역-->
 
-                <TextBlock Text="오늘의 컬러를 찾아보세요" FontSize="20" FontWeight="Bold" 
-                           VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
-            </StackPanel>
-
-            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="20">
+        <Grid Grid.Column="1" Margin="10,20,20,20">
+            <Border>
                 <ContentControl x:Name ="ContentArea" Content="{Binding CurrentView}"/>
             </Border>
         </Grid>
+
     </Grid>
 </Window>
