@@ -62,6 +62,7 @@
 
         <Style.Triggers>
             <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed"/>
                 <DataTrigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>

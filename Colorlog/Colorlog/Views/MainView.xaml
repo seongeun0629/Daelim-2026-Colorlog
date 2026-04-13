@@ -13,16 +13,28 @@
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundBrush}">
 
-    <Window.DataContext>
-        <viewmodel:MainViewModel/>
-    </Window.DataContext>
-
     <Window.Resources>
 
         <conv:BoolToHAlignConverter x:Key="BoolToHAlignConverter"/>
-        
-        <DataTemplate x:Name="BeautyLogPage" DataType="{x:Type viewmodel:BeautyLogViewModel}">
+
+        <DataTemplate DataType="{x:Type viewmodel:DashboardViewModel}">
+            <views:DashboardView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewmodel:LiveAnalysisViewModel}">
+            <views:LiveAnalysisView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewmodel:HistoryViewModel}">
+            <views:HistoryView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewmodel:BeautyLogViewModel}">
             <views:BeautyLogView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewmodel:SettingsViewModel}">
+            <views:SettingsView/>
         </DataTemplate>
 
         <Storyboard x:Key="OpenSidebar">
@@ -110,8 +122,7 @@
                 <StackPanel Grid.Row="1" Margin="0,0,0,20" >
                     <ListBox x:Name="SidebarListBox" BorderThickness="0"
                          Background="Transparent" Margin="10,0" SelectedValuePath="Tag"
-                         SelectedIndex="0"
-                         SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}"
+                         SelectedValue="{Binding SelectedMenuTag, Mode=TwoWay}"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Disabled"
                          >
