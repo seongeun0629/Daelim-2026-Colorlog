@@ -1,14 +1,168 @@
-﻿<Page x:Class="Colorlog.Views.Pages.DashboardView"
+﻿<UserControl x:Class="Colorlog.Views.Pages.DashboardView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:Colorlog.Views.Pages"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="DashboardView">
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="900" d:DesignWidth="1100"
+      Background="Transparent">
 
-    <Grid>
-        <TextBlock Text="대시보드" FontSize="24" FontWeight="Bold" Margin="20"/>
-    </Grid>
-</Page>
+    <UserControl.Resources>
+        <Style x:Key="CardTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="19"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}"/>
+        </Style>
+
+        <Style x:Key="CardSubTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24,12,12,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,18">
+                <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님의 상태 요약}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TitleTextBrush}"/>
+                <TextBlock Text="{Binding LastDiagnosisAtText, StringFormat=최근 분석 {0}}" Margin="0,6,0,0" Style="{StaticResource CardSubTextStyle}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="컬러 요약" Style="{StaticResource CardTitleStyle}"/>
+                        <TextBlock Text="{Binding PersonalColorName, StringFormat=현재 퍼스널 컬러: {0}}" Margin="0,8,0,0" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
+                        <TextBlock Text="베스트 컬러" Margin="0,14,0,8" Style="{StaticResource CardSubTextStyle}"/>
+
+                        <ItemsControl ItemsSource="{Binding BestColors}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,10,10" Padding="10,8" CornerRadius="18" Background="#FFF8FAFC" BorderBrush="#FFE5E7EB" BorderThickness="1">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="16" Height="16" Fill="{Binding ToneBrush}" Stroke="#33000000" StrokeThickness="1"/>
+                                            <TextBlock Text="{Binding Name}" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="12"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="최근 화장품 추천 요약" Style="{StaticResource CardTitleStyle}"/>
+                        <TextBlock Text="내 톤과 피부 상태 기준 상위 추천 제품" Margin="0,6,0,14" Style="{StaticResource CardSubTextStyle}"/>
+
+                        <ItemsControl ItemsSource="{Binding RecentRecommendations}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,10" Padding="12" CornerRadius="10" Background="#FFF9FAFB" BorderBrush="#FFE5E7EB" BorderThickness="1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="{Binding Summary}" Margin="0,4,0,0" Style="{StaticResource CardSubTextStyle}"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" VerticalAlignment="Center" Background="#FFFFF1F2" BorderBrush="#FFFECACA" BorderThickness="1" CornerRadius="14" Padding="8,4">
+                                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="#FFBE123C" FontSize="12" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="피부 컨디션 지표" Style="{StaticResource CardTitleStyle}"/>
+                        <TextBlock Text="오늘 촬영 기준 핵심 지수" Margin="0,6,0,16" Style="{StaticResource CardSubTextStyle}"/>
+
+                        <ItemsControl ItemsSource="{Binding SkinMetrics}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="130"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+
+                                        <ProgressBar Grid.Column="1" Height="14" Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" VerticalAlignment="Center"/>
+
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Current, StringFormat={}{0}/100}" FontSize="12" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <Border Background="#FFF3F4F6" CornerRadius="12" Padding="8,3">
+                                                <TextBlock Text="{Binding StatusLabel}" FontSize="12" Foreground="{Binding AccentBrush}" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+                <Expander IsExpanded="False">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="피부톤 진단 결과 (Beta)" FontWeight="SemiBold" FontSize="15" Foreground="{StaticResource TitleTextBrush}"/>
+                            <TextBlock Text="  얼굴 부위별 평균 색상 인사이트" Style="{StaticResource CardSubTextStyle}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel Margin="0,14,0,4">
+                        <ItemsControl ItemsSource="{Binding FaceZoneTones}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,10,10" Padding="12,10" CornerRadius="10" BorderBrush="#FFE5E7EB" BorderThickness="1" Background="#FFF9FAFB">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Rectangle Width="28" Height="28" RadiusX="8" RadiusY="8" Fill="{Binding ZoneBrush}" Stroke="#33000000" StrokeThickness="1"/>
+                                            <StackPanel Margin="10,0,0,0">
+                                                <TextBlock Text="{Binding ZoneName}" FontSize="13" FontWeight="SemiBold"/>
+                                                <TextBlock Text="평균 톤 추출 완료" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

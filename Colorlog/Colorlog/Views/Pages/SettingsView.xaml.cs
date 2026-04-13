@@ -18,7 +18,7 @@ namespace Colorlog.Views.Pages
     /// <summary>
     /// SettingsView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class SettingsView : Page
+    public partial class SettingsView : UserControl
     {
         public SettingsView()
         {

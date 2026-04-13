@@ -18,7 +18,7 @@ namespace Colorlog.Views.Pages
     /// <summary>
     /// HistoryView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class HistoryView : Page
+    public partial class HistoryView : UserControl
     {
         public HistoryView()
         {

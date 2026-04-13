@@ -18,7 +18,7 @@ namespace Colorlog.Views.Pages
     /// <summary>
     /// LiveAnalysisView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class LiveAnalysisView : Page
+    public partial class LiveAnalysisView : UserControl
     {
         public LiveAnalysisView()
         {

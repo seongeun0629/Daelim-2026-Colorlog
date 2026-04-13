@@ -1,51 +1,66 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Colorlog.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
-        [ObservableProperty]
-        private object? _currentView;
+        [ObservableProperty] 
+        private object _currentView;
 
         [ObservableProperty]
-        private string _selectedMenuTag = "Dashboard";
+        private ListBoxItem? _selectedMenuItem;
 
-        public DashboardViewModel DashboardViewModel { get; }
-        public LiveAnalysisViewModel LiveAnalysisViewModel { get; }
-        public HistoryViewModel HistoryViewModel { get; }
-        public BeautyLogViewModel BeautyLogViewModel { get; }
-        public SettingsViewModel SettingsViewModel { get; }
+        public IRelayCommand ShowDashboardCommand { get; }
+        public IRelayCommand ShowLiveAnalysisCommand { get; }
+        public IRelayCommand ShowHistoryCommand { get; }
+        public IRelayCommand ShowBeautyLogCommand { get; }
+        public IRelayCommand ShowSettingsCommand { get; }
+
+        private readonly DashboardViewModel _dashboardViewModel;
+        private readonly LiveAnalysisViewModel _liveAnalysisViewModel;
+        private readonly HistoryViewModel _historyViewModel;
+        private readonly BeautyLogViewModel _beautyLogViewModel;
+        private readonly SettingsViewModel _settingsViewModel;
 
         [ObservableProperty]
         private bool _isSidebarExpanded = true;
-
         public MainViewModel()
         {
-            DashboardViewModel = new DashboardViewModel();
-            LiveAnalysisViewModel = new LiveAnalysisViewModel();
-            HistoryViewModel = new HistoryViewModel();
-            BeautyLogViewModel = new BeautyLogViewModel();
-            SettingsViewModel = new SettingsViewModel();
+            _dashboardViewModel = new DashboardViewModel();
+            _liveAnalysisViewModel = new LiveAnalysisViewModel();
+            _historyViewModel = new HistoryViewModel();
+            _beautyLogViewModel = new BeautyLogViewModel();
+            _settingsViewModel = new SettingsViewModel();
 
-            UpdateView();
+            ShowDashboardCommand = new RelayCommand(() => CurrentView = _dashboardViewModel);
+            ShowLiveAnalysisCommand = new RelayCommand(() => CurrentView = _liveAnalysisViewModel);
+            ShowHistoryCommand = new RelayCommand(() => CurrentView = _historyViewModel);
+            ShowBeautyLogCommand = new RelayCommand(() => CurrentView = _beautyLogViewModel);
+            ShowSettingsCommand = new RelayCommand(() => CurrentView = _settingsViewModel);
+
+            CurrentView = _dashboardViewModel;
         }
 
-        partial void OnSelectedMenuTagChanged(string value)
+        partial void OnSelectedMenuItemChanged(ListBoxItem? value)
         {
-            UpdateView();
-        }
+            if(value==null || value.Tag == null) return;
+            string tag = value.Tag.ToString()!;
 
-        private void UpdateView()
-        {
-            CurrentView = SelectedMenuTag switch
+            CurrentView = tag switch
             {
-                "Dashboard" => DashboardViewModel,
-                "LiveAnalysis" => LiveAnalysisViewModel,
-                "History" => HistoryViewModel,
-                "BeautyLog" => BeautyLogViewModel,
-                "Settings" => SettingsViewModel,
-                _ => DashboardViewModel
+                "Dashboard" => _dashboardViewModel,
+                "LiveAnalysis" => _liveAnalysisViewModel,
+                "History" => _historyViewModel,
+                "BeautyLog" => _beautyLogViewModel,
+                "Settings" => _settingsViewModel,
+                _ => CurrentView
             };
         }
 
@@ -54,5 +69,8 @@ namespace Colorlog.ViewModels
         {
             IsSidebarExpanded = !IsSidebarExpanded;
         }
+
+
+
     }
 }
