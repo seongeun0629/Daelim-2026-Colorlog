@@ -7,7 +7,5 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid>
-        <TextBlock Text="실시간 분석" FontSize="24" FontWeight="Bold" Margin="20"/>
-    </Grid>
+    <Grid/>
 </UserControl>
