@@ -120,12 +120,14 @@
                 </Grid>
                 <!--메뉴-->
                 <StackPanel Grid.Row="1" Margin="0,0,0,20" >
-                    <ListBox x:Name="SidebarListBox" BorderThickness="0"
-                         Background="Transparent" Margin="10,0" SelectedValuePath="Tag"
-                         SelectedValue="{Binding SelectedMenuTag, Mode=TwoWay}"
+                    <ListBox x:Name="SidebarListBox" 
+                         BorderThickness="0"
+                         Background="Transparent" 
+                         Margin="10,0"
+                         SelectedValuePath="Tag"
+                         SelectedValue="{Binding SelectedMenuTag, Mode=TwoWay}" 
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                         >
+                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Template">
