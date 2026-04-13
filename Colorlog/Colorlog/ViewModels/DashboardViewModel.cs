@@ -6,7 +6,7 @@ namespace Colorlog.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
-        public string UserDisplayName { get; } = "Yeon";
+        public string UserDisplayName { get; } = "유현성";
         public string LastDiagnosisAtText { get; } = "오늘 09:12";
 
         public string PersonalColorName { get; } = "봄 웜 라이트";

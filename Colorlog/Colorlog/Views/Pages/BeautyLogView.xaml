@@ -7,78 +7,174 @@
              d:DesignHeight="700" d:DesignWidth="1000">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="ProductCardTemplate">
-            <Border Width="280" Margin="0,0,12,12" Padding="14" 
-                    CornerRadius="14" Background="#FFFCFCFD" BorderBrush="#FFE5E7EB" BorderThickness="1">
-                <StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+        <Style x:Key="ProductCardContainerStyle" TargetType="Border">
+            <Setter Property="MinWidth" Value="236"/>
+            <Setter Property="MaxWidth" Value="320"/>
+            <Setter Property="Margin" Value="0,0,16,16"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Background" Value="#FFFCFCFD"/>
+            <Setter Property="BorderBrush" Value="#FFE5E7EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.06" Color="#FF111827"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#FFD1D5DB"/>
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.12" Color="#FF111827"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <TranslateTransform Y="-2"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" 
-                                       Foreground="{StaticResource TextPrimaryBrush}"/>
-                            <TextBlock Text="{Binding Category}" Margin="0,3,0,0" FontSize="12" 
-                                       Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold"/>
-                        </StackPanel>
+        <Style x:Key="TagChipStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="Background" Value="#FFE5E7EB"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
 
-                        <Border Grid.Column="1" VerticalAlignment="Top" Background="#FFFFF1F2" 
-                                BorderBrush="#FFFECACA" BorderThickness="1" CornerRadius="12" Padding="8,3">
-                            <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" 
-                                       Foreground="#FFBE123C" FontSize="12" FontWeight="SemiBold"/>
-                        </Border>
-                    </Grid>
+        <DataTemplate x:Key="MakeupProductCardTemplate">
+            <Border Style="{StaticResource ProductCardContainerStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="4"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                    <TextBlock Text="{Binding RecommendationReason}" Margin="0,10,0,10" FontSize="12" 
-                               Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                    <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="14,14,0,0"/>
 
-                    <ItemsControl ItemsSource="{Binding Tags}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="0,0,6,6" Padding="8,3" Background="#FFF3F4F6" 
-                                        CornerRadius="10">
-                                    <TextBlock Text="{Binding}" FontSize="11" 
-                                               Foreground="{StaticResource MutedTextBrush}"/>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                    <StackPanel Grid.Row="1" Margin="14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <Border Grid.Column="1" VerticalAlignment="Top" Background="#FFFFF1F2" BorderBrush="#FFFECACA" BorderThickness="1" CornerRadius="12" Padding="8,3">
+                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="#FFBE123C" FontSize="12" FontWeight="SemiBold"/>
+                            </Border>
+                        </Grid>
+
+                        <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
+
+                        <ItemsControl ItemsSource="{Binding Tags}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource TagChipStyle}">
+                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="#FF4B5563"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SkinCareProductCardTemplate">
+            <Border Style="{StaticResource ProductCardContainerStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="4"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="{StaticResource SuccessBrush}" CornerRadius="14,14,0,0"/>
+
+                    <StackPanel Grid.Row="1" Margin="14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <Border Grid.Column="1" VerticalAlignment="Top" Background="#FFECFDF5" BorderBrush="#FFA7F3D0" BorderThickness="1" CornerRadius="12" Padding="8,3">
+                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="#FF047857" FontSize="12" FontWeight="SemiBold"/>
+                            </Border>
+                        </Grid>
+
+                        <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
+
+                        <ItemsControl ItemsSource="{Binding Tags}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource TagChipStyle}">
+                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="#FF4B5563"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
+                    </StackPanel>
+                </Grid>
             </Border>
         </DataTemplate>
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <Grid Margin="24,12,12,18">
+        <Grid Margin="24,16,16,24">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,14">
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
                 <TextBlock Text="Beauty Log" FontSize="28" FontWeight="Bold" 
                            Foreground="{StaticResource TitleTextBrush}"/>
-                <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님을 위한 톤/피부 맞춤 추천 요약}" 
-                           Margin="0,6,0,0" Style="{StaticResource BeautySubStyle}"/>
+                <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님을 위한 톤/피부 맞춤 추천 요약}" Margin="0,8,0,0" Style="{StaticResource BeautySubStyle}"/>
+                <TextBlock Text="추천은 최근 톤 분석/피부 컨디션 기준으로 매일 업데이트됩니다." Margin="0,8,0,0" FontSize="12" Foreground="{StaticResource MutedTextBrush}"/>
             </StackPanel>
 
-            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,10,16">
+            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,16,16">
                 <StackPanel>
                     <TextBlock Text="오늘의 추천 기준" Style="{StaticResource BeautyHeaderStyle}"/>
-                    <TextBlock Text="{Binding ToneSummary}" Margin="0,10,0,0" FontSize="14" 
+                    <TextBlock Text="{Binding ToneSummary}" Margin="0,8,0,0" FontSize="14" 
                                FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
-                    <TextBlock Text="{Binding SkinConditionSummary}" Margin="0,6,0,10" 
+                    <TextBlock Text="{Binding SkinConditionSummary}" Margin="0,8,0,8" 
                                Style="{StaticResource BeautySubStyle}"/>
 
-                    <ItemsControl ItemsSource="{Binding FocusKeywords}">
+                    <ItemsControl ItemsSource="{Binding FocusKeywords}" Margin="0,0,0,8">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel/>
@@ -98,16 +194,16 @@
                 </StackPanel>
             </Border>
 
-            <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,10,10">
+            <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,16,16">
                 <TabControl Style="{StaticResource BeautyTabControlStyle}" Background="Transparent" 
                             BorderThickness="0" ItemContainerStyle="{StaticResource BeautyTabItemStyle}" 
                             UseLayoutRounding="True" SnapsToDevicePixels="True">
                     <TabItem Header="🎨 색조 메이크업">
-                        <StackPanel Margin="10,12,0,0">
+                        <StackPanel Margin="8,16,0,0">
                             <TextBlock Text="톤 매칭률과 발색 지속력이 좋은 제품 추천" 
-                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,12"/>
+                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,16"/>
                             <ItemsControl ItemsSource="{Binding MakeupItems}" 
-                                          ItemTemplate="{StaticResource ProductCardTemplate}">
+                                          ItemTemplate="{StaticResource MakeupProductCardTemplate}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel/>
@@ -118,11 +214,11 @@
                     </TabItem>
 
                     <TabItem Header="🧴 기초 스킨케어">
-                        <StackPanel Margin="10,12,0,0">
+                        <StackPanel Margin="8,16,0,0">
                             <TextBlock Text="수분/진정/장벽 중심으로 오늘 상태에 맞춘 제품 추천" 
-                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,12"/>
+                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,16"/>
                             <ItemsControl ItemsSource="{Binding SkinCareItems}" 
-                                          ItemTemplate="{StaticResource ProductCardTemplate}">
+                                          ItemTemplate="{StaticResource SkinCareProductCardTemplate}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel/>

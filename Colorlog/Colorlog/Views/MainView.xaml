@@ -123,7 +123,7 @@
                     <ListBox x:Name="SidebarListBox" 
                          BorderThickness="0"
                          Background="Transparent" 
-                         Margin="10,0"
+                         Margin="8,0"
                          SelectedValuePath="Tag"
                          SelectedValue="{Binding SelectedMenuTag, Mode=TwoWay}" 
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -133,20 +133,34 @@
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="ListBoxItem">
-                                            <Border x:Name="border" CornerRadius="10" Margin="5,4" Padding="0,15" Background="Transparent">
-                                                <ContentPresenter VerticalAlignment="Center"
-                                                                  HorizontalAlignment="{Binding DataContext.IsSidebarExpanded, 
-                                                                  RelativeSource={RelativeSource AncestorType=Window}, 
-                                                                  Converter={StaticResource BoolToHAlignConverter}}"/>
+                                            <Border x:Name="border" CornerRadius="12" Margin="4,4" Padding="0,12" Background="Transparent">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="4"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="activeIndicator"
+                                                            Grid.Column="0"
+                                                            Margin="0,4,0,4"
+                                                            CornerRadius="2"
+                                                            Background="{StaticResource PrimaryBrush}"
+                                                            Opacity="0"/>
+                                                    <ContentPresenter Grid.Column="1"
+                                                                      VerticalAlignment="Center"
+                                                                      HorizontalAlignment="{Binding DataContext.IsSidebarExpanded, 
+                                                                      RelativeSource={RelativeSource AncestorType=Window}, 
+                                                                      Converter={StaticResource BoolToHAlignConverter}}"/>
+                                                </Grid>
                                             </Border>
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SelectedBgBrush}"/>
+                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SidebarHoverBgBrush}"/>
                                                 </Trigger>
                                                 <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SelectedBgBrush}"/>
-                                                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
-                                                    <Setter Property="FontWeight" Value="Bold"/>
+                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SidebarSelectedBgBrush}"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource SidebarSelectedTextBrush}"/>
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                    <Setter TargetName="activeIndicator" Property="Opacity" Value="1"/>
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -157,48 +171,48 @@
                             
                         </ListBox.ItemContainerStyle>
 
-                        <ListBoxItem Tag="Dashboard" Cursor="Hand">
+                        <ListBoxItem Tag="Dashboard" Cursor="Hand" ToolTip="나의 컬러 홈">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="🏠" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="🏠" Width="38" FontSize="17" TextAlignment="Center"/>
                                 <TextBlock Text="나의 컬러 홈" Style="{StaticResource SidebarLabelStyle}" 
                                            VerticalAlignment="Center" 
-                                           FontSize="15"/>
+                                           FontSize="14"/>
                             </StackPanel>
                         </ListBoxItem>
 
-                        <ListBoxItem Tag="LiveAnalysis" Cursor="Hand">
+                        <ListBoxItem Tag="LiveAnalysis" Cursor="Hand" ToolTip="실시간 컬러 분석">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="✨" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="✨" Width="38" FontSize="17" TextAlignment="Center"/>
                                 <TextBlock Text="실시간 컬러 분석" Style="{StaticResource SidebarLabelStyle}" 
                                            VerticalAlignment="Center" 
-                                           FontSize="15"/>
+                                           FontSize="14"/>
                             </StackPanel>
                         </ListBoxItem>
 
-                        <ListBoxItem Tag="History" Cursor="Hand">
+                        <ListBoxItem Tag="History" Cursor="Hand" ToolTip="컬러 히스토리">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="📅" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="📅" Width="38" FontSize="17" TextAlignment="Center"/>
                                 <TextBlock Text="컬러 히스토리" Style="{StaticResource SidebarLabelStyle}" 
                                            VerticalAlignment="Center" 
-                                           FontSize="15"/>
+                                           FontSize="14"/>
                             </StackPanel>
                         </ListBoxItem>
 
-                        <ListBoxItem Tag="BeautyLog" Cursor="Hand">
+                        <ListBoxItem Tag="BeautyLog" Cursor="Hand" ToolTip="퍼스널 뷰티템">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="💄" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="💄" Width="38" FontSize="17" TextAlignment="Center"/>
                                 <TextBlock Text="퍼스널 뷰티템" Style="{StaticResource SidebarLabelStyle}" 
                                            VerticalAlignment="Center" 
-                                           FontSize="15"/>
+                                           FontSize="14"/>
                             </StackPanel>
                         </ListBoxItem>
 
-                        <ListBoxItem Tag="Settings" Cursor="Hand">
+                        <ListBoxItem Tag="Settings" Cursor="Hand" ToolTip="서비스 설정">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="⚙️" Width="40" FontSize="18" TextAlignment="Center"/>
+                                <TextBlock Text="⚙️" Width="38" FontSize="17" TextAlignment="Center"/>
                                 <TextBlock Text="서비스 설정" Style="{StaticResource SidebarLabelStyle}" 
                                            VerticalAlignment="Center" 
-                                           FontSize="15"/>
+                                           FontSize="14"/>
                             </StackPanel>
                         </ListBoxItem>
                     </ListBox>

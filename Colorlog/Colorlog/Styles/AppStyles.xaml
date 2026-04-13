@@ -16,6 +16,9 @@
 
     <SolidColorBrush x:Key="TitleTextBrush" Color="#FF1F2937"/>
     <SolidColorBrush x:Key="MutedTextBrush" Color="#FF6B7280"/>
+    <SolidColorBrush x:Key="SidebarHoverBgBrush" Color="#FFFBEDEF"/>
+    <SolidColorBrush x:Key="SidebarSelectedBgBrush" Color="#FFF6DDE2"/>
+    <SolidColorBrush x:Key="SidebarSelectedTextBrush" Color="#FFB24E67"/>
     
     
     
