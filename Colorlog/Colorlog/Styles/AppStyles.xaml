@@ -37,7 +37,6 @@
     <SolidColorBrush x:Key="SurfaceSubtleBrush" Color="#FFF9FAFB"/>
     <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#FFF8FAFC"/>
     <SolidColorBrush x:Key="SurfaceCardShellBrush" Color="#FFFCFCFD"/>
-    <SolidColorBrush x:Key="SurfaceToggleIdleBrush" Color="#FFF5F5F5"/>
     <SolidColorBrush x:Key="NeutralChipBackgroundBrush" Color="#FFE5E7EB"/>
 
     <!-- 로즈 톤 (메이크업 배지·설정 UI) -->
@@ -564,53 +563,6 @@
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-    </Style>
-
-    <!-- 추구미 그룹 레이블 -->
-    <Style x:Key="VibeGroupLabelStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
-        <Setter Property="Margin" Value="2,0,0,6"/>
-    </Style>
-
-    <!-- 추구미 토글 버튼 스타일 -->
-    <Style x:Key="VibeToggleStyle" TargetType="ToggleButton">
-        <Setter Property="Margin" Value="0,0,6,0"/>
-        <Setter Property="Padding" Value="12,6"/>
-        <Setter Property="Height" Value="30"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Background" Value="{StaticResource SurfaceToggleIdleBrush}"/>
-        <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource NeutralBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="border"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="15"
-                        Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource RoseSelectedBackgroundBrush}"/>
-                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource RoseSelectedBorderBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource RoseEmphasisTextBrush}"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource RoseSoftBackgroundBrush}"/>
-                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource RoseOutlineLightBrush}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
 
     <!-- 아웃라인 버튼 스타일 -->
