@@ -328,12 +328,34 @@
         <Setter Property="Padding" Value="8,3"/>
     </Style>
 
+    <!-- 대시보드 피부 지표 등: OS 기본색 대신 앱 토큰 -->
+    <Style x:Key="DashboardProgressBarStyle" TargetType="ProgressBar">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceMutedBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="PART_Track" CornerRadius="5" Background="{TemplateBinding Background}"/>
+                        <Border x:Name="PART_Indicator" CornerRadius="5" Background="{TemplateBinding Foreground}" HorizontalAlignment="Left"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Beauty Log · 제품 카드 -->
     <Style x:Key="ProductCardContainerStyle" TargetType="Border">
         <Setter Property="MinWidth" Value="236"/>
         <Setter Property="MaxWidth" Value="320"/>
         <Setter Property="Margin" Value="0,0,16,16"/>
         <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="Background" Value="{StaticResource SurfaceCardShellBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource NeutralBorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
@@ -559,7 +581,7 @@
         </Setter>
     </Style>
 
-    <!-- 설정 화면 · 폼 공통 (SettingsView 등) -->
+<!-- 설정 화면 · 폼 공통 (SettingsView 등) -->
     <!-- 설정 라벨 스타일 -->
     <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13"/>

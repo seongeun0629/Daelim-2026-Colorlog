@@ -226,7 +226,7 @@
 
         <!--메인 영역-->
 
-        <Grid Grid.Column="1" Margin="10,20,20,20">
+        <Grid Grid.Column="1" Margin="0,20,20,20">
             <Border>
                 <ContentControl x:Name ="ContentArea" Content="{Binding CurrentView}"/>
             </Border>

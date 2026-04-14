@@ -4,111 +4,114 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="700" d:DesignWidth="1000">
+             d:DesignHeight="700" d:DesignWidth="1000"
+             Background="Transparent"
+             SnapsToDevicePixels="True"
+             UseLayoutRounding="True">
 
     <UserControl.Resources>
         <DataTemplate x:Key="MakeupProductCardTemplate">
             <Border Style="{StaticResource ProductCardContainerStyle}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="4"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <!-- 한 장의 면: 위만 강조색, 경계는 수평 직선(아래는 면색). 테두리 곡선은 카드와 동일 -->
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FFFF8A8A" Offset="0"/>
+                        <GradientStop Color="#FFFF8A8A" Offset="0.028"/>
+                        <GradientStop Color="#FFFCFCFD" Offset="0.028"/>
+                        <GradientStop Color="#FFFCFCFD" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <StackPanel Margin="14,16,14,14" SnapsToDevicePixels="True">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="14,14,0,0"/>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
 
-                    <StackPanel Grid.Row="1" Margin="14">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                        <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource RoseSoftBackgroundBrush}" BorderBrush="{StaticResource RoseBadgeBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
+                            <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource RoseEmphasisTextBrush}" FontSize="12" FontWeight="SemiBold"/>
+                        </Border>
+                    </Grid>
 
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold"/>
-                            </StackPanel>
+                    <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
 
-                            <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource RoseSoftBackgroundBrush}" BorderBrush="{StaticResource RoseBadgeBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
-                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource RoseEmphasisTextBrush}" FontSize="12" FontWeight="SemiBold"/>
-                            </Border>
-                        </Grid>
+                    <ItemsControl ItemsSource="{Binding Tags}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource TagChipStyle}">
+                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                        <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
-
-                        <ItemsControl ItemsSource="{Binding Tags}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource TagChipStyle}">
-                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
-                    </StackPanel>
-                </Grid>
+                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
+                </StackPanel>
             </Border>
         </DataTemplate>
 
         <DataTemplate x:Key="SkinCareProductCardTemplate">
             <Border Style="{StaticResource ProductCardContainerStyle}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="4"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FF4CAF50" Offset="0"/>
+                        <GradientStop Color="#FF4CAF50" Offset="0.028"/>
+                        <GradientStop Color="#FFFCFCFD" Offset="0.028"/>
+                        <GradientStop Color="#FFFCFCFD" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <StackPanel Margin="14,16,14,14" SnapsToDevicePixels="True">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Border Grid.Row="0" Background="{StaticResource SuccessBrush}" CornerRadius="14,14,0,0"/>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
 
-                    <StackPanel Grid.Row="1" Margin="14">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                        <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource SuccessSoftBackgroundBrush}" BorderBrush="{StaticResource SuccessSoftBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
+                            <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource SuccessDeepTextBrush}" FontSize="12" FontWeight="SemiBold"/>
+                        </Border>
+                    </Grid>
 
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"/>
-                            </StackPanel>
+                    <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
 
-                            <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource SuccessSoftBackgroundBrush}" BorderBrush="{StaticResource SuccessSoftBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
-                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource SuccessDeepTextBrush}" FontSize="12" FontWeight="SemiBold"/>
-                            </Border>
-                        </Grid>
+                    <ItemsControl ItemsSource="{Binding Tags}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource TagChipStyle}">
+                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                        <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
-
-                        <ItemsControl ItemsSource="{Binding Tags}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource TagChipStyle}">
-                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
-                    </StackPanel>
-                </Grid>
+                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
+                </StackPanel>
             </Border>
         </DataTemplate>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  SnapsToDevicePixels="True" UseLayoutRounding="True">
         <Grid Margin="{StaticResource AppShellPagePadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -116,13 +119,13 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel Grid.Row="0" Margin="0,0,0,24">
                 <TextBlock Text="Beauty Log" Style="{StaticResource PageHeaderTitleStyle}"/>
-                <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님을 위한 톤/피부 맞춤 추천 요약}" Margin="0,8,0,0" Style="{StaticResource BeautySubStyle}"/>
-                <TextBlock Text="추천은 최근 톤 분석/피부 컨디션 기준으로 매일 업데이트됩니다." Margin="0,8,0,0" FontSize="12" Foreground="{StaticResource MutedTextBrush}"/>
+                <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님을 위한 톤/피부 맞춤 추천 요약}" Style="{StaticResource PageHeaderSubtitleStyle}"/>
+                <TextBlock Text="추천은 최근 톤 분석/피부 컨디션 기준으로 매일 업데이트됩니다." Style="{StaticResource PageHeaderHintStyle}"/>
             </StackPanel>
 
-            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,16,16">
+            <Border x:Name="BeautyCriteriaCard" Grid.Row="1" Style="{StaticResource DashboardCardStyle}" Margin="10,10,10,16">
                 <StackPanel>
                     <TextBlock Text="오늘의 추천 기준" Style="{StaticResource BeautyHeaderStyle}"/>
                     <TextBlock Text="{Binding ToneSummary}" Margin="0,8,0,0" FontSize="14" 
@@ -150,7 +153,7 @@
                 </StackPanel>
             </Border>
 
-            <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,16,16">
+            <Border x:Name="BeautyTabsCard" Grid.Row="2" Style="{StaticResource DashboardCardStyle}" Margin="10,0,10,10">
                 <TabControl Style="{StaticResource BeautyTabControlStyle}" Background="Transparent" 
                             BorderThickness="0" ItemContainerStyle="{StaticResource BeautyTabItemStyle}" 
                             UseLayoutRounding="True" SnapsToDevicePixels="True">

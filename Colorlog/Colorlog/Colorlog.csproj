@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Resource Include="Assets\user.png" />
-    <Resource Include="Assets\light.png" />
   </ItemGroup>
 
 </Project>

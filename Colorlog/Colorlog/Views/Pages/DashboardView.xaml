@@ -5,9 +5,14 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
       d:DesignHeight="900" d:DesignWidth="1100"
-      Background="Transparent">
+      Background="Transparent"
+      SnapsToDevicePixels="True"
+      UseLayoutRounding="True"
+      Loaded="UserControl_Loaded"
+      SizeChanged="UserControl_SizeChanged">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  SnapsToDevicePixels="True" UseLayoutRounding="True">
         <Grid Margin="{StaticResource AppShellPagePadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -16,12 +21,12 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Margin="0,0,0,24">
-                <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님의 상태 요약}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TitleTextBrush}"/>
-                <TextBlock Text="{Binding LastDiagnosisAtText, StringFormat=최근 분석 {0}}" Margin="0,8,0,0" Style="{StaticResource DashboardCardSubTextStyle}"/>
-                <TextBlock Text="오늘의 톤/피부 상태를 빠르게 확인하고 바로 다음 액션으로 이어가세요." Margin="0,8,0,0" FontSize="12" Foreground="{StaticResource MutedTextBrush}"/>
+                <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님의 상태 요약}" Style="{StaticResource PageHeaderTitleStyle}"/>
+                <TextBlock Text="{Binding LastDiagnosisAtText, StringFormat=최근 분석 {0}}" Style="{StaticResource PageHeaderSubtitleStyle}"/>
+                <TextBlock Text="오늘의 톤/피부 상태를 빠르게 확인하고 바로 다음 액션으로 이어가세요." Style="{StaticResource PageHeaderHintStyle}"/>
             </StackPanel>
 
-            <Grid Grid.Row="1">
+            <Grid x:Name="DashboardTopCardsGrid" Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -31,7 +36,7 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="DashboardColorSummaryCard" Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="컬러 요약" Style="{StaticResource DashboardCardTitleStyle}"/>
                         <TextBlock Text="{Binding PersonalColorName, StringFormat=현재 퍼스널 컬러: {0}}" Margin="0,8,0,0" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
@@ -57,7 +62,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="DashboardRecommendCard" Grid.Row="0" Grid.Column="1" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="최근 화장품 추천 요약" Style="{StaticResource DashboardCardTitleStyle}"/>
                         <TextBlock Text="내 톤과 피부 상태 기준 상위 추천 제품" Margin="0,8,0,16" Style="{StaticResource DashboardCardSubTextStyle}"/>
@@ -86,7 +91,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="DashboardSkinMetricsCard" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="피부 컨디션 지표" Style="{StaticResource DashboardCardTitleStyle}"/>
                         <TextBlock Text="오늘 촬영 기준 핵심 지수" Margin="0,8,0,16" Style="{StaticResource DashboardCardSubTextStyle}"/>
@@ -101,9 +106,10 @@
                                             <ColumnDefinition Width="130"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
 
-                                        <ProgressBar Grid.Column="1" Height="12" Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" VerticalAlignment="Center"/>
+                                        <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" VerticalAlignment="Center"
+                                                     Style="{StaticResource DashboardProgressBarStyle}"/>
 
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Current, StringFormat={}{0}/100}" FontSize="12" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
