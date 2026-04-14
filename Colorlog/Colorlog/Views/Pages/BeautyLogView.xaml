@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Colorlog.Views.Pages.BeautyLogView"
+<UserControl x:Class="Colorlog.Views.Pages.BeautyLogView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,49 +7,6 @@
              d:DesignHeight="700" d:DesignWidth="1000">
 
     <UserControl.Resources>
-        <Style x:Key="ProductCardContainerStyle" TargetType="Border">
-            <Setter Property="MinWidth" Value="236"/>
-            <Setter Property="MaxWidth" Value="320"/>
-            <Setter Property="Margin" Value="0,0,16,16"/>
-            <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Background" Value="#FFFCFCFD"/>
-            <Setter Property="BorderBrush" Value="#FFE5E7EB"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-            <Setter Property="RenderTransform">
-                <Setter.Value>
-                    <TranslateTransform/>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.06" Color="#FF111827"/>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="#FFD1D5DB"/>
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.12" Color="#FF111827"/>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <TranslateTransform Y="-2"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="TagChipStyle" TargetType="Border">
-            <Setter Property="Margin" Value="0,0,6,6"/>
-            <Setter Property="Padding" Value="8,3"/>
-            <Setter Property="Background" Value="#FFE5E7EB"/>
-            <Setter Property="CornerRadius" Value="10"/>
-        </Style>
-
         <DataTemplate x:Key="MakeupProductCardTemplate">
             <Border Style="{StaticResource ProductCardContainerStyle}">
                 <Grid>
@@ -72,8 +29,8 @@
                                 <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold"/>
                             </StackPanel>
 
-                            <Border Grid.Column="1" VerticalAlignment="Top" Background="#FFFFF1F2" BorderBrush="#FFFECACA" BorderThickness="1" CornerRadius="12" Padding="8,3">
-                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="#FFBE123C" FontSize="12" FontWeight="SemiBold"/>
+                            <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource RoseSoftBackgroundBrush}" BorderBrush="{StaticResource RoseBadgeBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
+                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource RoseEmphasisTextBrush}" FontSize="12" FontWeight="SemiBold"/>
                             </Border>
                         </Grid>
 
@@ -88,7 +45,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Style="{StaticResource TagChipStyle}">
-                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="#FF4B5563"/>
+                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -122,8 +79,8 @@
                                 <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"/>
                             </StackPanel>
 
-                            <Border Grid.Column="1" VerticalAlignment="Top" Background="#FFECFDF5" BorderBrush="#FFA7F3D0" BorderThickness="1" CornerRadius="12" Padding="8,3">
-                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="#FF047857" FontSize="12" FontWeight="SemiBold"/>
+                            <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource SuccessSoftBackgroundBrush}" BorderBrush="{StaticResource SuccessSoftBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
+                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource SuccessDeepTextBrush}" FontSize="12" FontWeight="SemiBold"/>
                             </Border>
                         </Grid>
 
@@ -138,7 +95,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Style="{StaticResource TagChipStyle}">
-                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="#FF4B5563"/>
+                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -152,7 +109,7 @@
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <Grid Margin="24,16,16,24">
+        <Grid Margin="{StaticResource AppShellPagePadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -160,8 +117,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="Beauty Log" FontSize="28" FontWeight="Bold" 
-                           Foreground="{StaticResource TitleTextBrush}"/>
+                <TextBlock Text="Beauty Log" Style="{StaticResource PageHeaderTitleStyle}"/>
                 <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님을 위한 톤/피부 맞춤 추천 요약}" Margin="0,8,0,0" Style="{StaticResource BeautySubStyle}"/>
                 <TextBlock Text="추천은 최근 톤 분석/피부 컨디션 기준으로 매일 업데이트됩니다." Margin="0,8,0,0" FontSize="12" Foreground="{StaticResource MutedTextBrush}"/>
             </StackPanel>
@@ -183,7 +139,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Margin="0,0,8,8" Padding="10,5" 
-                                        Background="#FFF9FAFB" BorderBrush="#FFE5E7EB" 
+                                        Background="{StaticResource SurfaceSubtleBrush}" BorderBrush="{StaticResource NeutralBorderBrush}" 
                                         BorderThickness="1" CornerRadius="12">
                                     <TextBlock Text="{Binding}" FontSize="12" 
                                                Foreground="{StaticResource MutedTextBrush}"/>

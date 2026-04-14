@@ -19,9 +19,49 @@
     <SolidColorBrush x:Key="SidebarHoverBgBrush" Color="#FFFBEDEF"/>
     <SolidColorBrush x:Key="SidebarSelectedBgBrush" Color="#FFF6DDE2"/>
     <SolidColorBrush x:Key="SidebarSelectedTextBrush" Color="#FFB24E67"/>
-    
-    
-    
+
+    <!-- 디자인 토큰: Effect/그라데이션용 Color -->
+    <Color x:Key="ShadowSlate900Color">#FF111827</Color>
+    <Color x:Key="GlassBorderHighlightStopColor">#CCFFFFFF</Color>
+    <Color x:Key="GlassBorderFeatherStopColor">#22FFFFFF</Color>
+
+    <Thickness x:Key="AppShellPagePadding">24,12,12,24</Thickness>
+
+    <SolidColorBrush x:Key="WhiteBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="ShellGlassFaceBrush" Color="#FFFFFFFF" Opacity="0.6"/>
+
+    <!-- 중립 표면 · 보더 -->
+    <SolidColorBrush x:Key="NeutralBorderBrush" Color="#FFE5E7EB"/>
+    <SolidColorBrush x:Key="NeutralBorderStrongBrush" Color="#FFD1D5DB"/>
+    <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#FFF3F4F6"/>
+    <SolidColorBrush x:Key="SurfaceSubtleBrush" Color="#FFF9FAFB"/>
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#FFF8FAFC"/>
+    <SolidColorBrush x:Key="SurfaceCardShellBrush" Color="#FFFCFCFD"/>
+    <SolidColorBrush x:Key="SurfaceToggleIdleBrush" Color="#FFF5F5F5"/>
+    <SolidColorBrush x:Key="NeutralChipBackgroundBrush" Color="#FFE5E7EB"/>
+
+    <!-- 로즈 톤 (메이크업 배지·설정 UI) -->
+    <SolidColorBrush x:Key="RoseSoftBackgroundBrush" Color="#FFFFF1F2"/>
+    <SolidColorBrush x:Key="RoseBadgeBorderBrush" Color="#FFFECACA"/>
+    <SolidColorBrush x:Key="RoseSelectedBackgroundBrush" Color="#FFFCE4E8"/>
+    <SolidColorBrush x:Key="RoseSelectedBorderBrush" Color="#FFE08E9B"/>
+    <SolidColorBrush x:Key="RoseEmphasisTextBrush" Color="#FFBE123C"/>
+    <SolidColorBrush x:Key="RoseOutlineLightBrush" Color="#FFFECDD3"/>
+
+    <!-- 위험 액션 -->
+    <SolidColorBrush x:Key="DangerSurfaceBackgroundBrush" Color="#FFFFF8F8"/>
+    <SolidColorBrush x:Key="DangerStrongTextBrush" Color="#FFDC2626"/>
+    <SolidColorBrush x:Key="DangerOutlineBorderBrush" Color="#FFFCA5A5"/>
+
+    <!-- 스킨케어 성공 톤 -->
+    <SolidColorBrush x:Key="SuccessSoftBackgroundBrush" Color="#FFECFDF5"/>
+    <SolidColorBrush x:Key="SuccessSoftBorderBrush" Color="#FFA7F3D0"/>
+    <SolidColorBrush x:Key="SuccessDeepTextBrush" Color="#FF047857"/>
+
+    <!-- 칩·스와치 -->
+    <SolidColorBrush x:Key="SwatchStrokeBrush" Color="#33000000"/>
+    <SolidColorBrush x:Key="CaptionOnNeutralBrush" Color="#FF4B5563"/>
+
     <!--사이드바-->
     <Style x:Key="SidebarNavButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
@@ -239,6 +279,98 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- Dashboard 페이지 -->
+    <Style x:Key="DashboardCardTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="19"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardCardSubTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardCardStyle" TargetType="Border" BasedOn="{StaticResource CardStyle}">
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.08" Color="{StaticResource ShadowSlate900Color}"/>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.14" Color="{StaticResource ShadowSlate900Color}"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <TranslateTransform Y="-2"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DashboardMetricTagStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SurfaceMutedBrush}"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="8,3"/>
+    </Style>
+
+    <!-- Beauty Log · 제품 카드 -->
+    <Style x:Key="ProductCardContainerStyle" TargetType="Border">
+        <Setter Property="MinWidth" Value="236"/>
+        <Setter Property="MaxWidth" Value="320"/>
+        <Setter Property="Margin" Value="0,0,16,16"/>
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceCardShellBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeutralBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.06" Color="{StaticResource ShadowSlate900Color}"/>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource NeutralBorderStrongBrush}"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.12" Color="{StaticResource ShadowSlate900Color}"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <TranslateTransform Y="-2"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TagChipStyle" TargetType="Border">
+        <Setter Property="Margin" Value="0,0,6,6"/>
+        <Setter Property="Padding" Value="8,3"/>
+        <Setter Property="Background" Value="{StaticResource NeutralChipBackgroundBrush}"/>
+        <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
 <!--Primary 버튼 스타일-->
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
@@ -310,12 +442,39 @@
         </Style.Triggers>
     </Style>
     
-    <!--섹션 타이틀-->
+    <!--섹션 타이틀 (큰 블록/옛 화면용)-->
     <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="20"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
         <Setter Property="Margin" Value="0,0,0,20"/>
+    </Style>
+
+    <!-- 카드 내부 소제목 (SettingsView 등 통일) -->
+    <Style x:Key="CardSectionTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+    </Style>
+
+    <!-- 페이지 최상단 타이틀 -->
+    <Style x:Key="PageHeaderTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}"/>
+    </Style>
+
+    <Style x:Key="PageHeaderSubtitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+        <Setter Property="Margin" Value="0,6,0,0"/>
+    </Style>
+
+    <Style x:Key="PageHeaderHintStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+        <Setter Property="Margin" Value="0,8,0,0"/>
     </Style>
 
     <Style x:Key="BeautyHeaderStyle" TargetType="TextBlock">
@@ -393,6 +552,164 @@
                         <Border Grid.Row="1" Background="Transparent">
                             <ContentPresenter ContentSource="SelectedContent"/>
                         </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 설정 화면 · 폼 공통 (SettingsView 등) -->
+    <!-- 설정 라벨 스타일 -->
+    <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- 추구미 그룹 레이블 -->
+    <Style x:Key="VibeGroupLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+        <Setter Property="Margin" Value="2,0,0,6"/>
+    </Style>
+
+    <!-- 추구미 토글 버튼 스타일 -->
+    <Style x:Key="VibeToggleStyle" TargetType="ToggleButton">
+        <Setter Property="Margin" Value="0,0,6,0"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceToggleIdleBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeutralBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="15"
+                        Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource RoseSelectedBackgroundBrush}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource RoseSelectedBorderBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource RoseEmphasisTextBrush}"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource RoseSoftBackgroundBrush}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource RoseOutlineLightBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 아웃라인 버튼 스타일 -->
+    <Style x:Key="OutlineButtonStyle" TargetType="Button">
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="16"
+                        Padding="14,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource RoseSoftBackgroundBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 위험 아웃라인 버튼 (초기화) -->
+    <Style x:Key="DangerOutlineButtonStyle" TargetType="Button">
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource DangerStrongTextBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DangerOutlineBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="16"
+                        Padding="14,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource RoseSoftBackgroundBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 슬라이더 스타일 -->
+    <Style x:Key="LightSliderStyle" TargetType="Slider">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <Track x:Name="PART_Track">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="4" CornerRadius="2" Background="{StaticResource PrimaryBrush}"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="4" CornerRadius="2" Background="{StaticResource NeutralBorderBrush}"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Ellipse Width="16" Height="16" Fill="{StaticResource WhiteBrush}"
+                                                 Stroke="{StaticResource PrimaryBrush}"
+                                                 StrokeThickness="2"/>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
