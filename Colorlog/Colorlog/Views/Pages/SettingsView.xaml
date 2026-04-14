@@ -3,28 +3,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:conv="clr-namespace:Colorlog.Converter"
              mc:Ignorable="d"
              d:DesignHeight="760" d:DesignWidth="1000"
              Background="Transparent"
-             Loaded="UserControl_Loaded">
+             SnapsToDevicePixels="True"
+             UseLayoutRounding="True"
+             Loaded="UserControl_Loaded"
+             SizeChanged="UserControl_SizeChanged">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  SnapsToDevicePixels="True" UseLayoutRounding="True">
         <Grid Margin="{StaticResource AppShellPagePadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- 페이지 헤더 (Dashboard / BeautyLog 와 동일 리듬) -->
+            <!-- 페이지 헤더: 제목 + 설명 한 줄 -->
             <StackPanel Grid.Row="0" Margin="0,0,0,24">
                 <TextBlock Text="서비스 설정" Style="{StaticResource PageHeaderTitleStyle}"/>
-                <TextBlock Text="계정 정보, 스타일 선호도, 카메라 환경을 관리하세요"
-                           Style="{StaticResource PageHeaderSubtitleStyle}"/>
-                <TextBlock Text="프로필·카메라·추구미·데이터를 한 화면에서 설정할 수 있습니다."
-                           Style="{StaticResource PageHeaderHintStyle}"/>
+                <TextBlock Text="계정·스타일·카메라·추구미·데이터를 한 화면에서 관리하세요."
+                           Style="{StaticResource PageHeaderSubtitleStyle}"
+                           TextWrapping="Wrap"/>
             </StackPanel>
 
-            <Grid Grid.Row="1">
+            <Grid x:Name="CardsLayoutGrid" Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="16"/>
@@ -37,7 +45,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- 사용자 정보 -->
-                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="UserInfoCard" Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="사용자 정보" Style="{StaticResource DashboardCardTitleStyle}"/>
 
@@ -49,7 +57,7 @@
                                     <Border.Clip>
                                         <EllipseGeometry Center="48,48" RadiusX="48" RadiusY="48"/>
                                     </Border.Clip>
-                                    <Image Source="/user.png" Stretch="UniformToFill"/>
+                                    <Image Source="pack://application:,,,/Assets/user.png" Stretch="UniformToFill"/>
                                 </Border>
                                 <Button Content="사진 변경"
                                         Style="{StaticResource OutlineButtonStyle}"
@@ -123,23 +131,27 @@
                 </Border>
 
                 <!-- 카메라 / 조명 -->
-                <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="CameraSettingsCard" Grid.Row="0" Grid.Column="2" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="카메라 / 조명 설정" Style="{StaticResource DashboardCardTitleStyle}"/>
                         <TextBlock Text="촬영 장치와 밝기를 맞추면 분석 결과가 더 안정적입니다."
                                    Style="{StaticResource DashboardCardSubTextStyle}"
                                    Margin="0,8,0,0"/>
 
-                        <Border CornerRadius="12" Background="{StaticResource SurfaceMutedBrush}"
+                        <Border x:Name="PreviewHost"
+                                CornerRadius="12" Background="{StaticResource SurfaceMutedBrush}"
                                 Height="150" Margin="0,16,0,0"
-                                BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
+                                BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1"
+                                ClipToBounds="True"
+                                SizeChanged="PreviewHost_SizeChanged">
                             <Grid>
-                                <Image x:Name="웹캠_화면" Stretch="UniformToFill">
-                                    <Image.Clip>
-                                        <RectangleGeometry Rect="0,0,600,150" RadiusX="12" RadiusY="12"/>
-                                    </Image.Clip>
-                                </Image>
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image x:Name="WebcamPreviewImage" Stretch="UniformToFill"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
+                                    <Viewbox Width="112" Height="84" Stretch="Uniform" Margin="0,0,0,10" Opacity="0.2">
+                                        <Path Fill="{StaticResource MutedTextBrush}"
+                                              Stretch="Uniform"
+                                              Data="M12,15.2A3.2,3.2,0,1,1,15.2,12,3.2,3.2,0,0,1,12,15.2 M9,2L7.17,4H4A2,2,0,0,0,2,6V18A2,2,0,0,0,4,20H20A2,2,0,0,0,22,18V6A2,2,0,0,0,20,4H16.83L15,2H9 M12,17A5,5,0,1,0,7,12,5,5,0,0,0,12,17Z"/>
+                                    </Viewbox>
                                     <TextBlock Text="카메라 미리보기"
                                                Style="{StaticResource DashboardCardSubTextStyle}"
                                                HorizontalAlignment="Center"
@@ -160,93 +172,145 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="카메라" Style="{StaticResource FieldLabelStyle}"/>
-                            <ComboBox Grid.Column="1"
-                                      Height="32" FontSize="13"
-                                      VerticalContentAlignment="Center"
-                                      BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1"/>
+                            <Grid Grid.Column="1" MinHeight="32">
+                                <ComboBox ItemsSource="{Binding CameraNames}"
+                                          SelectedItem="{Binding SelectedCameraName, Mode=TwoWay}"
+                                          Visibility="{Binding HasCameras, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                <TextBlock Text="사용 가능한 카메라가 없습니다."
+                                           VerticalAlignment="Center"
+                                           FontSize="13"
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           TextWrapping="Wrap"
+                                           Visibility="{Binding HasCameras, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}"
+                                           IsHitTestVisible="False"/>
+                            </Grid>
                         </Grid>
 
                         <Grid Margin="0,14,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="80"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Image Height="18" Width="18" Source="/light.png" Stretch="Fill" Margin="0,0,6,0"/>
+                                <Image Height="18" Width="18" Source="pack://application:,,,/Assets/light.png" Stretch="Uniform" Margin="0,0,6,0"/>
                                 <TextBlock Text="밝기" Style="{StaticResource FieldLabelStyle}"/>
                             </StackPanel>
                             <Slider Grid.Column="1" VerticalAlignment="Center"
-                                    Minimum="0" Maximum="100" Value="60"
+                                    Minimum="0" Maximum="100"
+                                    Value="{Binding Brightness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     Style="{StaticResource LightSliderStyle}"/>
-                            <TextBlock Grid.Column="2" Text="60" FontSize="12"
+                            <TextBlock Grid.Column="2"
+                                       MinWidth="28"
+                                       Text="{Binding Brightness, StringFormat={}{0:0}}"
+                                       FontSize="12"
                                        Foreground="{StaticResource MutedTextBrush}"
-                                       VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0"
+                                       TextAlignment="Right"/>
                         </Grid>
                     </StackPanel>
                 </Border>
 
                 <!-- 추구미 -->
-                <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="PreferenceCard" Grid.Row="2" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="추구미" Style="{StaticResource DashboardCardTitleStyle}"/>
                         <TextBlock Text="선호하는 스타일을 골라보세요. (복수 선택 가능)"
                                    Style="{StaticResource DashboardCardSubTextStyle}"
                                    Margin="0,8,0,0"/>
+                        <TextBlock Text="{Binding PreferenceSelectionSummary}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   Margin="0,8,0,0"
+                                   TextWrapping="Wrap"
+                                   LineHeight="18"/>
 
-                        <Border Background="{StaticResource SurfaceSubtleBrush}" CornerRadius="12"
-                                Padding="12,10" Margin="0,16,0,8" BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
-                            <StackPanel>
+                        <StackPanel Margin="0,12,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Ellipse Width="6" Height="6" VerticalAlignment="Center" Margin="0,0,8,0"
+                                         Fill="{StaticResource PrimaryBrush}"/>
                                 <TextBlock Text="분위기" FontWeight="SemiBold" FontSize="13"
-                                           Foreground="{StaticResource TitleTextBrush}" Margin="0,0,0,8"/>
-                                <WrapPanel>
-                                    <ToggleButton Content="청순" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="화려" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="스모키" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="러블리" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="시크" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="데일리" Style="{StaticResource FilterToggleStyle}"/>
-                                </WrapPanel>
+                                           Foreground="{StaticResource TitleTextBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
-                        </Border>
+                            <ItemsControl ItemsSource="{Binding MoodItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ToggleButton Content="{Binding Label}"
+                                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      Style="{StaticResource FilterToggleStyle}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
 
-                        <Border Background="{StaticResource SurfaceSubtleBrush}" CornerRadius="12"
-                                Padding="12,10" Margin="0,0,0,8" BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
-                            <StackPanel>
+                        <Border Height="1" Background="{StaticResource NeutralBorderBrush}" Margin="0,14,0,14"/>
+
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Ellipse Width="6" Height="6" VerticalAlignment="Center" Margin="0,0,8,0"
+                                         Fill="{StaticResource PrimaryBrush}"/>
                                 <TextBlock Text="피부 표현" FontWeight="SemiBold" FontSize="13"
-                                           Foreground="{StaticResource TitleTextBrush}" Margin="0,0,0,8"/>
-                                <WrapPanel>
-                                    <ToggleButton Content="글로우" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="매트" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="세미매트" Style="{StaticResource FilterToggleStyle}"/>
-                                </WrapPanel>
+                                           Foreground="{StaticResource TitleTextBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
-                        </Border>
+                            <ItemsControl ItemsSource="{Binding SkinItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ToggleButton Content="{Binding Label}"
+                                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      Style="{StaticResource FilterToggleStyle}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
 
-                        <Border Background="{StaticResource SurfaceSubtleBrush}" CornerRadius="12"
-                                Padding="12,10" BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
-                            <StackPanel>
+                        <Border Height="1" Background="{StaticResource NeutralBorderBrush}" Margin="0,14,0,14"/>
+
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Ellipse Width="6" Height="6" VerticalAlignment="Center" Margin="0,0,8,0"
+                                         Fill="{StaticResource PrimaryBrush}"/>
                                 <TextBlock Text="톤" FontWeight="SemiBold" FontSize="13"
-                                           Foreground="{StaticResource TitleTextBrush}" Margin="0,0,0,8"/>
-                                <WrapPanel>
-                                    <ToggleButton Content="웜톤" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="쿨톤" Style="{StaticResource FilterToggleStyle}"/>
-                                    <ToggleButton Content="뉴트럴톤" Style="{StaticResource FilterToggleStyle}"/>
-                                </WrapPanel>
+                                           Foreground="{StaticResource TitleTextBrush}" VerticalAlignment="Center"/>
                             </StackPanel>
-                        </Border>
+                            <ItemsControl ItemsSource="{Binding ToneItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ToggleButton Content="{Binding Label}"
+                                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      Style="{StaticResource FilterToggleStyle}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
                 <!-- 데이터 관리 -->
-                <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="DataManagementCard" Grid.Row="2" Grid.Column="2" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="데이터 관리" Style="{StaticResource DashboardCardTitleStyle}"/>
                         <TextBlock Text="기록을 비우거나 파일로 보낼 수 있습니다."
                                    Style="{StaticResource DashboardCardSubTextStyle}"
                                    Margin="0,8,0,0"/>
 
-                        <Border Background="{StaticResource DangerSurfaceBackgroundBrush}" BorderBrush="{StaticResource RoseOutlineLightBrush}"
+                        <Border Background="Transparent"
+                                BorderBrush="{StaticResource DangerSubtleSectionBorderBrush}"
                                 BorderThickness="1" CornerRadius="12" Padding="14,12" Margin="0,16,0,0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -256,15 +320,16 @@
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                     <TextBlock Text="모든 기록 초기화"
                                                FontSize="14" FontWeight="SemiBold"
-                                               Foreground="{StaticResource DangerStrongTextBrush}"/>
+                                               Foreground="{StaticResource TitleTextBrush}"/>
                                     <TextBlock Text="진단 기록, 추천 내역을 모두 삭제합니다"
                                                Style="{StaticResource DashboardCardSubTextStyle}"
                                                Margin="0,4,0,0"/>
                                 </StackPanel>
                                 <Button Grid.Column="1"
                                         Content="초기화"
-                                        Style="{StaticResource DangerOutlineButtonStyle}"
-                                        Height="32" VerticalAlignment="Center"/>
+                                        Style="{StaticResource DangerSolidButtonStyle}"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding ResetAllRecordsCommand}"/>
                             </Grid>
                         </Border>
 
@@ -286,7 +351,8 @@
                                 <Button Grid.Column="1"
                                         Content="백업"
                                         Style="{StaticResource OutlineButtonStyle}"
-                                        Height="32" VerticalAlignment="Center"/>
+                                        Height="32" VerticalAlignment="Center"
+                                        Command="{Binding ExportBackupCommand}"/>
                             </Grid>
                         </Border>
                     </StackPanel>

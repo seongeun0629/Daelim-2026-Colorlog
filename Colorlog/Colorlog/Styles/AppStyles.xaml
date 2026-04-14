@@ -51,6 +51,8 @@
     <SolidColorBrush x:Key="DangerSurfaceBackgroundBrush" Color="#FFFFF8F8"/>
     <SolidColorBrush x:Key="DangerStrongTextBrush" Color="#FFDC2626"/>
     <SolidColorBrush x:Key="DangerOutlineBorderBrush" Color="#FFFCA5A5"/>
+    <!-- 초기화 구역: 아주 옅은 붉은 테두리(배경은 카드와 동일하게 두고 경고만 암시) -->
+    <SolidColorBrush x:Key="DangerSubtleSectionBorderBrush" Color="#33F87171"/>
 
     <!-- 스킨케어 성공 톤 -->
     <SolidColorBrush x:Key="SuccessSoftBackgroundBrush" Color="#FFECFDF5"/>
@@ -625,8 +627,55 @@
         </Setter>
     </Style>
 
+    <!-- 위험 솔리드 버튼 (초기화 등 강조 액션) -->
+    <Style x:Key="DangerSolidButtonStyle" TargetType="Button">
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource DangerStrongTextBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="16"
+                        Padding="14,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource DangerBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#FFB91C1C"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ComboBox (앱 공통) -->
+    <Style x:Key="AppComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="Background" Value="{StaticResource WhiteBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeutralBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style TargetType="ComboBox" BasedOn="{StaticResource AppComboBoxStyle}"/>
+
     <!-- 슬라이더 스타일 -->
     <Style x:Key="LightSliderStyle" TargetType="Slider">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Slider">
