@@ -5,7 +5,6 @@ using System.Windows.Data;
 
 namespace Colorlog.Converter;
 
-/// <summary>값이 null이 아니면 Visible, null이면 Collapsed. ConverterParameter=Inverse면 반대.</summary>
 public sealed class NullToVisibilityConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
