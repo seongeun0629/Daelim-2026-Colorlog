@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Colorlog.Services;
 
 namespace Colorlog.ViewModels
 {
@@ -20,6 +21,15 @@ namespace Colorlog.ViewModels
         [ObservableProperty]
         private bool _isSidebarExpanded = true;
 
+        private readonly PythonEngineService _engineService;
+        private string _persnalColorResult = "진단 대기 중...";
+
+        public string PersonalColorResult
+        {
+            get => _persnalColorResult;
+            set { _persnalColorResult = value; OnPropertyChanged(); }
+        }
+        
         public MainViewModel()
         {
             DashboardViewModel = new DashboardViewModel();
@@ -29,6 +39,14 @@ namespace Colorlog.ViewModels
             SettingsViewModel = new SettingsViewModel();
 
             UpdateView();
+
+            _engineService = new PythonEngineService();
+            _engineService.OnColorDetected += (result) =>
+            {
+                PersonalColorResult = $"진단 결과: {result}";
+            };
+
+            _engineService.Start();
         }
 
         partial void OnSelectedMenuTagChanged(string value)
