@@ -2,11 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
+using Colorlog.Services;
+using Newtonsoft.Json.Linq;
 
 namespace Colorlog.ViewModels
 {
     public partial class LiveAnalysisViewModel : ObservableObject
     {
+
+        private readonly PythonEngineService _pythonService;
         private static readonly Brush HealthyStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF16A34A"));
         private static readonly Brush WarningStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF59E0B"));
         private static readonly Brush DangerStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFDC2626"));
@@ -38,8 +42,22 @@ namespace Colorlog.ViewModels
         [ObservableProperty]
         private bool _isLightingGood = true;
 
+        [ObservableProperty]
+        private string _bestType = "분석 중...";
+
+        [ObservableProperty]
+        private string _secondType = "-";
+
+        [ObservableProperty]
+        private string _worstType = "-";
+
+        [ObservableProperty]
+        private string _typeAnalysisNote = "데이터를 모으는 중입니다. 얼굴을 고정한 채 잠시만 기다려주세요.";
+
         public ObservableCollection<FaceTonePreview> FaceTonePreviews { get; }
         public ObservableCollection<string> PreCheckItems { get; }
+
+        private readonly Queue<string> _resultBuffer = new Queue<string>();
 
         public string AnalysisStageText => $"{AnalysisPhase} · {AnalysisPhaseDetail}";
         public string PreviewBasisText => "수치는 최근 1초 평균값 기준";
@@ -94,30 +112,142 @@ namespace Colorlog.ViewModels
         public string LightingStateText => IsLightingGood ? "조명 양호" : "조명 주의";
         public Brush LightingStateBrush => IsLightingGood ? HealthyStateBrush : WarningStateBrush;
 
-        public LiveAnalysisViewModel()
+        public LiveAnalysisViewModel(PythonEngineService pythonService)
         {
-            FaceTonePreviews = new ObservableCollection<FaceTonePreview>
-            {
-                new("이마", "#FFD4B09A", 88),
-                new("좌측 볼", "#FFD9AA98", 84),
-                new("우측 볼", "#FFD8A893", 86),
-                new("코 주변", "#FFE4BCA6", 81),
-                new("턱", "#FFD1AE98", 83)
-            };
+            _pythonService = pythonService;
 
-            PreCheckItems = new ObservableCollection<string>
-            {
-                "정면 응시",
-                "마스크/모자 제거",
-                "광원 균일",
-                "거리 30~40cm"
+            _pythonService.OnColorDetected += UpdateEngineData;
+
+            FaceTonePreviews = new ObservableCollection<FaceTonePreview>(); 
+            PreCheckItems = new ObservableCollection<string> { 
+                "정면 응시", "마스크/모자 제거", "광원 균일", "거리 30~40cm" 
             };
+        }
+
+        private void UpdateEngineData(JObject json)
+        {
+            var personalColor = json["personal_color"]?["type"]?.ToString();
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                IsFaceDetected = json["face_detected"]?.Value<bool>() ?? false;
+
+                if (IsFaceDetected)
+                {
+                    var skin = json["skin_tone"];
+                    if (skin != null)
+                    {
+                        FaceTonePreviews.Clear();
+
+                        AddTonePreview("이마", skin["forehead"] ?? skin);
+                        AddTonePreview("왼쪽 볼", skin["left_cheek"] ?? skin);
+                        AddTonePreview("오른쪽 볼", skin["right_cheek"] ?? skin);
+                        AddTonePreview("코 주변", skin["nose"] ?? skin);
+                        AddTonePreview("턱", skin["chin"] ?? skin);
+
+                        AnalysisStatus = "실시간 분석 진행 중";
+                        AnalysisPhase = "피부톤 추출";
+                        AnalysisPhaseDetail = $"R:{skin["r"]} G:{skin["g"]} B:{skin["b"]} 추출 완료";
+                    }
+                }
+                else
+                {
+                    AnalysisStatus = "얼굴 미감지";
+                    AnalysisPhase = "대기";
+                    AnalysisPhaseDetail = "얼굴을 가이드 프레임 안에 맞춰주세요.";
+                    FaceTonePreviews.Clear();
+                }
+
+                if (!string.IsNullOrEmpty(personalColor))
+                {
+                    _resultBuffer.Enqueue(personalColor);
+                    if (_resultBuffer.Count > 50) _resultBuffer.Dequeue();
+
+                    var statistics = _resultBuffer.GroupBy(x => x)
+                        .Select(g => new { Type = g.Key, Count = g.Count(), Percent = (g.Count() / (double)_resultBuffer.Count) * 100 })
+                        .OrderByDescending(g => g.Count)
+                        .ToList();
+
+                    if (statistics.Count > 0)
+                    {
+                        BestType = statistics[0].Type;
+                        AnalysisStatus = $"Best: {BestType}";
+
+                        if(statistics.Count > 1)
+                        {
+                            SecondType = statistics[1].Type;
+                            TypeAnalysisNote = $"{BestType}({statistics[0].Percent:F0}%)와 {SecondType}({statistics[1].Percent:F0}%)의 특징이 섞여 있습니다.";
+                        }
+                        else
+                        {
+                            if (_resultBuffer.Count < 10)
+                            {
+                                SecondType = "분석 중...";
+                                TypeAnalysisNote = "정밀 분석을 위해 데이터를 수집하고 있습니다. 얼굴을 계속 고정해주세요.";
+                            }
+                            else
+                            {
+                                SecondType = "단일 타입";
+                                TypeAnalysisNote = $"{BestType}의 특징이 매우 확고하여 세컨드 타입의 영향이 적습니다.";
+                            }
+                        }
+
+                        if (BestType.Contains("봄") || BestType.Contains("가을") || BestType.Contains("Warm"))
+                        {
+                            WorstType = "겨울 쿨톤 (Winter Cool)"; 
+                        }
+                        else
+                        {
+                            WorstType = "가을 웜톤 (Autumn Warm)"; 
+                        }
+                    }
+                    
+                    if (personalColor.Contains("봄 웜") || personalColor.Contains("Spring Warm"))
+                    {
+                        GuidanceMessage = "생기 넘치는 봄 웜톤! 밝고 화사한 코랄과 노란색 계열이 베스트예요. 😊";
+                    }
+                    else if (personalColor.Contains("봄 라이트") || personalColor.Contains("Spring Light"))
+                    {
+                        GuidanceMessage = "봄 라이트톤이시네요. 파스텔 톤의 부드러운 색상이 얼굴을 환하게 밝혀줄 거예요.";
+                    }
+                    else if (personalColor.Contains("여름 쿨") || personalColor.Contains("Summer Cool"))
+                    {
+                        GuidanceMessage = "청량한 여름 쿨톤! 시원한 블루와 라벤더 컬러로 지적인 이미지를 연출해보세요. ❄️";
+                    }
+                    else if (personalColor.Contains("여름 라이트") || personalColor.Contains("Summer Light"))
+                    {
+                        GuidanceMessage = "깨끗한 여름 라이트톤입니다. 밝고 투명한 느낌의 메이크업과 코디를 추천해요.";
+                    }
+                    else if (personalColor.Contains("가을 웜") || personalColor.Contains("Autumn Warm"))
+                    {
+                        GuidanceMessage = "분위기 여신 가을 웜톤! 깊이 있는 베이지와 브라운, 카키색이 정말 잘 어울려요. 🍂";
+                    }
+                    else if (personalColor.Contains("가을 뮤트") || personalColor.Contains("Autumn Mute"))
+                    {
+                        GuidanceMessage = "차분한 가을 뮤트톤입니다. 회색기가 섞인 오묘한 컬러들이 고급스러움을 더해줍니다.";
+                    }
+                    else if (personalColor.Contains("겨울 쿨") || personalColor.Contains("Winter Cool"))
+                    {
+                        GuidanceMessage = "강렬한 겨울 쿨톤! 블랙 & 화이트나 선명한 레드 컬러로 또렷한 인상을 완성해보세요. 💄";
+                    }
+                    else if (personalColor.Contains("겨울 딥") || personalColor.Contains("Winter Deep"))
+                    {
+                        GuidanceMessage = "도시적인 겨울 딥톤입니다. 채도가 낮고 깊은 와인, 네이비 컬러가 무게감을 잡아줄 거예요.";
+                    }
+                    else
+                    {
+                        GuidanceMessage = "데이터를 정밀 분석 중입니다. 얼굴을 고정하고 잠시만 기다려주세요.";
+                    }
+                }
+                RaiseStateChanged();
+            });
         }
 
         [RelayCommand]
         private void StartAnalysis()
         {
             IsAnalyzing = true;
+            _pythonService.Start();
+
             AnalysisStatus = "실시간 분석 진행 중";
             AnalysisProgress = 58;
             AnalysisPhase = "피부톤 추출";
@@ -129,6 +259,8 @@ namespace Colorlog.ViewModels
         private void StopAnalysis()
         {
             IsAnalyzing = false;
+            _pythonService.Stop();
+
             AnalysisStatus = "분석 일시 중지";
             AnalysisProgress = 18;
             AnalysisPhase = "대기";
@@ -174,6 +306,26 @@ namespace Colorlog.ViewModels
             OnPropertyChanged(nameof(FaceStateBrush));
             OnPropertyChanged(nameof(LightingStateText));
             OnPropertyChanged(nameof(LightingStateBrush));
+        }
+    
+
+        private void AddTonePreview(string zoneName, JToken colorData)
+        {
+            if (colorData == null) return;
+
+            try
+            {
+                byte r = colorData["r"]?.Value<byte>() ?? 0;
+                byte g = colorData["g"]?.Value<byte>() ?? 0;
+                byte b = colorData["b"]?.Value<byte>() ?? 0;
+
+                string hex = $"#FF{r:X2}{g:X2}{b:X2}";
+
+                FaceTonePreviews.Add(new FaceTonePreview(zoneName, hex, 95)); // 신뢰도는 우선 95로 고정해두었음 나중에 수정하기 
+            }catch (Exception ex) { 
+                Console.WriteLine($"색상 데이터 처리 중 오류 발생: {ex.Message}");
+            }
+
         }
     }
 

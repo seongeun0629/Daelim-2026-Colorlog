@@ -33,7 +33,7 @@ namespace Colorlog.ViewModels
         public MainViewModel()
         {
             DashboardViewModel = new DashboardViewModel();
-            LiveAnalysisViewModel = new LiveAnalysisViewModel();
+            LiveAnalysisViewModel = new LiveAnalysisViewModel(new PythonEngineService());
             HistoryViewModel = new HistoryViewModel();
             BeautyLogViewModel = new BeautyLogViewModel();
             SettingsViewModel = new SettingsViewModel();

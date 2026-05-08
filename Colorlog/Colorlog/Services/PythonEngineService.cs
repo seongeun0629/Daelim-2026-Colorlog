@@ -14,7 +14,7 @@ namespace Colorlog.Services
     {
         private Process _process;
 
-        public event Action<string> OnColorDetected;
+        public event Action<JObject> OnColorDetected;
 
         public void Start()
         {
@@ -51,7 +51,7 @@ namespace Colorlog.Services
 
                             if (!string.IsNullOrEmpty(colorType))
                             {
-                                OnColorDetected?.Invoke(colorType);
+                                OnColorDetected?.Invoke(json);
                                 Debug.WriteLine($"[성공] 분석된 컬러: {colorType}");
                             }
                         }
@@ -67,7 +67,7 @@ namespace Colorlog.Services
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
-                    Debug.WriteLine($"[Python Error]: {e.Data}");
+                    Debug.WriteLine($"!!! [파이썬 에러]: {e.Data}");
                 }
             };
 

@@ -215,12 +215,6 @@
                     </ListBox>
                 </StackPanel>
 
-                <!--사이드바 Bottom 영역-->
-                <StackPanel x:Name="SidebarBottomActions" Style="{StaticResource SidebarBottomActionsStyle}" Grid.Row="2" Margin="20,0,20,0" VerticalAlignment="Bottom">
-                    <Button Content="진단 시작" Style="{StaticResource AccentPillButtonStyle}" HorizontalAlignment="Stretch"/>
-                    <Button Content="진단 중지" Style="{StaticResource AccentOutlinePillButtonStyle}" Margin="0,12,0,0" HorizontalAlignment="Stretch"/>
-                    <TextBlock Text="© 2026 Colorlog Inc." FontSize="12" Foreground="{StaticResource MutedTextBrush}" Margin="0,12,0,0"/>
-                </StackPanel>
             </Grid>
         </Border>
 
