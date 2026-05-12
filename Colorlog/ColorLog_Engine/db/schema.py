@@ -14,16 +14,15 @@ colorlog DB 스키마 설정 파일
 import sqlite3
 import os
 
-# DB 파일 경로: 이 파일(schema.py)이 있는 db 폴더 안에 colorlog.db 생성
 DB_PATH = os.path.join(os.path.dirname(__file__), "colorlog.db")
 
 
 def get_connection():
     """DB에 연결하고 연결 객체를 반환합니다."""
     conn = sqlite3.connect(DB_PATH)
-    # 외래 키(Foreign Key) 기능을 활성화합니다 (SQLite는 기본이 꺼져 있음)
+    # 외래 키(Foreign Key) 기능을 활성화
     conn.execute("PRAGMA foreign_keys = ON")
-    # 쿼리 결과를 컬럼 이름으로 접근할 수 있게 설정합니다 (row["user_id"] 처럼 사용 가능)
+    # 쿼리 결과를 컬럼 이름으로 접근할 수 있게 설정
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -33,11 +32,9 @@ def create_tables():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # ─────────────────────────────────────────────────────────────────
+
     # 테이블 1: personal_color_types (퍼스널컬러 유형)
-    # 봄 웜톤, 여름 쿨톤 등 퍼스널컬러 유형 정보를 저장합니다.
-    # diagnosis 테이블이 이 테이블을 참조하므로 가장 먼저 만들어야 합니다.
-    # ─────────────────────────────────────────────────────────────────
+    
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS personal_color_types (
             type_id      INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,10 +57,8 @@ def create_tables():
         )
     """)
 
-    # ─────────────────────────────────────────────────────────────────
     # 테이블 2: users (사용자)
-    # 앱을 사용하는 사람의 기본 정보를 저장합니다.
-    # ─────────────────────────────────────────────────────────────────
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id     INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,11 +78,9 @@ def create_tables():
         )
     """)
 
-    # ─────────────────────────────────────────────────────────────────
     # 테이블 3: diagnosis (진단결과)
-    # 퍼스널 컬러 진단 1회의 측정값과 결과를 저장합니다.
-    # users, personal_color_types 테이블을 참조합니다.
-    # ─────────────────────────────────────────────────────────────────
+    # users, personal_color_types 테이블을 참조
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS diagnosis (
             diagnosis_id    INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -126,10 +119,9 @@ def create_tables():
         )
     """)
 
-    # ─────────────────────────────────────────────────────────────────
+
     # 테이블 4: products (화장품)
-    # 추천 가능한 화장품 정보를 저장합니다.
-    # ─────────────────────────────────────────────────────────────────
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS products (
             product_id      INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -149,11 +141,9 @@ def create_tables():
         )
     """)
 
-    # ─────────────────────────────────────────────────────────────────
+
     # 테이블 5: rec_products (추천 화장품)
-    # 진단결과에 따라 어떤 화장품을 추천했는지 기록합니다.
-    # diagnosis, products 두 테이블을 동시에 참조합니다.
-    # ─────────────────────────────────────────────────────────────────
+    # diagnosis, products 두 테이블을 동시에 참조
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS rec_products (
             rec_id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -173,12 +163,12 @@ def create_tables():
         )
     """)
 
-    conn.commit()   # 변경사항을 DB에 저장
-    conn.close()    # 연결 종료
+    conn.commit()   
+    conn.close()   
     print("테이블 생성 완료: personal_color_types, users, diagnosis, products, rec_products")
 
 
-# 이 파일을 직접 실행할 때만 아래 코드가 동작합니다.
+# 이 파일을 직접 실행할 때만 아래 코드가 동작
 if __name__ == "__main__":
     create_tables()
     print(f"DB 경로: {DB_PATH}")

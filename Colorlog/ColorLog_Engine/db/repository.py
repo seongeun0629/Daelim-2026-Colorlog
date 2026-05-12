@@ -15,9 +15,7 @@ from datetime import datetime
 from .schema import get_connection
 
 
-# ══════════════════════════════════════════════════════════════════════
 # 퍼스널컬러 유형(personal_color_types) 관련 함수
-# ══════════════════════════════════════════════════════════════════════
 
 def add_color_type(
     type_name: str,
@@ -95,9 +93,7 @@ def get_all_color_types() -> list[dict]:
     return [dict(row) for row in rows]
 
 
-# ══════════════════════════════════════════════════════════════════════
 # 사용자(users) 관련 함수
-# ══════════════════════════════════════════════════════════════════════
 
 def add_user(user_name: str, gender: str = None, age: str = None) -> int:
     """
@@ -117,7 +113,7 @@ def add_user(user_name: str, gender: str = None, age: str = None) -> int:
         INSERT INTO users (user_name, gender, age, created_at)
         VALUES (?, ?, ?, ?)
     """, (user_name, gender, age, now))
-    # ? 는 값을 안전하게 넣어주는 자리표시자입니다 (SQL 인젝션 방지)
+    # ? 는 값을 안전하게 넣어주는 자리표시자 (SQL 인젝션 방지)
 
     conn.commit()
     new_id = cursor.lastrowid  # 방금 저장된 행의 user_id
@@ -166,9 +162,7 @@ def get_all_users() -> list[dict]:
     return [dict(row) for row in rows]
 
 
-# ══════════════════════════════════════════════════════════════════════
 # 진단결과(diagnosis) 관련 함수
-# ══════════════════════════════════════════════════════════════════════
 
 def add_diagnosis(
     user_id: int,
@@ -259,9 +253,7 @@ def get_diagnoses_by_user(user_id: int) -> list[dict]:
     return [dict(row) for row in rows]
 
 
-# ══════════════════════════════════════════════════════════════════════
 # 화장품(products) 관련 함수
-# ══════════════════════════════════════════════════════════════════════
 
 def add_product(
     product_url: str,
@@ -336,10 +328,7 @@ def get_all_products() -> list[dict]:
 
     return [dict(row) for row in rows]
 
-
-# ══════════════════════════════════════════════════════════════════════
 # 추천 화장품(rec_products) 관련 함수
-# ══════════════════════════════════════════════════════════════════════
 
 def add_rec_product(
     product_id: int,
@@ -387,7 +376,7 @@ def get_rec_products_by_diagnosis(diagnosis_id: int) -> list[dict]:
     conn = get_connection()
     cursor = conn.cursor()
 
-    # JOIN: rec_products와 products를 합쳐서 한 번에 조회합니다
+    # JOIN: rec_products와 products를 합쳐서 한 번에 조회
     cursor.execute("""
         SELECT
             r.rec_id,

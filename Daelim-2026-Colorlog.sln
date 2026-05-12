@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Colorlog", "Colorlog", "{45A1A0BD-2EC1-FBDD-23D5-32783B38634A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colorlog", "Colorlog\Colorlog\Colorlog.csproj", "{69F73F8D-A872-F484-A2EA-DED7C90CA334}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69F73F8D-A872-F484-A2EA-DED7C90CA334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69F73F8D-A872-F484-A2EA-DED7C90CA334}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69F73F8D-A872-F484-A2EA-DED7C90CA334}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69F73F8D-A872-F484-A2EA-DED7C90CA334}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{69F73F8D-A872-F484-A2EA-DED7C90CA334} = {45A1A0BD-2EC1-FBDD-23D5-32783B38634A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4C681563-79E4-422D-93EC-FA57359E9B4F}
+	EndGlobalSection
+EndGlobal
