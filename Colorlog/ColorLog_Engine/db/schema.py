@@ -1,7 +1,14 @@
 """
 colorlog DB 스키마 설정 파일
 - 이 파일을 실행하면 colorlog.db 파일이 생성되고 테이블이 만들어집니다.
-- 설계 범위: 사용자(users), 진단결과(diagnosis) 테이블
+- 설계 범위: 5개 테이블 전체 (ERD 기준)
+
+테이블 생성 순서 (외래키 때문에 참조되는 쪽을 먼저 만들어야 합니다)
+  1. personal_color_types  ← diagnosis가 참조
+  2. users                 ← diagnosis가 참조
+  3. diagnosis             ← rec_products가 참조
+  4. products              ← rec_products가 참조
+  5. rec_products
 """
 
 import sqlite3
@@ -22,12 +29,39 @@ def get_connection():
 
 
 def create_tables():
-    """users, diagnosis 테이블을 생성합니다. 이미 있으면 건너뜁니다."""
+    """5개 테이블을 생성합니다. 이미 있으면 건너뜁니다."""
     conn = get_connection()
     cursor = conn.cursor()
 
     # ─────────────────────────────────────────────────────────────────
-    # 테이블 1: users (사용자)
+    # 테이블 1: personal_color_types (퍼스널컬러 유형)
+    # 봄 웜톤, 여름 쿨톤 등 퍼스널컬러 유형 정보를 저장합니다.
+    # diagnosis 테이블이 이 테이블을 참조하므로 가장 먼저 만들어야 합니다.
+    # ─────────────────────────────────────────────────────────────────
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS personal_color_types (
+            type_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                         -- 유형 고유 번호 (자동 증가)
+
+            type_name    TEXT    NOT NULL,
+                         -- 유형 이름 예: '봄 웜톤', '여름 쿨톤'
+
+            colors       TEXT,
+                         -- 어울리는 컬러 목록 예: '코랄, 피치, 아이보리'
+
+            worst_colors TEXT,
+                         -- 피해야 할 컬러 목록 예: '그레이, 블루블랙'
+
+            tone         TEXT,
+                         -- 웜/쿨 구분 예: '웜', '쿨'
+
+            keyword      TEXT
+                         -- 유형 키워드 예: '생기있는, 따뜻한, 화사한'
+        )
+    """)
+
+    # ─────────────────────────────────────────────────────────────────
+    # 테이블 2: users (사용자)
     # 앱을 사용하는 사람의 기본 정보를 저장합니다.
     # ─────────────────────────────────────────────────────────────────
     cursor.execute("""
@@ -50,8 +84,9 @@ def create_tables():
     """)
 
     # ─────────────────────────────────────────────────────────────────
-    # 테이블 2: diagnosis (진단결과)
+    # 테이블 3: diagnosis (진단결과)
     # 퍼스널 컬러 진단 1회의 측정값과 결과를 저장합니다.
+    # users, personal_color_types 테이블을 참조합니다.
     # ─────────────────────────────────────────────────────────────────
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS diagnosis (
@@ -80,24 +115,70 @@ def create_tables():
                             -- 얼굴 랜드마크 측정값 (선택 입력)
 
             type_id         INTEGER,
-                            -- 진단 결과 퍼스널컬러 유형 번호 (선택 입력)
-                            -- 추후 personal_color_types 테이블과 연결될 예정
+                            -- 진단 결과 퍼스널컬러 유형 번호
+                            -- personal_color_types 테이블의 type_id 참조
 
             user_id         INTEGER NOT NULL,
                             -- 이 진단을 받은 사용자 번호 (users 테이블의 user_id 참조)
 
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
-                            -- user_id는 반드시 users 테이블에 존재하는 번호여야 함
+            FOREIGN KEY (user_id) REFERENCES users(user_id),
+            FOREIGN KEY (type_id) REFERENCES personal_color_types(type_id)
+        )
+    """)
+
+    # ─────────────────────────────────────────────────────────────────
+    # 테이블 4: products (화장품)
+    # 추천 가능한 화장품 정보를 저장합니다.
+    # ─────────────────────────────────────────────────────────────────
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            product_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                            -- 화장품 고유 번호 (자동 증가)
+
+            product_url     TEXT    NOT NULL,
+                            -- 화장품 상품 링크 (필수)
+
+            product_name    TEXT,
+                            -- 화장품 이름 예: '데일리 수분 톤업 선크림'
+
+            keyword         TEXT,
+                            -- 화장품 키워드 예: '수분, 자외선차단'
+
+            category        TEXT
+                            -- 화장품 카테고리 예: '선크림', '파운데이션', '립'
+        )
+    """)
+
+    # ─────────────────────────────────────────────────────────────────
+    # 테이블 5: rec_products (추천 화장품)
+    # 진단결과에 따라 어떤 화장품을 추천했는지 기록합니다.
+    # diagnosis, products 두 테이블을 동시에 참조합니다.
+    # ─────────────────────────────────────────────────────────────────
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS rec_products (
+            rec_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                            -- 추천 기록 고유 번호 (자동 증가)
+
+            product_id      INTEGER NOT NULL,
+                            -- 추천된 화장품 번호 (products 테이블의 product_id 참조)
+
+            diagnosis_id    INTEGER NOT NULL,
+                            -- 어떤 진단에서 추천됐는지 (diagnosis 테이블의 diagnosis_id 참조)
+
+            rec_reason      TEXT,
+                            -- 추천 이유 예: '웜톤에 어울리는 코랄 계열'
+
+            FOREIGN KEY (product_id)   REFERENCES products(product_id),
+            FOREIGN KEY (diagnosis_id) REFERENCES diagnosis(diagnosis_id)
         )
     """)
 
     conn.commit()   # 변경사항을 DB에 저장
     conn.close()    # 연결 종료
-    print("테이블 생성 완료: users, diagnosis")
+    print("테이블 생성 완료: personal_color_types, users, diagnosis, products, rec_products")
 
 
 # 이 파일을 직접 실행할 때만 아래 코드가 동작합니다.
-# (다른 파일에서 import 할 때는 실행되지 않습니다)
 if __name__ == "__main__":
     create_tables()
     print(f"DB 경로: {DB_PATH}")

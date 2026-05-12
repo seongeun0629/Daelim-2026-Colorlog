@@ -1,11 +1,98 @@
 """
 DB 저장/조회 함수 모음 (Repository)
 - schema.py 에서 DB 연결을 가져와 사용합니다.
-- 사용자(users)와 진단결과(diagnosis) 관련 기본 기능을 제공합니다.
+- 5개 테이블 전체의 기본 기능을 제공합니다.
+
+  [테이블별 함수 목록]
+  personal_color_types : add_color_type / get_color_type / get_all_color_types
+  users                : add_user / get_user / get_all_users
+  diagnosis            : add_diagnosis / get_diagnosis / get_diagnoses_by_user
+  products             : add_product / get_product / get_all_products
+  rec_products         : add_rec_product / get_rec_products_by_diagnosis
 """
 
 from datetime import datetime
 from .schema import get_connection
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 퍼스널컬러 유형(personal_color_types) 관련 함수
+# ══════════════════════════════════════════════════════════════════════
+
+def add_color_type(
+    type_name: str,
+    colors: str = None,
+    worst_colors: str = None,
+    tone: str = None,
+    keyword: str = None,
+) -> int:
+    """
+    퍼스널컬러 유형 1개를 DB에 저장합니다.
+
+    사용 예:
+        type_id = add_color_type(
+            type_name="봄 웜톤",
+            colors="코랄, 피치, 아이보리",
+            worst_colors="그레이, 블루블랙",
+            tone="웜",
+            keyword="생기있는, 따뜻한",
+        )
+
+    반환값: 새로 생성된 type_id (정수)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO personal_color_types (type_name, colors, worst_colors, tone, keyword)
+        VALUES (?, ?, ?, ?, ?)
+    """, (type_name, colors, worst_colors, tone, keyword))
+
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return new_id
+
+
+def get_color_type(type_id: int) -> dict | None:
+    """
+    type_id로 퍼스널컬러 유형 1개를 조회합니다.
+
+    사용 예:
+        ctype = get_color_type(1)
+        print(ctype["type_name"])  # 봄 웜톤
+
+    반환값: 유형 정보 딕셔너리 또는 None(없으면)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM personal_color_types WHERE type_id = ?", (type_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    return dict(row) if row else None
+
+
+def get_all_color_types() -> list[dict]:
+    """
+    모든 퍼스널컬러 유형을 조회합니다.
+
+    사용 예:
+        types = get_all_color_types()
+        for t in types:
+            print(t["type_name"], t["tone"])
+
+    반환값: 유형 딕셔너리 리스트
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM personal_color_types ORDER BY type_id")
+    rows = cursor.fetchall()
+    conn.close()
+
+    return [dict(row) for row in rows]
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -52,7 +139,7 @@ def get_user(user_id: int) -> dict | None:
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    row = cursor.fetchone()  # 결과 1행 가져오기
+    row = cursor.fetchone()
     conn.close()
 
     return dict(row) if row else None
@@ -73,7 +160,7 @@ def get_all_users() -> list[dict]:
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM users ORDER BY created_at DESC")
-    rows = cursor.fetchall()  # 결과 전체 가져오기
+    rows = cursor.fetchall()
     conn.close()
 
     return [dict(row) for row in rows]
@@ -104,6 +191,7 @@ def add_diagnosis(
             lab_a=65.3,
             lab_b=12.1,
             lab_c=-5.4,
+            type_id=1,
         )
 
     반환값: 새로 생성된 diagnosis_id (정수)
@@ -165,6 +253,155 @@ def get_diagnoses_by_user(user_id: int) -> list[dict]:
         WHERE user_id = ?
         ORDER BY diagnosis_at DESC
     """, (user_id,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    return [dict(row) for row in rows]
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 화장품(products) 관련 함수
+# ══════════════════════════════════════════════════════════════════════
+
+def add_product(
+    product_url: str,
+    product_name: str = None,
+    keyword: str = None,
+    category: str = None,
+) -> int:
+    """
+    화장품 1개를 DB에 저장합니다.
+
+    사용 예:
+        product_id = add_product(
+            product_url="https://shop.example.com/item/123",
+            product_name="데일리 수분 톤업 선크림",
+            keyword="수분, 자외선차단",
+            category="선크림",
+        )
+
+    반환값: 새로 생성된 product_id (정수)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO products (product_url, product_name, keyword, category)
+        VALUES (?, ?, ?, ?)
+    """, (product_url, product_name, keyword, category))
+
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return new_id
+
+
+def get_product(product_id: int) -> dict | None:
+    """
+    product_id로 화장품 1개를 조회합니다.
+
+    사용 예:
+        product = get_product(1)
+        print(product["product_name"])
+
+    반환값: 화장품 정보 딕셔너리 또는 None(없으면)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM products WHERE product_id = ?", (product_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    return dict(row) if row else None
+
+
+def get_all_products() -> list[dict]:
+    """
+    모든 화장품 목록을 조회합니다.
+
+    사용 예:
+        products = get_all_products()
+        for p in products:
+            print(p["product_name"], p["category"])
+
+    반환값: 화장품 딕셔너리 리스트
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM products ORDER BY product_id")
+    rows = cursor.fetchall()
+    conn.close()
+
+    return [dict(row) for row in rows]
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 추천 화장품(rec_products) 관련 함수
+# ══════════════════════════════════════════════════════════════════════
+
+def add_rec_product(
+    product_id: int,
+    diagnosis_id: int,
+    rec_reason: str = None,
+) -> int:
+    """
+    진단결과에 대한 화장품 추천 기록 1건을 저장합니다.
+
+    사용 예:
+        rec_id = add_rec_product(
+            product_id=1,
+            diagnosis_id=1,
+            rec_reason="봄 웜톤에 어울리는 코랄 계열 블러셔",
+        )
+
+    반환값: 새로 생성된 rec_id (정수)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO rec_products (product_id, diagnosis_id, rec_reason)
+        VALUES (?, ?, ?)
+    """, (product_id, diagnosis_id, rec_reason))
+
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return new_id
+
+
+def get_rec_products_by_diagnosis(diagnosis_id: int) -> list[dict]:
+    """
+    특정 진단결과에 추천된 화장품 목록을 조회합니다.
+    화장품 상세 정보(이름, 카테고리 등)도 함께 반환합니다.
+
+    사용 예:
+        recs = get_rec_products_by_diagnosis(1)
+        for r in recs:
+            print(r["product_name"], r["rec_reason"])
+
+    반환값: 추천 기록 + 화장품 정보가 합쳐진 딕셔너리 리스트
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # JOIN: rec_products와 products를 합쳐서 한 번에 조회합니다
+    cursor.execute("""
+        SELECT
+            r.rec_id,
+            r.rec_reason,
+            p.product_id,
+            p.product_name,
+            p.product_url,
+            p.keyword,
+            p.category
+        FROM rec_products r
+        JOIN products p ON r.product_id = p.product_id
+        WHERE r.diagnosis_id = ?
+        ORDER BY r.rec_id
+    """, (diagnosis_id,))
     rows = cursor.fetchall()
     conn.close()
 
