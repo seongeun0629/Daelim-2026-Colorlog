@@ -10,6 +10,10 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.IO;
+using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Colorlog.ViewModels;
 
@@ -52,6 +56,13 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string preferenceSelectionSummary = "아직 선택된 항목이 없습니다.";
 
+    private VideoCapture? _capture;
+    private DispatcherTimer? _timer;
+    private readonly object _captureLock = new();
+
+    [ObservableProperty]
+    private BitmapSource? cameraFeed;
+
     public ObservableCollection<SelectablePreferenceItem> MoodItems { get; } = new();
 
     public ObservableCollection<SelectablePreferenceItem> SkinItems { get; } = new();
@@ -76,6 +87,7 @@ public partial class SettingsViewModel : ObservableObject
         }
 
         CameraNames.CollectionChanged += OnCameraNamesChanged;
+        DiscoverCameraDevices();
         SyncCameraAvailability();
         SyncUserAgeFromBirthDate();
     }
@@ -85,7 +97,6 @@ public partial class SettingsViewModel : ObservableObject
         UserAge = $"만 {EditProfileViewModel.GetCompletedAgeYears(UserBirthDate.Date, DateTime.Today)}세";
     }
 
-    //사진 변경 명령 실행 메서드
     private string _profileImagePath = "pack://application:,,,/Assets/user.png"; 
     public string ProfileImagePath
     {
@@ -136,22 +147,41 @@ public partial class SettingsViewModel : ObservableObject
     {
         if (!HasCameras || string.IsNullOrWhiteSpace(value))
         {
+            StopCamera();
             return;
         }
 
-        _ = SimulateCameraWarmupAsync();
+        _ = SwitchCameraAsync(value);
     }
-
-    private async Task SimulateCameraWarmupAsync()
+    private async Task SwitchCameraAsync(string cameraName)
     {
         try
         {
             IsCameraLoading = true;
-            await Task.Delay(500);
+            StopCamera(); 
+
+            await Task.Delay(500); 
+
+            int cameraIndex = 0;
+            var match = System.Text.RegularExpressions.Regex.Match(cameraName, @"\d+");
+            if (match.Success) cameraIndex = int.Parse(match.Value);
+
+            InitializeCamera(cameraIndex); 
         }
         finally
         {
             IsCameraLoading = false;
+        }
+    }
+
+    partial void OnBrightnessChanged(double value)
+    {
+        lock (_captureLock)
+        {
+            if (_capture != null && _capture.IsOpened())
+            {
+                _capture.Set(VideoCaptureProperties.Brightness, value);
+            }
         }
     }
 
@@ -163,6 +193,7 @@ public partial class SettingsViewModel : ObservableObject
         if (!HasCameras)
         {
             SelectedCameraName = null;
+            StopCamera();
             return;
         }
 
@@ -232,5 +263,86 @@ public partial class SettingsViewModel : ObservableObject
         UserName = vm.Name.Trim();
         UserBirthDate = vm.BirthDate.Value.Date;
         SyncUserAgeFromBirthDate();
+    }
+
+    private void DiscoverCameraDevices()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            using var tempCapture = new VideoCapture(i, VideoCaptureAPIs.DSHOW);
+            if (tempCapture.IsOpened())
+            {
+                CameraNames.Add($"카메라 장치 #{i}");
+            }
+        }
+    }
+
+    public void InitializeCamera(int cameraIndex = 0)
+    {
+        lock (_captureLock)
+        {
+            if (_capture != null) StopCamera();
+
+            _capture = new VideoCapture(cameraIndex, VideoCaptureAPIs.DSHOW);
+            if (!_capture.IsOpened()) return;
+
+            _capture.Set(VideoCaptureProperties.Brightness, Brightness);
+
+            _timer = new DispatcherTimer(DispatcherPriority.Render);
+            _timer.Interval = TimeSpan.FromMilliseconds(33);
+            _timer.Tick += (s, e) =>
+            {
+                lock (_captureLock)
+                {
+                    if (_capture == null || !_capture.IsOpened()) return;
+
+                    using Mat frame = new Mat();
+                    if (_capture.Read(frame) && !frame.Empty())
+                    {
+                        CameraFeed = frame.ToBitmapSource(); 
+                    }
+                }
+            };
+            _timer.Start();
+        }
+    }
+
+    public void StopCamera()
+    {
+        lock (_captureLock)
+        {
+            if (_timer != null)
+            {
+                _timer.Stop();
+                _timer = null;
+            }
+            if (_capture != null)
+            {
+                _capture.Release();
+                _capture.Dispose();
+                _capture = null;
+            }
+            CameraFeed = null;
+        }
+    }
+
+    [RelayCommand]
+    private void TogglePreviewClick()
+    {
+        if (_capture != null && _capture.IsOpened())
+        {
+            StopCamera();
+        }
+        else
+        {
+            int cameraIndex = 0;
+            if (!string.IsNullOrEmpty(SelectedCameraName))
+            {
+                var match = System.Text.RegularExpressions.Regex.Match(SelectedCameraName, @"\d+");
+                if (match.Success) cameraIndex = int.Parse(match.Value);
+            }
+
+            InitializeCamera(cameraIndex);
+        }
     }
 }

@@ -27,9 +27,9 @@ namespace Colorlog.Services
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = @"C:\Users\user\anaconda3\envs\colorlog\python.exe",
-                    Arguments = @"C:\Users\user\Documents\Daelim-2026-Colorlog\Colorlog\ColorLog_Engine\main.py",
-                    WorkingDirectory = @"C:\Users\user\Documents\Daelim-2026-Colorlog\Colorlog\ColorLog_Engine",
+                    FileName = @"C:\Users\NOW\anaconda3\envs\colorlog\python.exe",
+                    Arguments = @"main.py",
+                    WorkingDirectory = @"D:\project\Colorlog\Colorlog\ColorLog_Engine",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true, 

@@ -96,24 +96,39 @@
                                 </StackPanel>
 
                                 <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                                    <Image Source="{Binding CameraSource}" 
+                                        Width="640" Height="480" 
+                                        Stretch="UniformToFill"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" />
+                                        </Image.RenderTransform>
+                                        <Image.Clip>
+                                            <RectangleGeometry Rect="0,0,640,480" RadiusX="14" RadiusY="14"/>
+                                        </Image.Clip>
+                                    </Image>
+
                                     <Rectangle Width="360" Height="470"
-                                               Stroke="#AAFFFFFF"
-                                               StrokeThickness="2"
-                                               RadiusX="28" RadiusY="28"
-                                               StrokeDashArray="6 6"
-                                               Fill="#10FFFFFF"/>
+                                        Stroke="#AAFFFFFF"
+                                        StrokeThickness="2"
+                                        RadiusX="28" RadiusY="28"
+                                        StrokeDashArray="6 6"
+                                        Fill="#10FFFFFF"/>
 
                                     <Ellipse Width="220" Height="280"
-                                             Stroke="#80FFFFFF"
-                                             StrokeThickness="1.5"
-                                             Fill="#0DFFFFFF"/>
+                                        Stroke="#80FFFFFF"
+                                        StrokeThickness="1.5"
+                                        Fill="#0DFFFFFF"/>
 
-                                    <TextBlock Margin="0,196,0,0"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Foreground="#E5FFFFFF"
-                                               FontSize="12"
-                                               Text="얼굴을 프레임 중앙에 맞춰주세요"/>
+                                    <TextBlock Text="얼굴을 프레임 중앙에 맞춰주세요"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        Margin="0,0,0,40" 
+                                        Foreground="#E5FFFFFF"
+                                        FontSize="12"/>     
                                 </Grid>
 
                                 <Border Grid.Row="2" CornerRadius="10" Padding="12,8" Background="#33000000">

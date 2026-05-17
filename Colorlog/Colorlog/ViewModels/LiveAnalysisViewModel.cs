@@ -4,6 +4,10 @@ using System.Collections.ObjectModel;
 using System.Windows.Media;
 using Colorlog.Services;
 using Newtonsoft.Json.Linq;
+using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
+using System;
+using System.Windows.Media.Imaging;
 
 namespace Colorlog.ViewModels
 {
@@ -15,8 +19,7 @@ namespace Colorlog.ViewModels
         private static readonly Brush WarningStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF59E0B"));
         private static readonly Brush DangerStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFDC2626"));
 
-        [ObservableProperty]
-        private bool _isAnalyzing;
+
 
         [ObservableProperty]
         private double _analysisProgress = 22;
@@ -53,6 +56,17 @@ namespace Colorlog.ViewModels
 
         [ObservableProperty]
         private string _typeAnalysisNote = "데이터를 모으는 중입니다. 얼굴을 고정한 채 잠시만 기다려주세요.";
+
+        // 카메라 연동
+        private VideoCapture _capture;
+        private bool _isCamRunning;
+
+        [ObservableProperty]
+        private BitmapSource _cameraSource;
+
+        [ObservableProperty]
+        private bool _isAnalyzing;
+
 
         public ObservableCollection<FaceTonePreview> FaceTonePreviews { get; }
         public ObservableCollection<string> PreCheckItems { get; }
@@ -118,9 +132,9 @@ namespace Colorlog.ViewModels
 
             _pythonService.OnColorDetected += UpdateEngineData;
 
-            FaceTonePreviews = new ObservableCollection<FaceTonePreview>(); 
-            PreCheckItems = new ObservableCollection<string> { 
-                "정면 응시", "마스크/모자 제거", "광원 균일", "거리 30~40cm" 
+            FaceTonePreviews = new ObservableCollection<FaceTonePreview>();
+            PreCheckItems = new ObservableCollection<string> {
+                "정면 응시", "마스크/모자 제거", "광원 균일", "거리 30~40cm"
             };
         }
 
@@ -172,7 +186,7 @@ namespace Colorlog.ViewModels
                         BestType = statistics[0].Type;
                         AnalysisStatus = $"Best: {BestType}";
 
-                        if(statistics.Count > 1)
+                        if (statistics.Count > 1)
                         {
                             SecondType = statistics[1].Type;
                             TypeAnalysisNote = $"{BestType}({statistics[0].Percent:F0}%)와 {SecondType}({statistics[1].Percent:F0}%)의 특징이 섞여 있습니다.";
@@ -193,14 +207,14 @@ namespace Colorlog.ViewModels
 
                         if (BestType.Contains("봄") || BestType.Contains("가을") || BestType.Contains("Warm"))
                         {
-                            WorstType = "겨울 쿨톤 (Winter Cool)"; 
+                            WorstType = "겨울 쿨톤 (Winter Cool)";
                         }
                         else
                         {
-                            WorstType = "가을 웜톤 (Autumn Warm)"; 
+                            WorstType = "가을 웜톤 (Autumn Warm)";
                         }
                     }
-                    
+
                     if (personalColor.Contains("봄 웜") || personalColor.Contains("Spring Warm"))
                     {
                         GuidanceMessage = "생기 넘치는 봄 웜톤! 밝고 화사한 코랄과 노란색 계열이 베스트예요. 😊";
@@ -243,22 +257,66 @@ namespace Colorlog.ViewModels
         }
 
         [RelayCommand]
-        private void StartAnalysis()
+        private async Task StartAnalysis()
         {
+            if (IsAnalyzing) return;
             IsAnalyzing = true;
+
             _pythonService.Start();
+
+            _capture = new VideoCapture(0, VideoCaptureAPIs.DSHOW);
+            _capture.FrameWidth = 640;
+            _capture.FrameHeight = 480;
+
+            if (!_capture.IsOpened())
+            {
+                // 카메라 열기 실패 시 원상복구
+                _pythonService.Stop();
+                IsAnalyzing = false;
+                AnalysisStatus = "카메라 연결 실패";
+                return;
+            }
+
+            _isCamRunning = true;
 
             AnalysisStatus = "실시간 분석 진행 중";
             AnalysisProgress = 58;
             AnalysisPhase = "피부톤 추출";
             AnalysisPhaseDetail = "부위별 평균 색상과 홍조 지수를 계산 중";
             GuidanceMessage = "좋아요! 얼굴을 고정한 채 2~3초만 유지해주세요.";
+
+            //백그라운드 스레드에서 실시간 프레임 렌더링 루프 가동
+            await Task.Run(async () =>
+            {
+                using (Mat frame = new Mat())
+                {
+                    while (_isCamRunning)
+                    {
+                        _capture.Read(frame);
+                        if (frame.Empty()) continue;
+
+                        // UI 스레드에서 이미지 바인딩 소스 안전하게 갱신
+                        App.Current.Dispatcher.Invoke(() =>
+                        {
+                            CameraSource = frame.ToBitmapSource();
+                        });
+
+                        await Task.Delay(33); // 약 30 FPS 유지
+                    }
+                }
+            });
         }
 
         [RelayCommand]
         private void StopAnalysis()
         {
+            _isCamRunning = false;
             IsAnalyzing = false;
+
+            _capture?.Release();
+            _capture = null;
+            CameraSource = null;
+
             _pythonService.Stop();
 
             AnalysisStatus = "분석 일시 중지";
@@ -307,7 +365,7 @@ namespace Colorlog.ViewModels
             OnPropertyChanged(nameof(LightingStateText));
             OnPropertyChanged(nameof(LightingStateBrush));
         }
-    
+
 
         private void AddTonePreview(string zoneName, JToken colorData)
         {
@@ -322,12 +380,17 @@ namespace Colorlog.ViewModels
                 string hex = $"#FF{r:X2}{g:X2}{b:X2}";
 
                 FaceTonePreviews.Add(new FaceTonePreview(zoneName, hex, 95)); // 신뢰도는 우선 95로 고정해두었음 나중에 수정하기 
-            }catch (Exception ex) { 
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine($"색상 데이터 처리 중 오류 발생: {ex.Message}");
             }
 
         }
+
+       
     }
+        
 
     public sealed class FaceTonePreview
     {

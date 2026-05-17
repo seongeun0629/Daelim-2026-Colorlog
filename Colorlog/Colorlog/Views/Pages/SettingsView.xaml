@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:conv="clr-namespace:Colorlog.Converter"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
              mc:Ignorable="d"
              d:DesignHeight="760" d:DesignWidth="1000"
              Background="Transparent"
@@ -131,21 +132,30 @@
                                    Style="{StaticResource DashboardCardSubTextStyle}" Margin="0,8,0,0"/>
 
                         <Border x:Name="PreviewHost" CornerRadius="12" Background="{StaticResource SurfaceMutedBrush}"
-                                Height="150" Margin="0,16,0,0" BorderBrush="{StaticResource NeutralBorderBrush}"
-                                BorderThickness="1" ClipToBounds="True" SizeChanged="PreviewHost_SizeChanged">
+                            Height="150" Margin="0,16,0,0" BorderBrush="{StaticResource NeutralBorderBrush}"
+                            BorderThickness="1" ClipToBounds="True" SizeChanged="PreviewHost_SizeChanged"
+                            Cursor="Hand">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding TogglePreviewClickCommand}" />
+                            </Border.InputBindings>
                             <Grid>
-                                <Image x:Name="WebcamPreviewImage" Stretch="UniformToFill"/>
+                                <Image x:Name="WebcamPreviewImage" Source="{Binding CameraFeed}" Stretch="UniformToFill"/>
+
                                 <Border Background="#99FCFCFD" Visibility="{Binding IsCameraLoading, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <ProgressBar IsIndeterminate="True" Height="4" Width="180"
-                                                     Foreground="{StaticResource PrimaryBrush}" Background="Transparent" BorderThickness="0"/>
+                                            Foreground="{StaticResource PrimaryBrush}" Background="Transparent" BorderThickness="0"/>
                                         <TextBlock Text="카메라를 불러오는 중..." Margin="0,12,0,0" HorizontalAlignment="Center"
-                                                   FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                                            FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
                                     </StackPanel>
                                 </Border>
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.5"
-                                            Visibility="{Binding IsCameraLoading, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
-                                    <TextBlock Text="카메라 미리보기" Style="{StaticResource DashboardCardSubTextStyle}" HorizontalAlignment="Center"/>
+
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.6"
+                                    Visibility="{Binding CameraFeed, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
+                                    <TextBlock Text="📷" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                    <TextBlock Text="여기를 클릭하면 미리보기가 시작됩니다." 
+                                        Style="{StaticResource DashboardCardSubTextStyle}" 
+                                        HorizontalAlignment="Center" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
