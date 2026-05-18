@@ -1,8 +1,15 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
+using Colorlog.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
+using System;
+using System.IO;
 
 namespace Colorlog.ViewModels;
 
@@ -12,7 +19,10 @@ public partial class SettingsViewModel : ObservableObject
     private string userName = "유현성";
 
     [ObservableProperty]
-    private string userAge = "24세";
+    private string userAge = string.Empty;
+
+    [ObservableProperty]
+    private DateTime userBirthDate = DateTime.Today.AddYears(-24);
 
     [ObservableProperty]
     private string personalColorName = "봄 웜 라이트";
@@ -25,6 +35,8 @@ public partial class SettingsViewModel : ObservableObject
 
     public ObservableCollection<string> CameraNames { get; } = new();
 
+    public ICommand ChangeProfileImageCommand => new RelayCommand(ExecuteChangeProfileImage);
+
     [ObservableProperty]
     private string? selectedCameraName;
 
@@ -33,6 +45,9 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private double brightness = 60;
+
+    [ObservableProperty]
+    private bool isCameraLoading;
 
     [ObservableProperty]
     private string preferenceSelectionSummary = "아직 선택된 항목이 없습니다.";
@@ -62,6 +77,82 @@ public partial class SettingsViewModel : ObservableObject
 
         CameraNames.CollectionChanged += OnCameraNamesChanged;
         SyncCameraAvailability();
+        SyncUserAgeFromBirthDate();
+    }
+
+    private void SyncUserAgeFromBirthDate()
+    {
+        UserAge = $"만 {EditProfileViewModel.GetCompletedAgeYears(UserBirthDate.Date, DateTime.Today)}세";
+    }
+
+    //사진 변경 명령 실행 메서드
+    private string _profileImagePath = "pack://application:,,,/Assets/user.png"; 
+    public string ProfileImagePath
+    {
+        get => _profileImagePath;
+        set
+        {
+            _profileImagePath = value;
+            OnPropertyChanged(nameof(ProfileImagePath)); 
+        }
+    }
+    private void ExecuteChangeProfileImage()
+    {
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "프로필 사진 선택",
+            Filter = "이미지 파일 (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) // 내 사진 폴더에서 시작
+        };
+
+        if (openFileDialog.ShowDialog() == true)
+        {
+            try
+            {
+                string sourceFile = openFileDialog.FileName;
+
+                string targetDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UserData", "Profiles");
+
+                if (!Directory.Exists(targetDir))
+                    Directory.CreateDirectory(targetDir);
+
+                string fileName = $"profile_{DateTime.Now:yyyyMMddHHmmss}{Path.GetExtension(sourceFile)}";
+                string targetFile = Path.Combine(targetDir, fileName);
+
+                File.Copy(sourceFile, targetFile, true);
+
+                ProfileImagePath = targetFile;
+
+                MessageBox.Show("프로필 사진이 성공적으로 변경되었습니다!", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"이미지를 불러오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
+
+    partial void OnSelectedCameraNameChanged(string? value)
+    {
+        if (!HasCameras || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _ = SimulateCameraWarmupAsync();
+    }
+
+    private async Task SimulateCameraWarmupAsync()
+    {
+        try
+        {
+            IsCameraLoading = true;
+            await Task.Delay(500);
+        }
+        finally
+        {
+            IsCameraLoading = false;
+        }
     }
 
     private void OnCameraNamesChanged(object? sender, NotifyCollectionChangedEventArgs e) => SyncCameraAvailability();
@@ -122,5 +213,24 @@ public partial class SettingsViewModel : ObservableObject
             "데이터 백업",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
+    }
+
+    [RelayCommand]
+    private void EditProfile()
+    {
+        var vm = new EditProfileViewModel(UserName, UserBirthDate);
+        var dialog = new EditProfileView(vm)
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        if (dialog.ShowDialog() != true || !vm.BirthDate.HasValue)
+        {
+            return;
+        }
+
+        UserName = vm.Name.Trim();
+        UserBirthDate = vm.BirthDate.Value.Date;
+        SyncUserAgeFromBirthDate();
     }
 }
