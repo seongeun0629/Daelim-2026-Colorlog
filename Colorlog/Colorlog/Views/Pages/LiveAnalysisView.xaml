@@ -1,0 +1,240 @@
+<UserControl x:Class="Colorlog.Views.Pages.LiveAnalysisView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="820" d:DesignWidth="1180"
+      Background="Transparent">
+
+    <UserControl.Resources>
+        <Style x:Key="LiveCardTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}"/>
+        </Style>
+
+        <Style x:Key="LiveSubTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+        </Style>
+
+        <Style x:Key="StartButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentPillButtonStyle}">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsAnalyzing}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StopButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentOutlinePillButtonStyle}">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsAnalyzing}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="VisibleWhenTrueBorderStyle" TargetType="Border">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24,16,16,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="실시간 컬러 진단" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TitleTextBrush}"/>
+                <TextBlock Text="카메라 가이드에 얼굴을 맞추면 피부톤/밝기/홍조를 실시간으로 분석합니다." Margin="0,8,0,0" Style="{StaticResource LiveSubTextStyle}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.2*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,16,16" CornerRadius="18">
+                        <Grid>
+                            <Border CornerRadius="14" Background="#FF111827"/>
+                            <Border CornerRadius="14" Background="#99000000"/>
+
+                            <Grid Margin="16">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                    <Border Background="{Binding CameraStateBrush}" CornerRadius="12" Padding="10,5" Margin="0,0,8,0">
+                                        <TextBlock Text="{Binding CameraStateText}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                    </Border>
+                                    <Border Background="{Binding FaceStateBrush}" CornerRadius="12" Padding="10,5" Margin="0,0,8,0">
+                                        <TextBlock Text="{Binding FaceStateText}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                    </Border>
+                                    <Border Background="{Binding LightingStateBrush}" CornerRadius="12" Padding="10,5">
+                                        <TextBlock Text="{Binding LightingStateText}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Rectangle Width="360" Height="470"
+                                               Stroke="#AAFFFFFF"
+                                               StrokeThickness="2"
+                                               RadiusX="28" RadiusY="28"
+                                               StrokeDashArray="6 6"
+                                               Fill="#10FFFFFF"/>
+
+                                    <Ellipse Width="220" Height="280"
+                                             Stroke="#80FFFFFF"
+                                             StrokeThickness="1.5"
+                                             Fill="#0DFFFFFF"/>
+
+                                    <TextBlock Margin="0,196,0,0"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#E5FFFFFF"
+                                               FontSize="12"
+                                               Text="얼굴을 프레임 중앙에 맞춰주세요"/>
+                                </Grid>
+
+                                <Border Grid.Row="2" CornerRadius="10" Padding="12,8" Background="#33000000">
+                                    <TextBlock Text="{Binding GuidanceMessage}" Foreground="#F9FAFB" FontSize="12"/>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,16,0">
+                        <StackPanel>
+                            <TextBlock Text="진단 상태" Style="{StaticResource LiveCardTitleStyle}"/>
+                            <TextBlock Text="{Binding AnalysisStatus}" Margin="0,8,0,0" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
+                            <TextBlock Text="{Binding AnalysisStageText}" Margin="0,6,0,0" Style="{StaticResource LiveSubTextStyle}"/>
+
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ProgressBar Height="12" Minimum="0" Maximum="100" Value="{Binding AnalysisProgress}"/>
+                                <TextBlock Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource MutedTextBrush}" Text="{Binding AnalysisProgress, StringFormat={}{0:0}%}"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                                <Button Content="진단 시작"
+                                        Width="120"
+                                        Command="{Binding StartAnalysisCommand}"
+                                        Style="{StaticResource StartButtonStyle}"/>
+                                <Button Content="진단 중지"
+                                        Width="120"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding StopAnalysisCommand}"
+                                        Style="{StaticResource StopButtonStyle}"/>
+                            </StackPanel>
+
+                            <Border Margin="0,12,0,0"
+                                    Padding="10,8"
+                                    CornerRadius="10"
+                                    Background="#FFFEF2F2"
+                                    BorderBrush="#FFFECACA"
+                                    BorderThickness="1"
+                                    Style="{StaticResource VisibleWhenTrueBorderStyle}"
+                                    DataContext="{Binding HasBlockingIssue}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DataContext.BlockingIssueTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="#FFB91C1C" FontSize="12" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding DataContext.BlockingIssueMessage, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="0,4,0,0" Foreground="#FF7F1D1D" FontSize="12"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Margin="0,8,0,0"
+                                    Padding="10,8"
+                                    CornerRadius="10"
+                                    Background="#FFFFFBEB"
+                                    BorderBrush="#FFFDE68A"
+                                    BorderThickness="1"
+                                    Style="{StaticResource VisibleWhenTrueBorderStyle}"
+                                    DataContext="{Binding HasQualityWarning}">
+                                <TextBlock Text="{Binding DataContext.QualityWarningMessage, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="#FF92400E" FontSize="12"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="촬영 전 체크" Style="{StaticResource LiveCardTitleStyle}"/>
+                            <ItemsControl ItemsSource="{Binding PreCheckItems}" Margin="0,10,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,0,8" Padding="10,6" CornerRadius="10" Background="#FFF9FAFB" BorderBrush="#FFE5E7EB" BorderThickness="1">
+                                            <TextBlock Text="{Binding}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="실시간 결과 미리보기" Style="{StaticResource LiveCardTitleStyle}"/>
+                            <TextBlock Text="분석 중 감지되는 얼굴 부위별 색상값" Margin="0,8,0,14" Style="{StaticResource LiveSubTextStyle}"/>
+                            <TextBlock Text="{Binding PreviewBasisText}" Margin="0,0,0,12" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
+
+                            <ItemsControl ItemsSource="{Binding FaceTonePreviews}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,0,10" Padding="12" CornerRadius="12" Background="#FFF9FAFB" BorderBrush="#FFE5E7EB" BorderThickness="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Rectangle Width="24" Height="24" RadiusX="8" RadiusY="8" Fill="{Binding ToneBrush}" Stroke="#33000000" StrokeThickness="1"/>
+
+                                                <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ZoneName}" FontSize="13" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding ColorHex}" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
+                                                </StackPanel>
+
+                                                <Border Grid.Column="2" Background="#FFF3F4F6" CornerRadius="10" Padding="8,3" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ConfidencePercent, StringFormat=신뢰도 {0}%}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

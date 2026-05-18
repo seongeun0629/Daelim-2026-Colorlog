@@ -1,0 +1,21 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE
+.idea/
+
+# Generated analysis outputs
+analysis/saves/
+python/analysis/saves/
+tests/*_output.jsonl
+tests/probe_output.jsonl
+
+# OS junk
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,310 @@
+<UserControl x:Class="Colorlog.Views.Pages.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:conv="clr-namespace:Colorlog.Converter"
+             mc:Ignorable="d"
+             d:DesignHeight="760" d:DesignWidth="1000"
+             Background="Transparent"
+             SnapsToDevicePixels="True"
+             UseLayoutRounding="True"
+             Loaded="UserControl_Loaded"
+             SizeChanged="UserControl_SizeChanged">
+
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  SnapsToDevicePixels="True"
+                  UseLayoutRounding="True">
+
+        <Grid x:Name="PageRoot" Margin="{StaticResource AppShellPagePadding}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,24">
+                <TextBlock Text="서비스 설정" Style="{StaticResource PageHeaderTitleStyle}"/>
+                <TextBlock Text="계정·스타일·카메라·추구미·데이터를 한 화면에서 관리하세요."
+                           Style="{StaticResource PageHeaderSubtitleStyle}"
+                           TextWrapping="Wrap"/>
+                <TextBlock Text="변경 사항은 앱을 종료하기 전까지 이 기기에 유지됩니다."
+                           Style="{StaticResource PageHeaderHintStyle}"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="300"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*" MinWidth="300"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 사용자 정보 -->
+                <Border Grid.Row="0" Grid.Column="0"
+                        VerticalAlignment="Stretch"
+                        Style="{StaticResource DashboardCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="사용자 정보" Style="{StaticResource DashboardCardTitleStyle}"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <StackPanel Width="110">
+                                <Border Width="96" Height="96" 
+                                        CornerRadius="48"
+                                        BorderBrush="{StaticResource NeutralBorderBrush}" 
+                                        BorderThickness="2">
+
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding ProfileImagePath, FallbackValue='pack://application:,,,/Assets/user.png'}" 
+                                                    Stretch="UniformToFill"/>
+                                    </Border.Background>
+                                </Border>
+
+                                <Button Content="사진 변경" Command="{Binding ChangeProfileImageCommand}"
+                                        Style="{StaticResource OutlineButtonStyle}"
+                                        Margin="0,10,0,0" Height="28" FontSize="12" Width="96"
+                                        ToolTip="프로필 사진 변경은 곧 제공될 예정입니다."/>
+                            </StackPanel>
+
+                            <StackPanel Margin="20,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding UserName, FallbackValue='유현성'}"
+                                           FontSize="22" FontWeight="Bold"
+                                           Foreground="{StaticResource TitleTextBrush}"/>
+                                <TextBlock Text="{Binding UserAge, FallbackValue='만 24세'}"
+                                           Style="{StaticResource DashboardCardSubTextStyle}"
+                                           Margin="0,6,0,0"/>
+                                <Button Content="정보 수정"
+                                        Style="{StaticResource OutlineButtonStyle}"
+                                        HorizontalAlignment="Left"
+                                        Width="90" Margin="0,16,0,0"
+                                        Command="{Binding EditProfileCommand}"
+                                        ToolTip="이름과 나이를 수정합니다."/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Border Height="1" Background="{StaticResource NeutralBorderBrush}" Margin="0,24,0,20"/>
+
+                        <UniformGrid Columns="3">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="퍼스널 컬러" Style="{StaticResource DashboardCardSubTextStyle}"
+                                           HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                <Border Background="{StaticResource RoseSelectedBackgroundBrush}"
+                                        BorderBrush="{StaticResource RoseSelectedBorderBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="10,4">
+                                    <TextBlock Text="{Binding PersonalColorName, FallbackValue='봄 웜 라이트'}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{StaticResource RoseEmphasisTextBrush}"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="총 진단 횟수" Style="{StaticResource DashboardCardSubTextStyle}"
+                                           HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                <TextBlock Text="{Binding DiagnosisCount, FallbackValue='12회'}"
+                                           FontSize="20" FontWeight="Bold" Foreground="{StaticResource TitleTextBrush}"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="가입일" Style="{StaticResource DashboardCardSubTextStyle}"
+                                           HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                <TextBlock Text="{Binding JoinDate, FallbackValue='2026.01.03'}"
+                                           FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 카메라 / 조명 -->
+                <Border Grid.Row="0" Grid.Column="2"
+                        VerticalAlignment="Stretch"
+                        Style="{StaticResource DashboardCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="카메라 / 조명 설정" Style="{StaticResource DashboardCardTitleStyle}"/>
+                        <TextBlock Text="촬영 장치와 밝기를 맞추면 분석 결과가 더 안정적입니다."
+                                   Style="{StaticResource DashboardCardSubTextStyle}" Margin="0,8,0,0"/>
+
+                        <Border x:Name="PreviewHost" CornerRadius="12" Background="{StaticResource SurfaceMutedBrush}"
+                                Height="150" Margin="0,16,0,0" BorderBrush="{StaticResource NeutralBorderBrush}"
+                                BorderThickness="1" ClipToBounds="True" SizeChanged="PreviewHost_SizeChanged">
+                            <Grid>
+                                <Image x:Name="WebcamPreviewImage" Stretch="UniformToFill"/>
+                                <Border Background="#99FCFCFD" Visibility="{Binding IsCameraLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <ProgressBar IsIndeterminate="True" Height="4" Width="180"
+                                                     Foreground="{StaticResource PrimaryBrush}" Background="Transparent" BorderThickness="0"/>
+                                        <TextBlock Text="카메라를 불러오는 중..." Margin="0,12,0,0" HorizontalAlignment="Center"
+                                                   FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.5"
+                                            Visibility="{Binding IsCameraLoading, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
+                                    <TextBlock Text="카메라 미리보기" Style="{StaticResource DashboardCardSubTextStyle}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Margin="0,20,0,0" Padding="14,12"
+                                Background="{StaticResource SurfaceSubtleBrush}"
+                                CornerRadius="10" BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1"
+                                Visibility="{Binding HasCameras, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
+                            <StackPanel>
+                                <TextBlock Text="연결된 카메라가 없습니다"
+                                           FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource TitleTextBrush}"/>
+                                <TextBlock Text="USB 웹캠을 연결하거나 다른 앱에서 카메라 사용을 해제한 뒤 다시 열어 주세요."
+                                           Style="{StaticResource DashboardCardSubTextStyle}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Grid Margin="0,20,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="카메라" Style="{StaticResource FieldLabelStyle}" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding CameraNames}"
+                                      SelectedItem="{Binding SelectedCameraName, Mode=TwoWay}"
+                                      Visibility="{Binding HasCameras, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </Grid>
+
+                        <Grid Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="44"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="밝기" Style="{StaticResource FieldLabelStyle}" VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1" Minimum="0" Maximum="100" VerticalAlignment="Center"
+                                    Value="{Binding Brightness, Mode=TwoWay}" Style="{StaticResource LightSliderStyle}"/>
+                            <Border Grid.Column="2" Background="{StaticResource RoseSoftBackgroundBrush}"
+                                    CornerRadius="8" Padding="6,2" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                    BorderBrush="{StaticResource RoseBadgeBorderBrush}" BorderThickness="1">
+                                <TextBlock Text="{Binding Brightness, StringFormat={}{0:0}}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource RoseEmphasisTextBrush}"
+                                           VerticalAlignment="Center" TextAlignment="Center" MinWidth="22"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 추구미 -->
+                <Border Grid.Row="2" Grid.Column="0"
+                        VerticalAlignment="Stretch"
+                        Style="{StaticResource DashboardCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="추구미" Style="{StaticResource DashboardCardTitleStyle}"/>
+                        <TextBlock Text="선호하는 스타일을 복수 선택할 수 있습니다."
+                                   Style="{StaticResource DashboardCardSubTextStyle}" Margin="0,8,0,0"/>
+
+                        <Border Background="{StaticResource SurfaceMutedBrush}" CornerRadius="10" Padding="12,10" Margin="0,12,0,4"
+                                BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
+                            <TextBlock Text="{Binding PreferenceSelectionSummary}"
+                                       FontSize="12" Foreground="{StaticResource CaptionOnNeutralBrush}"
+                                       TextWrapping="Wrap" LineHeight="18"/>
+                        </Border>
+
+                        <TextBlock Text="분위기" Style="{StaticResource CardSectionTitleStyle}" Margin="0,12,0,0"/>
+                        <ItemsControl ItemsSource="{Binding MoodItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Margin="-4"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ToggleButton Content="{Binding Label}" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  Style="{StaticResource FilterToggleStyle}" Margin="4"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="피부 표현" Style="{StaticResource CardSectionTitleStyle}" Margin="0,8,0,0"/>
+                        <ItemsControl ItemsSource="{Binding SkinItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Margin="-4"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ToggleButton Content="{Binding Label}" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  Style="{StaticResource FilterToggleStyle}" Margin="4"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="톤 선호" Style="{StaticResource CardSectionTitleStyle}" Margin="0,8,0,0"/>
+                        <ItemsControl ItemsSource="{Binding ToneItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Margin="-4"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ToggleButton Content="{Binding Label}" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  Style="{StaticResource FilterToggleStyle}" Margin="4"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- 데이터 관리 -->
+                <Border Grid.Row="2" Grid.Column="2"
+                        VerticalAlignment="Stretch"
+                        Style="{StaticResource DashboardCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="데이터 관리" Style="{StaticResource DashboardCardTitleStyle}"/>
+                        <TextBlock Text="기록을 초기화하거나 안전하게 보관하세요."
+                                   Style="{StaticResource DashboardCardSubTextStyle}" Margin="0,8,0,0"/>
+
+                        <Border Background="{StaticResource SurfaceElevatedBrush}" CornerRadius="12" Padding="16" Margin="0,20,0,0"
+                                BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                    <TextBlock Text="데이터 백업" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                                    <TextBlock Text="현재의 설정과 분석 결과를 파일로 보냅니다."
+                                               FontSize="12" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="보내기" Style="{StaticResource OutlineButtonStyle}"
+                                        VerticalAlignment="Center" Command="{Binding ExportBackupCommand}"
+                                        ToolTip="백업 파일 저장 위치를 선택합니다."/>
+                            </Grid>
+                        </Border>
+
+                        <Border BorderBrush="{StaticResource DangerSubtleSectionBorderBrush}"
+                                BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,12,0,0"
+                                Background="{StaticResource DangerSurfaceBackgroundBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                    <TextBlock Text="모든 기록 초기화" FontWeight="Bold" Foreground="{StaticResource DangerStrongTextBrush}"/>
+                                    <TextBlock Text="진단 및 추천 기록이 모두 삭제되며 복구할 수 없습니다."
+                                               FontSize="12" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="초기화" Style="{StaticResource DangerSolidButtonStyle}"
+                                        VerticalAlignment="Center" Command="{Binding ResetAllRecordsCommand}"
+                                        ToolTip="되돌릴 수 없습니다. 실행 전에 백업을 권장합니다."/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
