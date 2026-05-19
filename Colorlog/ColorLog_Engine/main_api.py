@@ -136,11 +136,34 @@ def get_status():
 
 @app.route("/api/result", methods=["GET"])
 def get_result():
-    """최신 분석 결과 조회"""
+    """최신 분석 결과 조회 (디버그 모드 지원)"""
+    # URL 쿼리 파라미터에서 debug 값을 확인 (예: /api/result?debug=true)
+    is_debug = request.args.get('debug', 'false').lower() == 'true'
+
     with result_lock:
         if current_result is None:
             return jsonify({"message": "아직 결과가 없습니다."}), 200
-        return jsonify(current_result), 200
+
+        # 디버그 모드일 경우 원본(TMI 포함) 그대로 반환
+        if is_debug:
+            return jsonify(current_result), 200
+
+        # 일반 모드일 경우 핵심 데이터만 필터링하여 반환
+        core_data = {
+            "timestamp": current_result.get("timestamp", 0),
+            "face_detected": current_result.get("face_detected", False),
+            "lighting": current_result.get("lighting", {}),
+            "oily": current_result.get("oily", {}),
+            "skin_tone": current_result.get("skin_tone", {}),
+            "personal_color": current_result.get("personal_color", {})
+        }
+
+        # 편의를 위해 피부색 Hex 코드 변환 로직 추가 (선택 사항)
+        if "r" in core_data["skin_tone"]:
+            r, g, b = core_data["skin_tone"]["r"], core_data["skin_tone"]["g"], core_data["skin_tone"]["b"]
+            core_data["skin_tone"]["hex"] = f"#{r:02X}{g:02X}{b:02X}"
+
+        return jsonify(core_data), 200
 
 
 @app.route("/api/config", methods=["GET"])
