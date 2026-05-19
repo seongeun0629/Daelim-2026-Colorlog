@@ -8,17 +8,6 @@
       Background="Transparent">
 
     <UserControl.Resources>
-        <Style x:Key="LiveCardTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}"/>
-        </Style>
-
-        <Style x:Key="LiveSubTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
-        </Style>
-
         <Style x:Key="StartButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentPillButtonStyle}">
             <Setter Property="Visibility" Value="Visible"/>
             <Style.Triggers>
@@ -47,16 +36,17 @@
         </Style>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <Grid Margin="24,16,16,24">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  Background="Transparent">
+        <Grid Background="Transparent" Margin="{StaticResource AppShellPagePadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="실시간 컬러 진단" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TitleTextBrush}"/>
-                <TextBlock Text="카메라 가이드에 얼굴을 맞추면 피부톤/밝기/홍조를 실시간으로 분석합니다." Margin="0,8,0,0" Style="{StaticResource LiveSubTextStyle}"/>
+            <StackPanel Grid.Row="0" Margin="{StaticResource PageHeaderBottomMargin}">
+                <TextBlock Text="실시간 컬러 진단" Style="{StaticResource PageHeaderTitleStyle}"/>
+                <TextBlock Text="카메라 가이드에 얼굴을 맞추면 피부톤/밝기/홍조를 실시간으로 분석합니다." Style="{StaticResource PageHeaderSubtitleStyle}"/>
             </StackPanel>
 
             <Grid Grid.Row="1">
@@ -140,9 +130,9 @@
 
                     <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,16,0">
                         <StackPanel>
-                            <TextBlock Text="진단 상태" Style="{StaticResource LiveCardTitleStyle}"/>
+                            <TextBlock Text="진단 상태" Style="{StaticResource AnalysisCardTitleStyle}"/>
                             <TextBlock Text="{Binding AnalysisStatus}" Margin="0,8,0,0" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
-                            <TextBlock Text="{Binding AnalysisStageText}" Margin="0,6,0,0" Style="{StaticResource LiveSubTextStyle}"/>
+                            <TextBlock Text="{Binding AnalysisStageText}" Margin="0,6,0,0" Style="{StaticResource AnalysisCardSubTextStyle}"/>
 
                             <Grid Margin="0,12,0,0">
                                 <Grid.ColumnDefinitions>
@@ -201,11 +191,11 @@
 
                     <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                         <StackPanel>
-                            <TextBlock Text="촬영 전 체크" Style="{StaticResource LiveCardTitleStyle}"/>
+                            <TextBlock Text="촬영 전 체크" Style="{StaticResource AnalysisCardTitleStyle}"/>
                             <ItemsControl ItemsSource="{Binding PreCheckItems}" Margin="0,10,0,0">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Margin="0,0,0,8" Padding="10,6" CornerRadius="10" Background="#FFF9FAFB" BorderBrush="#FFE5E7EB" BorderThickness="1">
+                                        <Border Margin="0,0,0,8" Padding="10,6" Style="{StaticResource GlassInsetStyle}">
                                             <TextBlock Text="{Binding}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
                                         </Border>
                                     </DataTemplate>
@@ -216,14 +206,14 @@
 
                     <Border Grid.Row="1" Style="{StaticResource CardStyle}">
                         <StackPanel>
-                            <TextBlock Text="실시간 결과 미리보기" Style="{StaticResource LiveCardTitleStyle}"/>
-                            <TextBlock Text="분석 중 감지되는 얼굴 부위별 색상값" Margin="0,8,0,14" Style="{StaticResource LiveSubTextStyle}"/>
+                            <TextBlock Text="실시간 결과 미리보기" Style="{StaticResource AnalysisCardTitleStyle}"/>
+                            <TextBlock Text="분석 중 감지되는 얼굴 부위별 색상값" Margin="0,8,0,14" Style="{StaticResource AnalysisCardSubTextStyle}"/>
                             <TextBlock Text="{Binding PreviewBasisText}" Margin="0,0,0,12" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
 
                             <ItemsControl ItemsSource="{Binding FaceTonePreviews}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Margin="0,0,0,10" Padding="12" CornerRadius="12" Background="#FFF9FAFB" BorderBrush="#FFE5E7EB" BorderThickness="1">
+                                        <Border Margin="0,0,0,10" Padding="12" Style="{StaticResource GlassInsetStyle}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -238,7 +228,7 @@
                                                     <TextBlock Text="{Binding ColorHex}" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
                                                 </StackPanel>
 
-                                                <Border Grid.Column="2" Background="#FFF3F4F6" CornerRadius="10" Padding="8,3" VerticalAlignment="Center">
+                                                <Border Grid.Column="2" Background="{StaticResource SurfaceMutedBrush}" CornerRadius="10" Padding="8,3" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding ConfidencePercent, StringFormat=신뢰도 {0}%}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
                                                 </Border>
                                             </Grid>

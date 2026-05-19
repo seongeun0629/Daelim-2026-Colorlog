@@ -71,9 +71,9 @@ namespace Colorlog.Services
                 }
             };
 
-            _process.Start();
-            _process.BeginOutputReadLine();
-            _process.BeginErrorReadLine(); 
+            ////_process.Start();
+            //_process.BeginOutputReadLine();
+            //_process.BeginErrorReadLine(); 
         }
 
         public void Stop() { _process?.Kill(); }

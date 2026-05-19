@@ -20,14 +20,9 @@
         d:DataContext="{d:DesignInstance vm:EditProfileViewModel, IsDesignTimeCreatable=True}">
 
     <Border Padding="20" Background="Transparent">
-        <Border CornerRadius="20"
-                Background="{StaticResource WhiteBrush}"
-                BorderBrush="{StaticResource NeutralBorderBrush}"
-                BorderThickness="1"
-                Padding="24,20,24,24">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.18" Color="{StaticResource ShadowSlate900Color}" Direction="270"/>
-            </Border.Effect>
+        <Border Style="{StaticResource CardStyle}"
+                CornerRadius="20"
+                Padding="26,22,26,26">
 
             <Grid>
                 <Grid.RowDefinitions>
