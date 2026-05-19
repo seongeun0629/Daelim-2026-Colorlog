@@ -85,26 +85,29 @@ GET /api/status
 ```
 GET /api/result
 응답: {
-  "timestamp": 1000,
-  "face_detected": true,
-  "lighting": {"status": "normal", "score": 165},
-  "lighting_debug": {
-    "blue_cast": 0.95,
-    "overprocessed_score": 0.15,
-    "alpha": 0.64,
-    "gain_rgb": [1.05, 1.0, 0.98]
-  },
-  "oily": {"status": "Not Oily", "score": 28},
-  "oily_debug": {
-    "tzone_focus": 0.42,
-    "bright_density": 0.011,
-    "component_count": 2
-  },
-  "skin_tone": {"r": 195, "g": 150, "b": 140},
-  "personal_color": {
-    "type": "warm_spring",
-    "lab": {"L": 60.5, "a": 15.3, "b": 25.8}
-  }
+        'face_detected': True,
+        'lighting': {
+              'score': 92,
+              'status': 'Good'
+        },
+        'oily': {
+              'score': 33,
+              'status': 'Not Oily'
+        },
+        'personal_color': {
+              'lab': {
+                  'L': 114.0,
+                  'a': 15.0,
+                  'b': 8.0
+                },
+              'type': '겨울 쿨톤 (Winter Cool)'
+        },
+        'skin_tone': {
+              'b': 93,
+              'g': 96,
+              'hex': '#85605D',
+              'r': 133},
+        'timestamp': 1683
 }
 ```
 
