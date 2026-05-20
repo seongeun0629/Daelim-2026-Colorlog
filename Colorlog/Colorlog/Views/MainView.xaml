@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:Colorlog"
         xmlns:views="clr-namespace:Colorlog.Views.Pages"
         xmlns:viewmodel ="clr-namespace:Colorlog.ViewModels"
-        xmlns:conv="clr-namespace:Colorlog.Converter"
         mc:Ignorable="d"
         Title="Colorlog" Height="900" Width="1440"
         MinHeight="760" MinWidth="1200"
@@ -14,8 +13,6 @@
         Background="{StaticResource BackgroundBrush}">
 
     <Window.Resources>
-
-        <conv:BoolToHAlignConverter x:Key="BoolToHAlignConverter"/>
 
         <DataTemplate DataType="{x:Type viewmodel:DashboardViewModel}">
             <views:DashboardView/>
@@ -49,185 +46,138 @@
     </Window.Resources>
     <Grid>
         <Border Background="{StaticResource AppShellBackgroundBrush}"/>
+        <Border Background="{StaticResource AppShellAuroraOrbRoseBrush}" IsHitTestVisible="False"/>
+        <Border Background="{StaticResource AppShellAuroraOrbLilacBrush}" IsHitTestVisible="False"/>
+        <Border Background="{StaticResource AppShellAuroraOrbMintBrush}" IsHitTestVisible="False"/>
 
         <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Margin="{StaticResource AppShellSidebarHostMargin}" Canvas.ZIndex="10">
-            <Border x:Name="SidebarBorder" Width="260"
-                    HorizontalAlignment="Left"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Padding="0"
-                    Effect="{StaticResource ShellSidebarShadowEffect}">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
-                                <DataTrigger.EnterActions>
-                                    <BeginStoryboard Storyboard="{StaticResource CloseSidebar}"/>
-                                </DataTrigger.EnterActions>
-                                <DataTrigger.ExitActions>
-                                    <BeginStoryboard Storyboard="{StaticResource OpenSidebar}"/>
-                                </DataTrigger.ExitActions>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
+            <Grid Grid.Column="0" Margin="{StaticResource AppShellSidebarHostMargin}" Canvas.ZIndex="10">
+                <Border x:Name="SidebarBorder" Width="260"
+                        HorizontalAlignment="Left"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        Effect="{StaticResource ShellSidebarShadowEffect}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSidebarExpanded}" Value="False">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard Storyboard="{StaticResource CloseSidebar}"/>
+                                    </DataTrigger.EnterActions>
+                                    <DataTrigger.ExitActions>
+                                        <BeginStoryboard Storyboard="{StaticResource OpenSidebar}"/>
+                                    </DataTrigger.ExitActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
 
-                <Grid>
-                    <Border Style="{StaticResource ShellSidebarPanelStyle}"
-                            Padding="0,20,0,24"
-                            Margin="0,0,4,0">
+                    <Grid>
+                        <Border Style="{StaticResource ShellSidebarPanelStyle}"
+                            Padding="0,18,0,22"
+                            Margin="0,0,6,0">
 
-                        <Grid x:Name="SidebarContentGrid">
-                            <Border CornerRadius="23"
-                                    Margin="1,1,0,1"
-                                    Background="{StaticResource ShellGlassInnerWashBrush}"
-                                    IsHitTestVisible="False"/>
+                            <Grid x:Name="SidebarContentGrid" ClipToBounds="True">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                            <Grid Panel.ZIndex="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                                    <!-- 사이드바 헤더 -->
+                                    <Grid Grid.Row="0" Margin="12,0,12,16" Height="50">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                <!-- 사이드바 헤더 -->
-                <Grid Grid.Row="0" Margin="0,0,0,24" Height="50">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                                        <ToggleButton x:Name="SidebarToggleButton" Content="☰"
+                                            Grid.Column="0" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                            Style="{StaticResource SidebarToggleButtonStyle}"
+                                            ToolTip="사이드바 접기/펼치기" Width="40" Height="40"
+                                            IsChecked="{Binding IsSidebarExpanded, Mode=TwoWay}"  
+                                            VerticalAlignment="Center"/>
 
-                    <ToggleButton x:Name="SidebarToggleButton" Content="☰"
-                            Grid.Column="0" HorizontalAlignment="Center" Margin="0,2,0,0"
-                            Style="{StaticResource SidebarToggleButtonStyle}"
-                            ToolTip="사이드바 접기/펼치기" Width="40" Height="40"
-                            IsChecked="{Binding IsSidebarExpanded, Mode=TwoWay}"  
-                            VerticalAlignment="Center"/>
+                                        <StackPanel x:Name="SidebarBrandText" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <TextBlock Style="{StaticResource SidebarBrandTitleStyle}" Text="Colorlog"/>
+                                            <TextBlock Style="{StaticResource SidebarBrandSubtitleStyle}" Text="Personal color studio"/>
+                                        </StackPanel>
+                                    </Grid>
 
-                    <StackPanel x:Name="SidebarBrandText" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource SidebarBrandTitleStyle}" Text="Colorlog"/>
-                        <TextBlock Style="{StaticResource SidebarBrandSubtitleStyle}" Text="Personal color studio"/>
-                    </StackPanel>
+                                    <Border Grid.Row="1"
+                                            Style="{StaticResource GlassDividerStyle}"
+                                            Margin="18,0,18,12"/>
 
-                    
-                </Grid>
-                <!--메뉴-->
-                <StackPanel Grid.Row="1" Margin="0,0,0,20" >
-                    <ListBox x:Name="SidebarListBox" 
-                         BorderThickness="0"
-                         Background="Transparent" 
-                         Margin="8,0"
-                         SelectedValuePath="Tag"
-                         SelectedValue="{Binding SelectedMenuTag, Mode=TwoWay}" 
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBoxItem">
-                                            <Border x:Name="border" CornerRadius="12" Margin="4,4" Padding="0,12"
-                                                    Background="Transparent" BorderBrush="Transparent" BorderThickness="0">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="4"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <Border x:Name="activeIndicator"
-                                                            Grid.Column="0"
-                                                            Margin="0,4,0,4"
-                                                            CornerRadius="2"
-                                                            Background="{StaticResource PrimaryBrush}"
-                                                            Opacity="0"/>
-                                                    <ContentPresenter Grid.Column="1"
-                                                                      VerticalAlignment="Center"
-                                                                      HorizontalAlignment="{Binding DataContext.IsSidebarExpanded, 
-                                                                      RelativeSource={RelativeSource AncestorType=Window}, 
-                                                                      Converter={StaticResource BoolToHAlignConverter}}"/>
-                                                </Grid>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SidebarHoverBgBrush}"/>
-                                                </Trigger>
-                                                <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="border" Property="Background" Value="{StaticResource SidebarSelectedBgBrush}"/>
-                                                    <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource RoseOutlineLightBrush}"/>
-                                                    <Setter TargetName="border" Property="BorderThickness" Value="1"/>
-                                                    <Setter Property="Foreground" Value="{StaticResource SidebarSelectedTextBrush}"/>
-                                                    <Setter Property="FontWeight" Value="SemiBold"/>
-                                                    <Setter TargetName="activeIndicator" Property="Opacity" Value="1"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                
-                            </Style>
-                            
-                        </ListBox.ItemContainerStyle>
+                                    <!--메뉴-->
+                                    <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                                        <ListBox x:Name="SidebarListBox" 
+                                            BorderThickness="0"
+                                            Background="Transparent" 
+                                            Margin="4,0"
+                                            ItemContainerStyle="{StaticResource SidebarNavListBoxItemStyle}"
+                                            SelectedValuePath="Tag"
+                                            SelectedValue="{Binding SelectedMenuTag, Mode=TwoWay}" 
+                                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                            ScrollViewer.VerticalScrollBarVisibility="Disabled">
 
-                        <ListBoxItem Tag="Dashboard" Cursor="Hand" ToolTip="나의 컬러 홈">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="🏠" Width="38" FontSize="17" TextAlignment="Center"/>
-                                <TextBlock Text="나의 컬러 홈" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </ListBoxItem>
+                                            <ListBoxItem Tag="Dashboard" Cursor="Hand" ToolTip="나의 컬러 홈">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="🏠" Width="38" FontSize="17" TextAlignment="Center"/>
+                                                    <TextBlock Text="나의 컬러 홈" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </ListBoxItem>
 
-                        <ListBoxItem Tag="LiveAnalysis" Cursor="Hand" ToolTip="실시간 컬러 분석">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="✨" Width="38" FontSize="17" TextAlignment="Center"/>
-                                <TextBlock Text="실시간 컬러 분석" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </ListBoxItem>
+                                            <ListBoxItem Tag="LiveAnalysis" Cursor="Hand" ToolTip="실시간 컬러 분석">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="✨" Width="38" FontSize="17" TextAlignment="Center"/>
+                                                    <TextBlock Text="실시간 컬러 분석" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </ListBoxItem>
 
-                        <ListBoxItem Tag="History" Cursor="Hand" ToolTip="컬러 히스토리">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="📅" Width="38" FontSize="17" TextAlignment="Center"/>
-                                <TextBlock Text="컬러 히스토리" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </ListBoxItem>
+                                            <ListBoxItem Tag="History" Cursor="Hand" ToolTip="컬러 히스토리">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="📅" Width="38" FontSize="17" TextAlignment="Center"/>
+                                                    <TextBlock Text="컬러 히스토리" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </ListBoxItem>
 
-                        <ListBoxItem Tag="BeautyLog" Cursor="Hand" ToolTip="퍼스널 뷰티템">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="💄" Width="38" FontSize="17" TextAlignment="Center"/>
-                                <TextBlock Text="퍼스널 뷰티템" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </ListBoxItem>
+                                            <ListBoxItem Tag="BeautyLog" Cursor="Hand" ToolTip="퍼스널 뷰티템">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="💄" Width="38" FontSize="17" TextAlignment="Center"/>
+                                                    <TextBlock Text="퍼스널 뷰티템" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </ListBoxItem>
 
-                        <ListBoxItem Tag="Settings" Cursor="Hand" ToolTip="서비스 설정">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="⚙️" Width="38" FontSize="17" TextAlignment="Center"/>
-                                <TextBlock Text="서비스 설정" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </ListBoxItem>
-                    </ListBox>
-                </StackPanel>
-
+                                            <ListBoxItem Tag="Settings" Cursor="Hand" ToolTip="서비스 설정">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="⚙️" Width="38" FontSize="17" TextAlignment="Center"/>
+                                                    <TextBlock Text="서비스 설정" Style="{StaticResource SidebarNavLabelStyle}" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </ListBoxItem>
+                                        </ListBox>
+                                    </StackPanel>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Border>
-
-                    
-                </Grid>
-            </Border>
-        </Grid>
-
-        <!-- 콘텐츠 영역: 구분선 + 캔버스 여백으로 사이드바와 시각적 분리 -->
-            <Grid Grid.Column="1" Margin="{StaticResource AppShellContentHostMargin}" Background="Transparent">
-                
-                <ContentControl x:Name="ContentArea"
-                            Margin="14,0,0,0"
-                            Background="Transparent"
-                            Content="{Binding CurrentView}"/>
+                        </Border>
+                    </Grid>
+                </Border>
             </Grid>
 
+            <!-- 콘텐츠 영역-->
+            <Grid Grid.Column="1" Margin="{StaticResource AppShellContentHostMargin}" Background="Transparent">
+                <ContentControl x:Name="ContentArea"
+                    Margin="14,0,0,0"
+                    Background="Transparent"
+                    Content="{Binding CurrentView}"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

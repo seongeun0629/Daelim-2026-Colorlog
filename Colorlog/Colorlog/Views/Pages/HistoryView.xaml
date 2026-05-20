@@ -92,7 +92,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- 주간 트렌드 -->
+                <!-- 주간 -->
                 <Border x:Name="WeekHistoryCard" Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="일주일 히스토리" Style="{StaticResource DashboardCardTitleStyle}"/>
@@ -363,7 +363,6 @@
                     </Grid>
                 </Border>
 
-                <!-- 주간 카드 아래: 안내 -->
                 <Border x:Name="HistoryHintCard" Grid.Row="2" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="기록에 대해" Style="{StaticResource DashboardCardTitleStyle}"/>

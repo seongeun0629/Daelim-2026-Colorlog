@@ -10,158 +10,123 @@
              UseLayoutRounding="True">
 
     <UserControl.Resources>
-        <!-- 메이크업: 상단 중심 코랄·핑크 글로우 → 외곽 맑은 흰 안개 (#4DFFFFFF) -->
-        <RadialGradientBrush x:Key="MakeupProductCardGlowBrush"
-                             Center="0.5,0.4"
-                             GradientOrigin="0.5,0.4"
-                             RadiusX="0.88"
-                             RadiusY="1.02">
-            <GradientStop Color="#77FFC9D0" Offset="0"/>
-            <GradientStop Color="#55FFE0E6" Offset="0.22"/>
-            <GradientStop Color="#3DFFF4F6" Offset="0.48"/>
-            <GradientStop Color="#59FFFFFF" Offset="0.78"/>
-            <GradientStop Color="#52FFFFFF" Offset="1"/>
-        </RadialGradientBrush>
-
-        <!-- 스킨케어: 상단 중심 민트 글로우 → 외곽 맑은 흰 안개 -->
-        <RadialGradientBrush x:Key="SkinCareProductCardGlowBrush"
-                             Center="0.5,0.4"
-                             GradientOrigin="0.5,0.4"
-                             RadiusX="0.88"
-                             RadiusY="1.02">
-            <GradientStop Color="#66D4F5EA" Offset="0"/>
-            <GradientStop Color="#44E8FAF4" Offset="0.22"/>
-            <GradientStop Color="#3DF5FCFA" Offset="0.48"/>
-            <GradientStop Color="#59FFFFFF" Offset="0.78"/>
-            <GradientStop Color="#52FFFFFF" Offset="1"/>
-        </RadialGradientBrush>
+        <!-- 방사형·비대칭 크롬: AppStyles (MakeupProductCardRadialBacklightBrush, BeautyProductCardChromeStyle) -->
 
         <DataTemplate x:Key="MakeupProductCardTemplate">
-            <Border Style="{StaticResource ProductCardContainerStyle}"
-                    ClipToBounds="True">
-                <Border CornerRadius="17"
-                        ClipToBounds="True"
-                        Background="{StaticResource MakeupProductCardGlowBrush}"
-                        BorderBrush="{StaticResource GlassBorderGradientBrush}"
-                        BorderThickness="{StaticResource GlassCardBorderThickness}"
-                        SnapsToDevicePixels="True"
-                        UseLayoutRounding="True">
-                <Grid ClipToBounds="True" SnapsToDevicePixels="True">
-                    <Border HorizontalAlignment="Left"
-                            Width="3"
-                            Margin="12,14,0,14"
-                            CornerRadius="2"
-                            Opacity="0.85"
-                            IsHitTestVisible="False">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="#CCFF8A8A" Offset="0"/>
-                                <GradientStop Color="#66FF8A8A" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
-                <StackPanel Margin="28,20,18,18" SnapsToDevicePixels="True" Panel.ZIndex="1">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+            <Border Style="{StaticResource ProductCardContainerStyle}">
+                <Border Style="{StaticResource BeautyProductCardChromeStyle}">
+                    <Grid ClipToBounds="True">
+                        <Border CornerRadius="20" Background="#26FFFFFF"/>
+                        <Border CornerRadius="20" Background="{StaticResource MakeupProductCardRadialBacklightBrush}"/>
+                        <Border CornerRadius="20"
+                                Background="{StaticResource FrostedGlassSheenBrush}"
+                                IsHitTestVisible="False"/>
 
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TitleTextBrush}"/>
-                            <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        <StackPanel Margin="22,20,20,20" SnapsToDevicePixels="True">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                                <TextBlock Text="{Binding Category}" Margin="0,5,0,0" FontSize="12" Foreground="{StaticResource DataEmphasisBrush}" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <Border Grid.Column="1" VerticalAlignment="Top" Padding="10,5"
+                                    Style="{StaticResource FrostedGlassNestedStyle}">
+
+                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}"
+                                           Foreground="{StaticResource RoseEmphasisTextBrush}"
+                                           FontSize="12" FontWeight="SemiBold"/>
+                            </Border>
+                        </Grid>
+
+                        <TextBlock Text="{Binding RecommendationReason}" Margin="0,10,0,10"
+                                   FontSize="12" Foreground="{StaticResource BodyTextBrush}"
+                                   TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding RecommendationReason}"/>
+
+                        <ItemsControl ItemsSource="{Binding Tags}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource TagChipStyle}">
+                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Margin="0,4,0,0" FontSize="11" Foreground="{StaticResource CaptionTextBrush}"
+                                   Text="자세히 보려면 카드에 마우스를 올려보세요."/>
                         </StackPanel>
-
-                        <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource RoseSoftBackgroundBrush}" BorderBrush="{StaticResource RoseBadgeBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
-                            <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource RoseEmphasisTextBrush}" FontSize="12" FontWeight="SemiBold"/>
-                        </Border>
                     </Grid>
-
-                    <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource BodyTextBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
-
-                    <ItemsControl ItemsSource="{Binding Tags}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Style="{StaticResource TagChipStyle}">
-                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource CaptionTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
-                </StackPanel>
-                </Grid>
                 </Border>
             </Border>
         </DataTemplate>
 
         <DataTemplate x:Key="SkinCareProductCardTemplate">
-            <Border Style="{StaticResource ProductCardContainerStyle}"
-                    ClipToBounds="True">
-                <Border CornerRadius="17"
-                        ClipToBounds="True"
-                        Background="{StaticResource SkinCareProductCardGlowBrush}"
-                        BorderBrush="{StaticResource GlassBorderGradientBrush}"
-                        BorderThickness="{StaticResource GlassCardBorderThickness}"
-                        SnapsToDevicePixels="True"
-                        UseLayoutRounding="True">
-                <Grid ClipToBounds="True" SnapsToDevicePixels="True">
-                    <Border HorizontalAlignment="Left"
-                            Width="3"
-                            Margin="12,14,0,14"
-                            CornerRadius="2"
-                            Opacity="0.85"
-                            IsHitTestVisible="False">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="#CC4CAF50" Offset="0"/>
-                                <GradientStop Color="#664CAF50" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
-                <StackPanel Margin="28,20,18,18" SnapsToDevicePixels="True" Panel.ZIndex="1">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+            <Border Style="{StaticResource ProductCardContainerStyle}">
+                <Border Style="{StaticResource BeautyProductCardChromeStyle}">
+                    <Grid ClipToBounds="True">
+                        <Border CornerRadius="20" Background="#26FFFFFF"/>
+                        <Border CornerRadius="20" Background="{StaticResource SkinCareProductCardRadialBacklightBrush}"/>
+                        <Border CornerRadius="20"
+                                Background="{StaticResource FrostedGlassSheenBrush}"
+                                IsHitTestVisible="False"/>
 
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TitleTextBrush}"/>
-                            <TextBlock Text="{Binding Category}" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"/>
+                        <StackPanel Margin="22,20,20,20" SnapsToDevicePixels="True">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                                <TextBlock Text="{Binding Category}" Margin="0,5,0,0" FontSize="12" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <Border Grid.Column="1" VerticalAlignment="Top" Padding="10,5"
+                                    Style="{StaticResource FrostedGlassNestedStyle}">
+                                <TextBlock Text="{Binding Rating, StringFormat=★ {0}}"
+                                           Foreground="{StaticResource SuccessDeepTextBrush}"
+                                           FontSize="12" FontWeight="SemiBold"/>
+                            </Border>
+                        </Grid>
+
+                        <TextBlock Text="{Binding RecommendationReason}" Margin="0,10,0,10"
+                                   FontSize="12" Foreground="{StaticResource BodyTextBrush}"
+                                   TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding RecommendationReason}"/>
+
+                        <ItemsControl ItemsSource="{Binding Tags}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource TagChipStyle}">
+                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Margin="0,4,0,0" FontSize="11" Foreground="{StaticResource CaptionTextBrush}"
+                                   Text="자세히 보려면 카드에 마우스를 올려보세요."/>
                         </StackPanel>
-
-                        <Border Grid.Column="1" VerticalAlignment="Top" Background="{StaticResource SuccessSoftBackgroundBrush}" BorderBrush="{StaticResource SuccessSoftBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8,3">
-                            <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource SuccessDeepTextBrush}" FontSize="12" FontWeight="SemiBold"/>
-                        </Border>
                     </Grid>
-
-                    <TextBlock Text="{Binding RecommendationReason}" Margin="0,8,0,8" FontSize="12" Foreground="{StaticResource BodyTextBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding RecommendationReason}"/>
-
-                    <ItemsControl ItemsSource="{Binding Tags}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Style="{StaticResource TagChipStyle}">
-                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="{StaticResource CaptionOnNeutralBrush}"/>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource CaptionTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
-                </StackPanel>
-                </Grid>
                 </Border>
             </Border>
         </DataTemplate>
@@ -170,6 +135,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                   Background="Transparent"
                   SnapsToDevicePixels="True" UseLayoutRounding="True">
+
         <Grid Background="Transparent" Margin="{StaticResource AppShellPagePadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -183,23 +149,24 @@
                 <TextBlock Text="추천은 최근 톤 분석/피부 컨디션 기준으로 매일 업데이트됩니다." Style="{StaticResource PageHeaderHintStyle}"/>
             </StackPanel>
 
-            <Border x:Name="BeautyCriteriaCard" Grid.Row="1" Style="{StaticResource DashboardCardStyle}" Margin="0,0,0,20">
+            <Border x:Name="BeautyCriteriaCard" Grid.Row="1" Style="{StaticResource DashboardCardStyle}" Margin="0,0,0,24">
                 <StackPanel>
                     <TextBlock Text="오늘의 추천 기준" Style="{StaticResource BeautyHeaderStyle}"/>
-                    <TextBlock Text="{Binding ToneSummary}" Margin="0,10,0,0" Style="{StaticResource DashboardAccentValueStyle}"/>
-                    <TextBlock Text="{Binding SkinConditionSummary}" Margin="0,8,0,8" 
+                    <TextBlock Text="{Binding ToneSummary}" Margin="0,12,0,0" Style="{StaticResource DashboardAccentValueStyle}"/>
+                    <TextBlock Text="{Binding SkinConditionSummary}" Margin="0,10,0,12"
                                Style="{StaticResource BeautySubStyle}"/>
-
-                    <ItemsControl ItemsSource="{Binding FocusKeywords}" Margin="0,0,0,8">
+                    
+                    <ItemsControl ItemsSource="{Binding FocusKeywords}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Margin="0,0,8,8" Padding="10,6" Style="{StaticResource GlassInsetStyle}">
-                                    <TextBlock Text="{Binding}" FontSize="12" 
+                                <Border Margin="0,0,10,10" Padding="12,8" Style="{StaticResource LiquidGlassInsetStyle}">
+                                    <TextBlock Text="{Binding}" FontSize="12" FontWeight="Medium"
                                                Foreground="{StaticResource BodyTextBrush}"/>
                                 </Border>
                             </DataTemplate>
@@ -209,14 +176,16 @@
             </Border>
 
             <Border x:Name="BeautyTabsCard" Grid.Row="2" Style="{StaticResource DashboardCardStyle}" Margin="0">
-                <TabControl Style="{StaticResource BeautyTabControlStyle}" Background="Transparent" 
-                            BorderThickness="0" ItemContainerStyle="{StaticResource BeautyTabItemStyle}" 
+                <TabControl Style="{StaticResource BeautyTabControlStyle}" Background="Transparent"
+                            BorderThickness="0" ItemContainerStyle="{StaticResource BeautyTabItemStyle}"
                             UseLayoutRounding="True" SnapsToDevicePixels="True">
+
                     <TabItem Header="🎨 색조 메이크업">
-                        <StackPanel Margin="8,16,0,0">
-                            <TextBlock Text="톤 매칭률과 발색 지속력이 좋은 제품 추천" 
-                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,16"/>
-                            <ItemsControl ItemsSource="{Binding MakeupItems}" 
+                        <StackPanel Margin="4,20,0,0">
+                            <TextBlock Text="톤 매칭률과 발색 지속력이 좋은 제품 추천"
+                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,20"/>
+                            
+                            <ItemsControl ItemsSource="{Binding MakeupItems}"
                                           ItemTemplate="{StaticResource MakeupProductCardTemplate}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -228,10 +197,10 @@
                     </TabItem>
 
                     <TabItem Header="🧴 기초 스킨케어">
-                        <StackPanel Margin="8,16,0,0">
-                            <TextBlock Text="수분/진정/장벽 중심으로 오늘 상태에 맞춘 제품 추천" 
-                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,16"/>
-                            <ItemsControl ItemsSource="{Binding SkinCareItems}" 
+                        <StackPanel Margin="4,20,0,0">
+                            <TextBlock Text="수분/진정/장벽 중심으로 오늘 상태에 맞춘 제품 추천"
+                                       Style="{StaticResource BeautySubStyle}" Margin="0,0,0,20"/>
+                            <ItemsControl ItemsSource="{Binding SkinCareItems}"
                                           ItemTemplate="{StaticResource SkinCareProductCardTemplate}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -246,3 +215,4 @@
         </Grid>
     </ScrollViewer>
 </UserControl>
+

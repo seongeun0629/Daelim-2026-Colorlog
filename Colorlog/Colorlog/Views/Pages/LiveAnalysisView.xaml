@@ -61,12 +61,25 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,16,16" CornerRadius="18">
-                        <Grid>
-                            <Border CornerRadius="14" Background="#FF111827"/>
-                            <Border CornerRadius="14" Background="#99000000"/>
+                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,20,20" Padding="14">
+                        <Grid ClipToBounds="True">
+                            <Border CornerRadius="14" Background="#FF0F1419" ClipToBounds="True"/>
+                            <Border CornerRadius="14" ClipToBounds="True">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#55000000" Offset="0"/>
+                                        <GradientStop Color="#99000000" Offset="0.45"/>
+                                        <GradientStop Color="#CC000000" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            <Border CornerRadius="14"
+                                    BorderBrush="{StaticResource GlassBorderGradientBrush}"
+                                    BorderThickness="1"
+                                    Opacity="0.55"
+                                    IsHitTestVisible="False"/>
 
-                            <Grid Margin="16">
+                            <Grid Margin="14">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
@@ -74,13 +87,16 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                    <Border Background="{Binding CameraStateBrush}" CornerRadius="12" Padding="10,5" Margin="0,0,8,0">
+                                    <Border Background="{Binding CameraStateBrush}" CornerRadius="14" Padding="12,6" Margin="0,0,8,0"
+                                            BorderBrush="#44FFFFFF" BorderThickness="1">
                                         <TextBlock Text="{Binding CameraStateText}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
                                     </Border>
-                                    <Border Background="{Binding FaceStateBrush}" CornerRadius="12" Padding="10,5" Margin="0,0,8,0">
+                                    <Border Background="{Binding FaceStateBrush}" CornerRadius="14" Padding="12,6" Margin="0,0,8,0"
+                                            BorderBrush="#44FFFFFF" BorderThickness="1">
                                         <TextBlock Text="{Binding FaceStateText}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
                                     </Border>
-                                    <Border Background="{Binding LightingStateBrush}" CornerRadius="12" Padding="10,5">
+                                    <Border Background="{Binding LightingStateBrush}" CornerRadius="14" Padding="12,6"
+                                            BorderBrush="#44FFFFFF" BorderThickness="1">
                                         <TextBlock Text="{Binding LightingStateText}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
                                     </Border>
                                 </StackPanel>
@@ -97,21 +113,21 @@
                                             <ScaleTransform ScaleX="-1" />
                                         </Image.RenderTransform>
                                         <Image.Clip>
-                                            <RectangleGeometry Rect="0,0,640,480" RadiusX="14" RadiusY="14"/>
+                                            <RectangleGeometry Rect="0,0,640,480" RadiusX="16" RadiusY="16"/>
                                         </Image.Clip>
                                     </Image>
 
                                     <Rectangle Width="360" Height="470"
-                                        Stroke="#AAFFFFFF"
-                                        StrokeThickness="2"
-                                        RadiusX="28" RadiusY="28"
-                                        StrokeDashArray="6 6"
-                                        Fill="#10FFFFFF"/>
+                                        Stroke="#C8FFFFFF"
+                                        StrokeThickness="1.5"
+                                        RadiusX="32" RadiusY="32"
+                                        StrokeDashArray="8 5"
+                                        Fill="#12FFFFFF"/>
 
                                     <Ellipse Width="220" Height="280"
-                                        Stroke="#80FFFFFF"
-                                        StrokeThickness="1.5"
-                                        Fill="#0DFFFFFF"/>
+                                        Stroke="#99FFFFFF"
+                                        StrokeThickness="1"
+                                        Fill="#0AFFFFFF"/>
 
                                     <TextBlock Text="얼굴을 프레임 중앙에 맞춰주세요"
                                         HorizontalAlignment="Center"
@@ -121,17 +137,19 @@
                                         FontSize="12"/>     
                                 </Grid>
 
-                                <Border Grid.Row="2" CornerRadius="10" Padding="12,8" Background="#33000000">
-                                    <TextBlock Text="{Binding GuidanceMessage}" Foreground="#F9FAFB" FontSize="12"/>
+                                <Border Grid.Row="2" CornerRadius="14" Padding="14,10"
+                                        Background="#44000000"
+                                        BorderBrush="#55FFFFFF" BorderThickness="1">
+                                    <TextBlock Text="{Binding GuidanceMessage}" Foreground="#F5F7FA" FontSize="12" FontWeight="Medium"/>
                                 </Border>
                             </Grid>
                         </Grid>
                     </Border>
 
-                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,16,0">
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,20,0">
                         <StackPanel>
                             <TextBlock Text="진단 상태" Style="{StaticResource AnalysisCardTitleStyle}"/>
-                            <TextBlock Text="{Binding AnalysisStatus}" Margin="0,8,0,0" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
+                            <TextBlock Text="{Binding AnalysisStatus}" Margin="0,10,0,0" FontSize="15" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
                             <TextBlock Text="{Binding AnalysisStageText}" Margin="0,6,0,0" Style="{StaticResource AnalysisCardSubTextStyle}"/>
 
                             <Grid Margin="0,12,0,0">
@@ -139,7 +157,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Height="12" Minimum="0" Maximum="100" Value="{Binding AnalysisProgress}"/>
+                                <ProgressBar Height="12" Minimum="0" Maximum="100" Value="{Binding AnalysisProgress}"
+                                             Style="{StaticResource DashboardProgressBarStyle}"/>
                                 <TextBlock Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource MutedTextBrush}" Text="{Binding AnalysisProgress, StringFormat={}{0:0}%}"/>
                             </Grid>
 
@@ -195,7 +214,7 @@
                             <ItemsControl ItemsSource="{Binding PreCheckItems}" Margin="0,10,0,0">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Margin="0,0,0,8" Padding="10,6" Style="{StaticResource GlassInsetStyle}">
+                                        <Border Margin="0,0,0,8" Padding="10,6" Style="{StaticResource LiquidGlassInsetStyle}">
                                             <TextBlock Text="{Binding}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
                                         </Border>
                                     </DataTemplate>
@@ -213,7 +232,7 @@
                             <ItemsControl ItemsSource="{Binding FaceTonePreviews}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Margin="0,0,0,10" Padding="12" Style="{StaticResource GlassInsetStyle}">
+                                        <Border Margin="0,0,0,10" Padding="12" Style="{StaticResource LiquidGlassInsetStyle}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -221,14 +240,18 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <Rectangle Width="24" Height="24" RadiusX="8" RadiusY="8" Fill="{Binding ToneBrush}" Stroke="#33000000" StrokeThickness="1"/>
+                                                <Border Width="28" Height="28" CornerRadius="10" ClipToBounds="True"
+                                                        BorderBrush="{StaticResource GlassBorderGradientBrush}" BorderThickness="1">
+                                                    <Rectangle Fill="{Binding ToneBrush}"/>
+                                                </Border>
 
-                                                <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding ZoneName}" FontSize="13" FontWeight="SemiBold"/>
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ZoneName}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
                                                     <TextBlock Text="{Binding ColorHex}" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
                                                 </StackPanel>
 
-                                                <Border Grid.Column="2" Background="{StaticResource SurfaceMutedBrush}" CornerRadius="10" Padding="8,3" VerticalAlignment="Center">
+                                                <Border Grid.Column="2" Background="#77FFFFFF" CornerRadius="12" Padding="10,5" VerticalAlignment="Center"
+                                                        BorderBrush="{StaticResource GlassBorderGradientBrush}" BorderThickness="1">
                                                     <TextBlock Text="{Binding ConfidencePercent, StringFormat=신뢰도 {0}%}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
                                                 </Border>
                                             </Grid>

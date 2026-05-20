@@ -15,77 +15,126 @@
     <SolidColorBrush x:Key="SuccessBrush" Color="#4CAF50"/>
     <SolidColorBrush x:Key="DangerBrush" Color="#FF5252"/>
 
-    <!-- 타이포 계층: Display → Title → Body → Caption (유리 위 가독성 강화) -->
-    <SolidColorBrush x:Key="TitleTextBrush" Color="#FF0F172A"/>
-    <SolidColorBrush x:Key="BodyTextBrush" Color="#FF1E293B"/>
-    <SolidColorBrush x:Key="MutedTextBrush" Color="#FF475569"/>
-    <SolidColorBrush x:Key="CaptionTextBrush" Color="#FF64748B"/>
-    <SolidColorBrush x:Key="LabelOnGlassBrush" Color="#FF334155"/>
-    <SolidColorBrush x:Key="SidebarHoverBgBrush" Color="#4DFFF1F3"/>
-    <SolidColorBrush x:Key="SidebarSelectedBgBrush" Color="#66FCE4E8"/>
-    <SolidColorBrush x:Key="SidebarSelectedTextBrush" Color="#FFB24E67"/>
+    <SolidColorBrush x:Key="TitleTextBrush" Color="#FF0B1220"/>
+    <SolidColorBrush x:Key="BodyTextBrush" Color="#FF1A2332"/>
+    <SolidColorBrush x:Key="MutedTextBrush" Color="#FF5B6B82"/>
+    <SolidColorBrush x:Key="CaptionTextBrush" Color="#FF7A8A9E"/>
+    <SolidColorBrush x:Key="LabelOnGlassBrush" Color="#FF2D3A4D"/>
+    <SolidColorBrush x:Key="DataEmphasisBrush" Color="#FFE85D7A"/>
+    <SolidColorBrush x:Key="SidebarHoverBgBrush" Color="#52FFFFFF"/>
+    <SolidColorBrush x:Key="SidebarSelectedBgBrush" Color="#6EFFFFFF"/>
+    <SolidColorBrush x:Key="SidebarSelectedTextBrush" Color="#FFC44D68"/>
+    <SolidColorBrush x:Key="SidebarActiveIndicatorBrush" Color="#FFFF8A8A"/>
+    <SolidColorBrush x:Key="SidebarNavSelectedBorderBrush" Color="#88FFFFFF"/>
 
-    <!-- 디자인 토큰: Effect/그라데이션용 Color -->
     <Color x:Key="ShadowSlate900Color">#FF111827</Color>
-    <!-- Specular Highlight Edge · 테두리 그라데이션 스톱 -->
-    <Color x:Key="GlassBorderHighlightStopColor">#FFFFFFFF</Color>
-    <Color x:Key="GlassBorderHighlightSoftStopColor">#E6FFFFFF</Color>
-    <Color x:Key="GlassBorderMidStopColor">#88FFFFFF</Color>
-    <Color x:Key="GlassBorderLowStopColor">#44FFFFFF</Color>
-    <Color x:Key="GlassBorderFeatherStopColor">#1AFFFFFF</Color>
-    <Thickness x:Key="GlassCardBorderThickness">1.5</Thickness>
-    <Thickness x:Key="ShellSidebarBorderThickness">1.5</Thickness>
+    <!-- Liquid Glass -->
+    <Color x:Key="GlassBorderHighlightStopColor">#CCFFFFFF</Color>
+    <Color x:Key="GlassBorderFeatherStopColor">#11FFFFFF</Color>
+    <Thickness x:Key="GlassCardBorderThickness">1.2</Thickness>
+    <Thickness x:Key="ShellSidebarBorderThickness">1.2</Thickness>
     <sys:Double x:Key="ShellSidebarRightEdgeWidth">2</sys:Double>
     <Thickness x:Key="GlassCardPadding">26,28</Thickness>
     <Thickness x:Key="GlassCardOuterMargin">0,0,16,16</Thickness>
     <Color x:Key="GlassShellEdgeHighlightColor">#E6FFFFFF</Color>
     <Color x:Key="GlassShellEdgeShadowColor">#40111827</Color>
 
-    <Thickness x:Key="AppShellPagePadding">36,22,28,36</Thickness>
-    <Thickness x:Key="AppShellSidebarHostMargin">20,20,0,20</Thickness>
-    <Thickness x:Key="AppShellContentHostMargin">14,20,20,20</Thickness>
-    <Thickness x:Key="PageHeaderBottomMargin">0,0,0,32</Thickness>
+    <Thickness x:Key="AppShellPagePadding">40,28,32,40</Thickness>
+    <Thickness x:Key="AppShellSidebarHostMargin">24,24,0,24</Thickness>
+    <Thickness x:Key="AppShellContentHostMargin">8,24,28,24</Thickness>
+    <Thickness x:Key="PageHeaderBottomMargin">0,0,0,36</Thickness>
     <Thickness x:Key="PageSectionBottomMargin">0,0,0,24</Thickness>
 
-    <!-- 앱 셸 최하단: 맑은 화이트·연그레이 파스텔 (콘텐츠 시선 분산 최소) -->
     <LinearGradientBrush x:Key="AppShellBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#FFFFF2F6" Offset="0"/>
-        <GradientStop Color="#FFEDF7FF" Offset="0.5"/>
+        <GradientStop Color="#FFEDF7FF" Offset="0.42"/>
+        <GradientStop Color="#FFF5F0FF" Offset="0.72"/>
         <GradientStop Color="#FFFFFAF2" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 유리 카드 · 부드러운 부유 그림자 (넓게 퍼지는 앰비언트) -->
+    <RadialGradientBrush x:Key="AppShellAuroraOrbRoseBrush" Center="0.1,0.2" GradientOrigin="0.1,0.2" RadiusX="0.5" RadiusY="0.42">
+        <GradientStop Color="#44FFC9D4" Offset="0"/>
+        <GradientStop Color="#00FFC9D4" Offset="1"/>
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="AppShellAuroraOrbLilacBrush" Center="0.9,0.15" GradientOrigin="0.9,0.15" RadiusX="0.48" RadiusY="0.4">
+        <GradientStop Color="#38C4B5FD" Offset="0"/>
+        <GradientStop Color="#00C4B5FD" Offset="1"/>
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="AppShellAuroraOrbMintBrush" Center="0.75,0.9" GradientOrigin="0.75,0.9" RadiusX="0.45" RadiusY="0.38">
+        <GradientStop Color="#2EA7F3D0" Offset="0"/>
+        <GradientStop Color="#00A7F3D0" Offset="1"/>
+    </RadialGradientBrush>
+
     <DropShadowEffect x:Key="GlassCardShadowEffect"
-                      BlurRadius="36"
+                      BlurRadius="28"
                       ShadowDepth="5"
                       Direction="270"
-                      Opacity="0.065"
+                      Opacity="0.06"
                       Color="Black"/>
     <DropShadowEffect x:Key="GlassCardShadowHoverEffect"
-                      BlurRadius="42"
-                      ShadowDepth="7"
-                      Direction="270"
-                      Opacity="0.085"
-                      Color="Black"/>
-    <DropShadowEffect x:Key="ShellSidebarShadowEffect"
                       BlurRadius="32"
                       ShadowDepth="6"
                       Direction="270"
-                      Opacity="0.09"
+                      Opacity="0.07"
+                      Color="Black"/>
+    <DropShadowEffect x:Key="ShellSidebarShadowEffect"
+                      BlurRadius="28"
+                      ShadowDepth="3"
+                      Direction="270"
+                      Opacity="0.06"
+                      Color="Black"/>
+    <DropShadowEffect x:Key="ProductCardLiftShadowEffect"
+                      BlurRadius="28"
+                      ShadowDepth="5"
+                      Direction="270"
+                      Opacity="0.06"
                       Color="Black"/>
 
     <SolidColorBrush x:Key="WhiteBrush" Color="#FFFFFFFF"/>
-    <!-- 사이드바: 카드보다 투명 · 배경 투과 -->
     <SolidColorBrush x:Key="ShellGlassFaceBrush" Color="#28FFFFFF"/>
-    <SolidColorBrush x:Key="ShellGlassInnerWashBrush" Color="#18FFF8FA"/>
-    <LinearGradientBrush x:Key="ShellGlassPanelBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#2EFFFFFF" Offset="0"/>
-        <GradientStop Color="#1AFFFFFF" Offset="1"/>
+    <SolidColorBrush x:Key="ShellGlassInnerWashBrush" Color="#22FFFFFF"/>
+    <!--
+      SwiftUI .overlay(RoundedRectangle.stroke(LinearGradient(topLeading → bottomTrailing))) 포팅.
+      StartPoint(0,0)=topLeading, EndPoint(1,1)=bottomTrailing, MappingMode=RelativeToBoundingBox.
+      스톱: TL 스펙큘러 → 상·좌 소프트 페이드 → 대각선 중간 숨쉼 → 우·하 림 복귀 → BR 앵커.
+    -->
+    <LinearGradientBrush x:Key="LiquidGlassAsymmetricHighlightBrush"
+                         MappingMode="RelativeToBoundingBox"
+                         StartPoint="0,0"
+                         EndPoint="1,1">
+        <GradientStop Color="#E6FFFFFF" Offset="0"/>
+        <GradientStop Color="#44FFFFFF" Offset="0.3"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.5"/>
+        <GradientStop Color="#22FFFFFF" Offset="0.8"/>
+        <GradientStop Color="#66FFFFFF" Offset="1"/>
     </LinearGradientBrush>
+    <LinearGradientBrush x:Key="LiquidGlassAsymmetricHighlightHoverBrush"
+                         MappingMode="RelativeToBoundingBox"
+                         StartPoint="0,0"
+                         EndPoint="1,1">
+        <GradientStop Color="#F2FFFFFF" Offset="0"/>
+        <GradientStop Color="#58FFFFFF" Offset="0.3"/>
+        <GradientStop Color="#0CFFFFFF" Offset="0.5"/>
+        <GradientStop Color="#33FFFFFF" Offset="0.8"/>
+        <GradientStop Color="#7AFFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="LiquidGlassAsymmetricHighlightSubtleBrush"
+                         MappingMode="RelativeToBoundingBox"
+                         StartPoint="0,0"
+                         EndPoint="1,1">
+        <GradientStop Color="#B0FFFFFF" Offset="0"/>
+        <GradientStop Color="#33FFFFFF" Offset="0.3"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.5"/>
+        <GradientStop Color="#18FFFFFF" Offset="0.8"/>
+        <GradientStop Color="#44FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 사이드바 · 단색 솔리드 (웜그레이, 저불투명) -->
+    <SolidColorBrush x:Key="ShellSidebarPanelFaceBrush" Color="#99F5F2F5"/>
+    <SolidColorBrush x:Key="ShellGlassPanelBackgroundBrush" Color="#99F5F2F5"/>
     <SolidColorBrush x:Key="GlassPillFaceBrush" Color="#38FFFFFF"/>
     <SolidColorBrush x:Key="GlassPillFaceHoverBrush" Color="#62FFFFFF"/>
 
-    <!-- 사이드바 · 콘텐츠 쪽 우측 경계 림 (세로 스펙큘러) -->
     <LinearGradientBrush x:Key="ShellSidebarRightEdgeBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="#FFFFFFFF" Offset="0"/>
         <GradientStop Color="#D9FFFFFF" Offset="0.2"/>
@@ -104,31 +153,92 @@
         <GradientStop Color="#00CBD5E1" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 글래스모피즘 · 카드 면 (반투명 프로스트 — 배경이 비치는 블러 느낌) -->
-    <SolidColorBrush x:Key="GlassCardFaceBrush" Color="#59FFFFFF"/>
-    <SolidColorBrush x:Key="GlassCardFaceHoverBrush" Color="#6BFFFFFF"/>
-    <SolidColorBrush x:Key="GlassInsetFaceBrush" Color="#4DFFFFFF"/>
-    <SolidColorBrush x:Key="GlassInsetFaceHoverBrush" Color="#59FFFFFF"/>
+    <SolidColorBrush x:Key="FrostedGlassFaceBrush" Color="#26FFFFFF"/>
+    <SolidColorBrush x:Key="FrostedGlassFaceHoverBrush" Color="#33FFFFFF"/>
+    <SolidColorBrush x:Key="FrostedGlassNestedFaceBrush" Color="#2CFFFFFF"/>
+    <SolidColorBrush x:Key="FrostedGlassNestedHoverBrush" Color="#38FFFFFF"/>
+    <SolidColorBrush x:Key="FrostedGlassBorderBrush" Color="#A8FFFFFF"/>
+    <SolidColorBrush x:Key="FrostedGlassNestedBorderBrush" Color="#88FFFFFF"/>
+    <Thickness x:Key="FrostedGlassCornerRadius">20</Thickness>
+    <CornerRadius x:Key="FrostedGlassCorner">20</CornerRadius>
+    <CornerRadius x:Key="FrostedGlassNestedCorner">16</CornerRadius>
 
-    <!-- 카드 면: ~35–42% 흰색 + 상단 살짝 밝게 (불투명 백판 X) -->
-    <LinearGradientBrush x:Key="GlassCardFaceGradientBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#6BFFFFFF" Offset="0"/>
-        <GradientStop Color="#59FFFFFF" Offset="0.5"/>
-        <GradientStop Color="#52FFFFFF" Offset="1"/>
+    <LinearGradientBrush x:Key="FrostedGlassSheenBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#30FFFFFF" Offset="0"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.14"/>
+        <GradientStop Color="#00FFFFFF" Offset="1"/>
     </LinearGradientBrush>
-    <LinearGradientBrush x:Key="GlassCardFaceHoverGradientBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#75FFFFFF" Offset="0"/>
-        <GradientStop Color="#66FFFFFF" Offset="0.5"/>
-        <GradientStop Color="#5CFFFFFF" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="GlassInsetFaceGradientBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#59FFFFFF" Offset="0"/>
-        <GradientStop Color="#4DFFFFFF" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="GlassInsetFaceHoverGradientBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#66FFFFFF" Offset="0"/>
-        <GradientStop Color="#55FFFFFF" Offset="1"/>
-    </LinearGradientBrush>
+
+    <!-- SwiftUI .ultraThinMaterial: 저불투명 화이트 베이스 + Center(0.5,0.4) 코랄 bleed -->
+    <DrawingBrush x:Key="FrostedGlassUltraThinMaterialBrush"
+                  Stretch="Fill"
+                  Viewbox="0,0,1,1"
+                  ViewboxUnits="RelativeToBoundingBox">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#26FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,1,1"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Brush>
+                        <RadialGradientBrush Center="0.5,0.4"
+                                             GradientOrigin="0.5,0.4"
+                                             RadiusX="0.78"
+                                             RadiusY="0.85"
+                                             MappingMode="RelativeToBoundingBox">
+                            <GradientStop Color="#3AFFD4DE" Offset="0"/>
+                            <GradientStop Color="#14FFE8EC" Offset="0.42"/>
+                            <GradientStop Color="#00FFFFFF" Offset="1"/>
+                        </RadialGradientBrush>
+                    </GeometryDrawing.Brush>
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,1,1"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    <DrawingBrush x:Key="FrostedGlassUltraThinMaterialHoverBrush"
+                  Stretch="Fill"
+                  Viewbox="0,0,1,1"
+                  ViewboxUnits="RelativeToBoundingBox">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#33FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,1,1"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Brush>
+                        <RadialGradientBrush Center="0.5,0.4"
+                                             GradientOrigin="0.5,0.4"
+                                             RadiusX="0.78"
+                                             RadiusY="0.85"
+                                             MappingMode="RelativeToBoundingBox">
+                            <GradientStop Color="#48FFD0DA" Offset="0"/>
+                            <GradientStop Color="#1CFFEBF0" Offset="0.4"/>
+                            <GradientStop Color="#00FFFFFF" Offset="1"/>
+                        </RadialGradientBrush>
+                    </GeometryDrawing.Brush>
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,1,1"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    <SolidColorBrush x:Key="GlassCardFaceBrush" Color="#28FFFFFF"/>
+    <SolidColorBrush x:Key="GlassCardFaceHoverBrush" Color="#38FFFFFF"/>
+    <SolidColorBrush x:Key="GlassInsetFaceBrush" Color="#35FFFFFF"/>
+    <SolidColorBrush x:Key="GlassInsetFaceHoverBrush" Color="#42FFFFFF"/>
+
+    <SolidColorBrush x:Key="GlassCardFaceGradientBrush" Color="#28FFFFFF"/>
+    <SolidColorBrush x:Key="GlassCardFaceHoverGradientBrush" Color="#38FFFFFF"/>
+    <SolidColorBrush x:Key="GlassInsetFaceGradientBrush" Color="#35FFFFFF"/>
+    <SolidColorBrush x:Key="GlassInsetFaceHoverGradientBrush" Color="#42FFFFFF"/>
 
     <!-- 제품 카드 등 내부 오버레이용 -->
     <LinearGradientBrush x:Key="GlassCardSpecularWashBrush" StartPoint="0,0" EndPoint="0,1">
@@ -147,43 +257,107 @@
     </LinearGradientBrush>
     <SolidColorBrush x:Key="GlassFormFieldBrush" Color="#F2FFFFFF"/>
 
-    <!-- 카드 · 공통 유리 테두리 (상단 밝은 림 → 중간 → 하단 페더) -->
-    <LinearGradientBrush x:Key="GlassBorderGradientBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="{StaticResource GlassBorderHighlightStopColor}" Offset="0"/>
-        <GradientStop Color="{StaticResource GlassBorderHighlightSoftStopColor}" Offset="0.14"/>
-        <GradientStop Color="{StaticResource GlassBorderMidStopColor}" Offset="0.42"/>
-        <GradientStop Color="{StaticResource GlassBorderLowStopColor}" Offset="0.72"/>
-        <GradientStop Color="{StaticResource GlassBorderFeatherStopColor}" Offset="1"/>
+    <SolidColorBrush x:Key="GlassBorderGradientBrush" Color="#A8FFFFFF"/>
+    <SolidColorBrush x:Key="GlassCrispBorderBrush" Color="#B3FFFFFF"/>
+    <LinearGradientBrush x:Key="GlassBorderHorizontalAccentBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#00FFFFFF" Offset="0"/>
+        <GradientStop Color="#44FFE4EC" Offset="0.35"/>
+        <GradientStop Color="#33E8E4FF" Offset="0.65"/>
+        <GradientStop Color="#00FFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 사이드바 외곽 유리 테두리 (전체 둘레) -->
-    <LinearGradientBrush x:Key="ShellSidebarGlassBorderBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#F5FFFFFF" Offset="0"/>
-        <GradientStop Color="#B3FFFFFF" Offset="0.35"/>
-        <GradientStop Color="#55FFFFFF" Offset="0.7"/>
-        <GradientStop Color="#28FFFFFF" Offset="1"/>
-    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ShellSidebarGlassBorderBrush" Color="#44FFFFFF"/>
+    <SolidColorBrush x:Key="ProductCardGlassBorderBrush" Color="#A8FFFFFF"/>
+
+    <SolidColorBrush x:Key="MakeupProductCardFaceBrush" Color="#30FFF8FA"/>
+    <SolidColorBrush x:Key="SkinCareProductCardFaceBrush" Color="#30F8FCFA"/>
+
+    <!-- Beauty 제품 카드 · 중심 방사형 백라이트 (0.5,0.4 → #F2FFFFFF) -->
+    <RadialGradientBrush x:Key="MakeupProductCardRadialBacklightBrush"
+                         Center="0.5,0.4" GradientOrigin="0.5,0.4" RadiusX="0.9" RadiusY="1.02">
+        <GradientStop Color="#92FFF0F4" Offset="0"/>
+        <GradientStop Color="#D4FFF6F8" Offset="0.35"/>
+        <GradientStop Color="#F2FFFFFF" Offset="0.72"/>
+        <GradientStop Color="#F2FFFFFF" Offset="1"/>
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="SkinCareProductCardRadialBacklightBrush"
+                         Center="0.5,0.4" GradientOrigin="0.5,0.4" RadiusX="0.9" RadiusY="1.02">
+        <GradientStop Color="#92EAF6F1" Offset="0"/>
+        <GradientStop Color="#D4F2FAF6" Offset="0.35"/>
+        <GradientStop Color="#F2FFFFFF" Offset="0.72"/>
+        <GradientStop Color="#F2FFFFFF" Offset="1"/>
+    </RadialGradientBrush>
+
+    <Style x:Key="BeautyProductCardChromeStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="20"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightBrush}"/>
+        <Setter Property="BorderThickness" Value="1.2,1,0.8,0"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
 
     <Style x:Key="ShellSidebarPanelStyle" TargetType="Border">
-        <Setter Property="CornerRadius" Value="24"/>
-        <Setter Property="Background" Value="{StaticResource ShellGlassPanelBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource ShellSidebarGlassBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="{StaticResource ShellSidebarBorderThickness}"/>
+        <Setter Property="CornerRadius" Value="20"/>
+        <Setter Property="Background" Value="{StaticResource ShellSidebarPanelFaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightSubtleBrush}"/>
+        <Setter Property="BorderThickness" Value="0.8,0.8,0,0"/>
         <Setter Property="ClipToBounds" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
 
-    <!-- 중립 표면 · 보더 (반투명 유리 톤) -->
+    <!-- 사이드바 · 네비 항목 (Liquid Glass pill) -->
+    <Style x:Key="SidebarNavListBoxItemStyle" TargetType="ListBoxItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="NavChrome"
+                            Margin="10,2"
+                            Padding="0,10"
+                            CornerRadius="14"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <TranslateTransform Y="0"/>
+                        </Border.RenderTransform>
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="NavChrome" Property="Background" Value="{StaticResource SidebarHoverBgBrush}"/>
+                            <Setter TargetName="NavChrome" Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightSubtleBrush}"/>
+                            <Setter TargetName="NavChrome" Property="BorderThickness" Value="1,1,0.6,0"/>
+                            <Setter TargetName="NavChrome" Property="RenderTransform">
+                                <Setter.Value>
+                                    <TranslateTransform Y="-1"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="NavChrome" Property="Background" Value="{StaticResource SidebarSelectedBgBrush}"/>
+                            <Setter TargetName="NavChrome" Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightBrush}"/>
+                            <Setter TargetName="NavChrome" Property="BorderThickness" Value="1.1,1,0.7,0"/>
+                            <Setter Property="Foreground" Value="{StaticResource SidebarSelectedTextBrush}"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <SolidColorBrush x:Key="NeutralBorderBrush" Color="#66FFFFFF"/>
     <SolidColorBrush x:Key="NeutralBorderStrongBrush" Color="#99FFFFFF"/>
     <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#66FFFFFF"/>
     <SolidColorBrush x:Key="SurfaceSubtleBrush" Color="#42FFFFFF"/>
     <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#80FFFFFF"/>
-    <SolidColorBrush x:Key="SurfaceCardShellBrush" Color="#59FFFFFF"/>
+    <SolidColorBrush x:Key="SurfaceCardShellBrush" Color="#45FFFFFF"/>
     <SolidColorBrush x:Key="NeutralChipBackgroundBrush" Color="#70FFFFFF"/>
     <SolidColorBrush x:Key="DangerGlassSectionBrush" Color="#99FFF5F5"/>
 
-    <!-- 로즈 톤 (메이크업 배지·설정 UI) -->
     <SolidColorBrush x:Key="RoseSoftBackgroundBrush" Color="#FFFFF1F2"/>
     <SolidColorBrush x:Key="RoseBadgeBorderBrush" Color="#FFFECACA"/>
     <SolidColorBrush x:Key="RoseSelectedBackgroundBrush" Color="#FFFCE4E8"/>
@@ -195,7 +369,6 @@
     <SolidColorBrush x:Key="DangerSurfaceBackgroundBrush" Color="#FFFFF8F8"/>
     <SolidColorBrush x:Key="DangerStrongTextBrush" Color="#FFDC2626"/>
     <SolidColorBrush x:Key="DangerOutlineBorderBrush" Color="#FFFCA5A5"/>
-    <!-- 초기화 구역: 아주 옅은 붉은 테두리(배경은 카드와 동일하게 두고 경고만 암시) -->
     <SolidColorBrush x:Key="DangerSubtleSectionBorderBrush" Color="#33F87171"/>
 
     <!-- 스킨케어 성공 톤 -->
@@ -203,7 +376,6 @@
     <SolidColorBrush x:Key="SuccessSoftBorderBrush" Color="#FFA7F3D0"/>
     <SolidColorBrush x:Key="SuccessDeepTextBrush" Color="#FF047857"/>
 
-    <!-- 칩·스와치 -->
     <SolidColorBrush x:Key="SwatchStrokeBrush" Color="#33000000"/>
     <SolidColorBrush x:Key="CaptionOnNeutralBrush" Color="#FF475569"/>
 
@@ -325,11 +497,11 @@
     </Style>
 
     <Style x:Key="SidebarToggleButtonStyle" TargetType="ToggleButton">
-        <Setter Property="Width" Value="38"/>
-        <Setter Property="Height" Value="38"/>
-        <Setter Property="Background" Value="{StaticResource GlassFormFieldBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource GlassBorderGradientBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Width" Value="40"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Background" Value="{StaticResource FrostedGlassNestedFaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightSubtleBrush}"/>
+        <Setter Property="BorderThickness" Value="1,1,0.6,0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -339,15 +511,12 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="12">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="10" ShadowDepth="2" Direction="270" Color="#FF000000" Opacity="0.08"/>
-                        </Border.Effect>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
-                    
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ToggleChrome" Property="Background" Value="{StaticResource GlassPillFaceHoverBrush}"/>
+                            <Setter TargetName="ToggleChrome" Property="Background" Value="{StaticResource FrostedGlassNestedHoverBrush}"/>
+                            <Setter TargetName="ToggleChrome" Property="BorderBrush" Value="{StaticResource FrostedGlassBorderBrush}"/>
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter  Property="RenderTransform">
@@ -431,26 +600,28 @@
     </Style>
 
 
-    <!-- 글래스모피즘 · 공통 카드 (LiveAnalysis CardStyle 포함) -->
-    <Style x:Key="CardStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource GlassCardFaceGradientBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource GlassBorderGradientBrush}"/>
-        <Setter Property="BorderThickness" Value="{StaticResource GlassCardBorderThickness}"/>
-        <Setter Property="CornerRadius" Value="18"/>
-        <Setter Property="Padding" Value="{StaticResource GlassCardPadding}"/>
+    <!-- 메인 카드 · SwiftUI material + 대각선 stroke 포팅 -->
+    <Style x:Key="FrostedGlassCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource FrostedGlassUltraThinMaterialBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightBrush}"/>
+        <Setter Property="BorderThickness" Value="1.2,1,0.8,0"/>
+        <Setter Property="CornerRadius" Value="20"/>
+        <Setter Property="Padding" Value="24,26"/>
         <Setter Property="Margin" Value="0"/>
-        <Setter Property="ClipToBounds" Value="False"/>
+        <Setter Property="ClipToBounds" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
         <Setter Property="RenderTransform">
             <Setter.Value>
-                <TranslateTransform/>
+                <TranslateTransform Y="0"/>
             </Setter.Value>
         </Setter>
         <Setter Property="Effect" Value="{StaticResource GlassCardShadowEffect}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource GlassCardFaceHoverGradientBrush}"/>
+                <Setter Property="Background" Value="{StaticResource FrostedGlassUltraThinMaterialHoverBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightHoverBrush}"/>
+                <Setter Property="BorderThickness" Value="1.3,1.05,0.85,0"/>
                 <Setter Property="Effect" Value="{StaticResource GlassCardShadowHoverEffect}"/>
                 <Setter Property="RenderTransform">
                     <Setter.Value>
@@ -461,16 +632,55 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="GlassInsetStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource GlassInsetFaceGradientBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource GlassBorderGradientBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="12"/>
+    <!-- 중첩 유리 · 비대칭 림 -->
+    <Style x:Key="FrostedGlassNestedStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource FrostedGlassNestedFaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightSubtleBrush}"/>
+        <Setter Property="BorderThickness" Value="1,1,0.6,0"/>
+        <Setter Property="CornerRadius" Value="16"/>
         <Setter Property="ClipToBounds" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource GlassInsetFaceHoverGradientBrush}"/>
+                <Setter Property="Background" Value="{StaticResource FrostedGlassNestedHoverBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="CardStyle" TargetType="Border" BasedOn="{StaticResource FrostedGlassCardStyle}">
+        <Setter Property="CornerRadius" Value="20"/>
+        <Setter Property="Padding" Value="24,26"/>
+    </Style>
+
+    <Style x:Key="LiquidGlassInsetStyle" TargetType="Border" BasedOn="{StaticResource FrostedGlassNestedStyle}">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform Y="0"/>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource FrostedGlassNestedHoverBrush}"/>
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <TranslateTransform Y="-1"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="GlassInsetStyle" TargetType="Border" BasedOn="{StaticResource FrostedGlassNestedStyle}">
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource FrostedGlassNestedHoverBrush}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -488,7 +698,7 @@
         </Setter>
     </Style>
 
-    <!-- Dashboard · 전역 페이지 카드 -->
+    <!-- Dashboard 카드 -->
     <Style x:Key="DashboardCardTitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="20"/>
         <Setter Property="FontWeight" Value="Bold"/>
@@ -503,14 +713,12 @@
     </Style>
 
     <Style x:Key="DashboardAccentValueStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="15"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
     </Style>
 
-    <Style x:Key="DashboardCardStyle" TargetType="Border" BasedOn="{StaticResource CardStyle}">
-        <Setter Property="CornerRadius" Value="20"/>
-        <Setter Property="Padding" Value="28,30"/>
+    <Style x:Key="DashboardCardStyle" TargetType="Border" BasedOn="{StaticResource FrostedGlassCardStyle}">
         <Setter Property="Margin" Value="{StaticResource GlassCardOuterMargin}"/>
     </Style>
 
@@ -519,45 +727,69 @@
         <Setter Property="CornerRadius" Value="12"/>
     </Style>
 
-    <!-- 대시보드 피부 지표 등: OS 기본색 대신 앱 토큰 -->
+    <!-- 대시보드 피부 지표 등 -->
     <Style x:Key="DashboardProgressBarStyle" TargetType="ProgressBar">
         <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
-        <Setter Property="Background" Value="{StaticResource SurfaceMutedBrush}"/>
+        <Setter Property="Background" Value="#55FFFFFF"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Height" Value="8"/>
+        <Setter Property="Height" Value="10"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ProgressBar">
                     <Grid SnapsToDevicePixels="True">
-                        <Border x:Name="PART_Track" CornerRadius="5" Background="{TemplateBinding Background}"/>
-                        <Border x:Name="PART_Indicator" CornerRadius="5" Background="{TemplateBinding Foreground}" HorizontalAlignment="Left"/>
+                        <Border x:Name="PART_Track" CornerRadius="6" Background="{TemplateBinding Background}"/>
+                        <Border x:Name="PART_Indicator" CornerRadius="6" Background="{TemplateBinding Foreground}" HorizontalAlignment="Left"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- Beauty Log · 제품 카드: 외곽=그림자·클립, 내부=방사형 유리 면 -->
-    <Style x:Key="ProductCardContainerStyle" TargetType="Border" BasedOn="{StaticResource CardStyle}">
-        <Setter Property="MinWidth" Value="240"/>
-        <Setter Property="MaxWidth" Value="328"/>
-        <Setter Property="Margin" Value="0,0,20,20"/>
+    <!-- Beauty Log  제품 카드 -->
+    <Style x:Key="ProductCardContainerStyle" TargetType="Border">
+        <Setter Property="MinWidth" Value="252"/>
+        <Setter Property="MaxWidth" Value="340"/>
+        <Setter Property="Margin" Value="0,0,22,22"/>
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="ClipToBounds" Value="False"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="CornerRadius" Value="20"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform Y="0"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect" Value="{StaticResource GlassCardShadowEffect}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Effect" Value="{StaticResource GlassCardShadowHoverEffect}"/>
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <TranslateTransform Y="-2"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="TagChipStyle" TargetType="Border">
         <Setter Property="Margin" Value="0,0,8,8"/>
-        <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="Background" Value="{StaticResource NeutralChipBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource GlassBorderGradientBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="11,7"/>
+        <Setter Property="Background" Value="#88FFFFFF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LiquidGlassAsymmetricHighlightSubtleBrush}"/>
+        <Setter Property="BorderThickness" Value="0.9,0.9,0,0"/>
+        <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#AAFFFFFF"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
 <!--Primary 버튼 스타일-->
@@ -669,7 +901,7 @@
 
     <Style x:Key="PageHeaderSubtitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="14"/>
-        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource BodyTextBrush}"/>
         <Setter Property="Margin" Value="0,10,0,0"/>
         <Setter Property="LineHeight" Value="22"/>
@@ -690,8 +922,8 @@
     <Style x:Key="BeautySubStyle" TargetType="TextBlock" BasedOn="{StaticResource DashboardCardSubTextStyle}"/>
 
     <Style x:Key="BeautyTabItemStyle" TargetType="TabItem">
-        <Setter Property="Width" Value="135"/>
-        <Setter Property="Height" Value="45"/>
+        <Setter Property="Width" Value="148"/>
+        <Setter Property="Height" Value="48"/>
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -706,8 +938,8 @@
                         Background="{StaticResource GlassPillFaceBrush}"
                         BorderBrush="{StaticResource GlassBorderGradientBrush}"
                         BorderThickness="1"
-                        CornerRadius="22"
-                        Margin="0,0,8,0"
+                        CornerRadius="20"
+                        Margin="0,0,10,0"
                         Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -759,8 +991,8 @@
         </Setter>
     </Style>
 
-    <!-- Settings 등 레거시 키 → 글로벌 글래스 별칭 -->
-    <SolidColorBrush x:Key="SettingsGlassFaceBrush" Color="#59FFFFFF"/>
+    <!-- Settings -->
+    <SolidColorBrush x:Key="SettingsGlassFaceBrush" Color="#45FFFFFF"/>
     <Style x:Key="SettingsGlassCardStyle" TargetType="Border" BasedOn="{StaticResource DashboardCardStyle}"/>
     <Style x:Key="SettingsGlassInsetStyle" TargetType="Border" BasedOn="{StaticResource GlassInsetStyle}"/>
     <Style x:Key="SettingsGlassDividerStyle" TargetType="Border" BasedOn="{StaticResource GlassDividerStyle}"/>
@@ -771,7 +1003,7 @@
     <Style x:Key="SettingsGlassCardSubTextStyle" TargetType="TextBlock" BasedOn="{StaticResource DashboardCardSubTextStyle}"/>
     <Style x:Key="SettingsGlassSectionTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource CardSectionTitleStyle}"/>
 
-<!-- 설정 화면 · 폼 공통 (SettingsView 등) -->
+<!-- 설정 화면-->
     <!-- 설정 라벨 스타일 -->
     <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13"/>
@@ -848,7 +1080,7 @@
         </Setter>
     </Style>
 
-    <!-- 위험 솔리드 버튼 (초기화 등 강조 액션) -->
+    <!-- 위험 솔리드 버튼 -->
     <Style x:Key="DangerSolidButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="32"/>
         <Setter Property="FontSize" Value="13"/>
@@ -878,7 +1110,7 @@
         </Setter>
     </Style>
 
-    <!-- ComboBox (앱 공통) -->
+    <!-- 공통 콤보박스-->
     <Style x:Key="AppComboBoxStyle" TargetType="ComboBox">
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
