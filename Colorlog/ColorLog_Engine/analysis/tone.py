@@ -95,8 +95,8 @@ def get_personal_color_season(L, a, b):
     # 1. 웜/쿨 판별 (기준점은 카메라/조명 캘리브레이션에 따라 미세 조정 필요)
     is_warm = b > a
 
-    # 2. 채도 계산
-    chroma = math.sqrt(a**2 + b**2)
+    # 2. 채도 계산 (float으로 변환해 오버플로우 방지)
+    chroma = math.sqrt(float(a)**2 + float(b)**2)
 
     # 3. 사계절 분류 휴리스틱 (예시 모델)
     if is_warm:

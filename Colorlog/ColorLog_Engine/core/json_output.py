@@ -11,9 +11,10 @@ class JsonOutputThrottler:
     def emit(self, payload):
         current_time = time.time()
         if current_time - self.last_output_time < self.interval_seconds:
-            return
+            return None
 
         print(json.dumps(payload))
         sys.stdout.flush()
         self.last_output_time = current_time
+        return payload
 
