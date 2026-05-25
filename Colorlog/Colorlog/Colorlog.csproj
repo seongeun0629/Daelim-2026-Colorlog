@@ -14,7 +14,11 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260427" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260302" />
+    <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.13.0.20260427" />
     <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Wpf.Ui" Version="3.4.2.7" />
   </ItemGroup>
 
   <ItemGroup>

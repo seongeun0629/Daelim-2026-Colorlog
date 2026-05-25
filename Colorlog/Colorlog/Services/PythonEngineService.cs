@@ -50,7 +50,7 @@ namespace Colorlog.Services
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pythonPath,
-                    Arguments = $"\"{scriptPath}\"", 
+                    Arguments = $"\"{scriptPath}\"",
                     WorkingDirectory = engineDir,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,

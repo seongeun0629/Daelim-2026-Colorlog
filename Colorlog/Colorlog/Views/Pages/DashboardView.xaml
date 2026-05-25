@@ -12,15 +12,16 @@
       SizeChanged="UserControl_SizeChanged">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  Background="Transparent"
                   SnapsToDevicePixels="True" UseLayoutRounding="True">
-        <Grid Margin="{StaticResource AppShellPagePadding}">
+        <Grid Background="Transparent" Margin="{StaticResource AppShellPagePadding}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <StackPanel Grid.Row="0" Margin="{StaticResource PageHeaderBottomMargin}">
                 <TextBlock Text="{Binding UserDisplayName, StringFormat={}{0}님의 상태 요약}" Style="{StaticResource PageHeaderTitleStyle}"/>
                 <TextBlock Text="{Binding LastDiagnosisAtText, StringFormat=최근 분석 {0}}" Style="{StaticResource PageHeaderSubtitleStyle}"/>
                 <TextBlock Text="오늘의 톤/피부 상태를 빠르게 확인하고 바로 다음 액션으로 이어가세요." Style="{StaticResource PageHeaderHintStyle}"/>
@@ -39,7 +40,7 @@
                 <Border x:Name="DashboardColorSummaryCard" Grid.Row="0" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="컬러 요약" Style="{StaticResource DashboardCardTitleStyle}"/>
-                        <TextBlock Text="{Binding PersonalColorName, StringFormat=현재 퍼스널 컬러: {0}}" Margin="0,8,0,0" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
+                        <TextBlock Text="{Binding PersonalColorName, StringFormat=현재 퍼스널 컬러: {0}}" Margin="0,10,0,0" Style="{StaticResource DashboardAccentValueStyle}"/>
                         <TextBlock Text="베스트 컬러" Margin="0,16,0,8" Style="{StaticResource DashboardCardSubTextStyle}"/>
 
                         <ItemsControl ItemsSource="{Binding BestColors}">
@@ -50,10 +51,14 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,0,8,8" Padding="10,6" CornerRadius="18" Background="{StaticResource SurfaceElevatedBrush}" BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
+                                    <Border Margin="0,0,10,10" Padding="12,8" Style="{StaticResource LiquidGlassInsetStyle}">
                                         <StackPanel Orientation="Horizontal">
-                                            <Ellipse Width="16" Height="16" Fill="{Binding ToneBrush}" Stroke="{StaticResource SwatchStrokeBrush}" StrokeThickness="1"/>
-                                            <TextBlock Text="{Binding Name}" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <Border Width="20" Height="20" CornerRadius="10" ClipToBounds="True"
+                                                    BorderBrush="{StaticResource GlassBorderGradientBrush}" BorderThickness="1">
+                                                <Ellipse Fill="{Binding ToneBrush}"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding Name}" Margin="10,0,0,0" VerticalAlignment="Center"
+                                                       FontSize="13" FontWeight="Medium" Foreground="{StaticResource TitleTextBrush}"/>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -70,17 +75,20 @@
                         <ItemsControl ItemsSource="{Binding RecentRecommendations}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,0,0,8" Padding="12" CornerRadius="12" Background="{StaticResource SurfaceSubtleBrush}" BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1">
+                                    <Border Margin="0,0,0,10" Padding="16,14" Style="{StaticResource LiquidGlassInsetStyle}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0">
-                                                <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                                <TextBlock Text="{Binding Summary}" Margin="0,4,0,0" Style="{StaticResource DashboardCardSubTextStyle}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Summary}"/>
+                                                <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" FontSize="15" Foreground="{StaticResource TitleTextBrush}"/>
+                                                <TextBlock Text="{Binding Summary}" Margin="0,6,0,0" Style="{StaticResource DashboardCardSubTextStyle}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Summary}"/>
                                             </StackPanel>
-                                            <Border Grid.Column="1" VerticalAlignment="Center" Background="{StaticResource RoseSoftBackgroundBrush}" BorderBrush="{StaticResource RoseBadgeBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="8,4">
+                                            <Border Grid.Column="1" VerticalAlignment="Center"
+                                                    Background="#AAFFFFFF"
+                                                    BorderBrush="{StaticResource GlassBorderGradientBrush}"
+                                                    BorderThickness="1" CornerRadius="14" Padding="10,5">
                                                 <TextBlock Text="{Binding Rating, StringFormat=★ {0}}" Foreground="{StaticResource RoseEmphasisTextBrush}" FontSize="12" FontWeight="SemiBold"/>
                                             </Border>
                                         </Grid>
@@ -106,7 +114,7 @@
                                             <ColumnDefinition Width="130"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}" Margin="0,0,12,0"/>
 
                                         <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" VerticalAlignment="Center"
                                                      Style="{StaticResource DashboardProgressBarStyle}"/>
@@ -142,11 +150,11 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,0,8,8" Padding="12,10" CornerRadius="12" BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1" Background="{StaticResource SurfaceSubtleBrush}">
+                                    <Border Margin="0,0,8,8" Padding="12,10" Style="{StaticResource GlassInsetStyle}">
                                         <StackPanel Orientation="Horizontal">
                                             <Rectangle Width="28" Height="28" RadiusX="8" RadiusY="8" Fill="{Binding ZoneBrush}" Stroke="{StaticResource SwatchStrokeBrush}" StrokeThickness="1"/>
                                             <StackPanel Margin="8,0,0,0">
-                                                <TextBlock Text="{Binding ZoneName}" FontSize="13" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding ZoneName}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}"/>
                                                 <TextBlock Text="평균 톤 추출 완료" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
                                             </StackPanel>
                                         </StackPanel>

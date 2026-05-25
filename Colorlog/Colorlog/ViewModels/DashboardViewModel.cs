@@ -6,10 +6,14 @@ namespace Colorlog.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
-        public string UserDisplayName { get; } = "유현성";
-        public string LastDiagnosisAtText { get; } = "오늘 09:12";
+        [ObservableProperty]
+        private string _userDisplayName = "사용자";
 
-        public string PersonalColorName { get; } = "봄 웜 라이트";
+        [ObservableProperty]
+        public string _lastDiagnosisAtText = "오늘 00:00";
+
+        [ObservableProperty]
+        public string _personalColorName = "봄 웜 라이트";
         public ObservableCollection<ColorChip> BestColors { get; }
 
         public ObservableCollection<ProductRecommendation> RecentRecommendations { get; }
@@ -20,6 +24,22 @@ namespace Colorlog.ViewModels
 
         public DashboardViewModel()
         {
+            // 생성자 실행 시 DB에서 최신 저장된 이름 긁어오기
+            try
+            {
+                var dbService = new Colorlog.Services.DatabaseService();
+                var latestUser = dbService.GetLatestUser();
+
+                if (latestUser != null && !string.IsNullOrEmpty(latestUser.UserName))
+                {
+                    UserDisplayName = latestUser.UserName;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"대시보드 유저 이름 로드 실패: {ex.Message}");
+            }
+
             BestColors = new ObservableCollection<ColorChip>
             {
                 new("Peach Coral", "#FFEEA39A"),

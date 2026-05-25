@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Colorlog.Views;
@@ -81,6 +80,7 @@ public partial class SettingsViewModel : ObservableObject
         }
 
         CameraNames.CollectionChanged += OnCameraNamesChanged;
+        DiscoverCameraDevices();
         SyncCameraAvailability();
         SyncUserAgeFromBirthDate();
 
@@ -113,14 +113,14 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     //사진 변경 명령 실행 메서드
-    private string _profileImagePath = "pack://application:,,,/Assets/user.png"; 
+    private string _profileImagePath = "pack://application:,,,/Assets/user.png";
     public string ProfileImagePath
     {
         get => _profileImagePath;
         set
         {
             _profileImagePath = value;
-            OnPropertyChanged(nameof(ProfileImagePath)); 
+            OnPropertyChanged(nameof(ProfileImagePath));
         }
     }
     private void ExecuteChangeProfileImage()
@@ -157,29 +157,6 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
-    partial void OnSelectedCameraNameChanged(string? value)
-    {
-        if (!HasCameras || string.IsNullOrWhiteSpace(value))
-        {
-            return;
-        }
-
-        _ = SimulateCameraWarmupAsync();
-    }
-
-    private async Task SimulateCameraWarmupAsync()
-    {
-        try
-        {
-            IsCameraLoading = true;
-            await Task.Delay(500);
-        }
-        finally
-        {
-            IsCameraLoading = false;
-        }
-    }
-
     private void OnCameraNamesChanged(object? sender, NotifyCollectionChangedEventArgs e) => SyncCameraAvailability();
 
     private void SyncCameraAvailability()
@@ -188,6 +165,7 @@ public partial class SettingsViewModel : ObservableObject
         if (!HasCameras)
         {
             SelectedCameraName = null;
+            StopCamera();
             return;
         }
 
@@ -246,7 +224,7 @@ public partial class SettingsViewModel : ObservableObject
         var vm = new EditProfileViewModel(UserName, UserBirthDate);
 
         if (UserGender == "남") { vm.IsGenderMale = true; vm.IsGenderFemale = false; vm.IsGenderNone = false; }
-        else if(UserGender == "여") { vm.IsGenderMale = false; vm.IsGenderFemale = true; vm.IsGenderNone = false; }
+        else if (UserGender == "여") { vm.IsGenderMale = false; vm.IsGenderFemale = true; vm.IsGenderNone = false; }
         else { vm.IsGenderNone = true; }
 
         var dialog = new EditProfileView(vm)

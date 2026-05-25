@@ -1,3 +1,4 @@
+using Colorlog.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,9 +14,18 @@ public partial class SettingsView : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        UpdateWebcamPreviewClip();
+        if (DataContext is SettingsViewModel viewModel)
+        {
+            viewModel.InitializeCamera();
+        }
     }
-
+    private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel viewModel)
+        {
+            viewModel.StopCamera();
+        }
+    }
     private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         UpdateWebcamPreviewClip();

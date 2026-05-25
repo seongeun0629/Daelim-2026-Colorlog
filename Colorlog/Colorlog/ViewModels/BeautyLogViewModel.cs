@@ -5,9 +5,14 @@ namespace Colorlog.ViewModels
 {
     public partial class BeautyLogViewModel : ObservableObject
     {
-        public string UserDisplayName { get; } = "유현성";
-        public string ToneSummary { get; } = "봄 웜 라이트 · 코랄/피치 계열 고채도 포인트 추천";
-        public string SkinConditionSummary { get; } = "오늘 피부 컨디션: 수분 보통 · 홍조 약간 · 밝기 양호";
+        [ObservableProperty]
+        private string _userDisplayName = "사용자";
+
+        [ObservableProperty]
+        public string _toneSummary = "봄 웜 라이트 · 코랄/피치 계열 고채도 포인트 추천";
+
+        [ObservableProperty]
+        public string _skinConditionSummary = "오늘 피부 컨디션: 수분 보통 · 홍조 약간 · 밝기 양호";
 
         public ObservableCollection<string> FocusKeywords { get; }
 
@@ -16,6 +21,21 @@ namespace Colorlog.ViewModels
 
         public BeautyLogViewModel()
         {
+            try
+            {
+                var dbService = new Colorlog.Services.DatabaseService();
+                var latestUser = dbService.GetLatestUser();
+
+                if (latestUser != null && !string.IsNullOrEmpty(latestUser.UserName))
+                {
+                    UserDisplayName = latestUser.UserName;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"대시보드 유저 이름 로드 실패: {ex.Message}");
+            }
+
             FocusKeywords = new ObservableCollection<string>
             {
                 "톤매치 우선",
