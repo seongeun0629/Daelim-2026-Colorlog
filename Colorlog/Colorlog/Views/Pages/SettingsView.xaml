@@ -77,11 +77,22 @@
 
                             <StackPanel Margin="20,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding UserName, FallbackValue='유현성'}"
-                                           FontSize="22" FontWeight="Bold"
-                                           Foreground="{StaticResource TitleTextBrush}"/>
-                                <TextBlock Text="{Binding UserAge, FallbackValue='만 24세'}"
-                                           Style="{StaticResource DashboardCardSubTextStyle}"
-                                           Margin="0,6,0,0"/>
+                                    FontSize="22" FontWeight="Bold"
+                                    Foreground="{StaticResource TitleTextBrush}"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <TextBlock Text="{Binding UserAge, FallbackValue='만 24세'}"
+                                        Style="{StaticResource DashboardCardSubTextStyle}"/>
+
+                                    <TextBlock Text="  |  " 
+                                        Style="{StaticResource DashboardCardSubTextStyle}"/>
+
+                                    <TextBlock Text="{Binding UserGender, FallbackValue='남'}"
+                                        Style="{StaticResource DashboardCardSubTextStyle}"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource TitleTextBrush}"/>
+                                </StackPanel>
+                                
                                 <Button Content="정보 수정"
                                         Style="{StaticResource OutlineButtonStyle}"
                                         HorizontalAlignment="Left"

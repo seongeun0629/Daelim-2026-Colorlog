@@ -24,6 +24,17 @@ from core.config import (
 from core.frame_processor import process_frame
 from core.json_output import JsonOutputThrottler
 
+# ============================================================
+# DB 패키지 가져오기 및 테이블 초기화
+# ============================================================
+
+try:
+    from db import create_tables, add_diagnosis
+    create_tables()  
+    print("SQLite 데이터베이스 테이블 초기화 완료")
+except ImportError as e:
+    print(f"db 패키지를 불러오지 못했습니다. 경로를 확인하세요: {e}")
+    
 app = Flask(__name__)
 CORS(app)
 
@@ -74,6 +85,45 @@ def camera_worker():
                 if throttled:
                     with result_lock:
                         current_result = throttled
+
+                    # ============================================================
+                    # DB 실제 스케줄 수치에 맞게 매핑하여 SQLite 저장
+                    # ============================================================
+                    if throttled.get("face_detected", False):
+                        try:
+                            # 1. throttled 내부에서 원본 데이터 그룹 꺼내기
+                            lighting_data = throttled.get("lighting", {})
+                            skin_tone_data = throttled.get("skin_tone", {})
+                            personal_color_data = throttled.get("personal_color", {})
+                            
+                            # 2. 내 데이터 구조(Lab, RPV 등)에 맞게 변수 추출하기
+                            # 만약 throttled 구조에 rpv_a가 없고 brightness만 있다면 아래처럼 기본값 처리를 하거나
+                            # 매칭되는 정확한 키(Key) 이름을 적어주어야 합니다.
+                            rpv_a_val = personal_color_data.get("rpv_a", 0.0)
+                            rpv_b_val = personal_color_data.get("rpv_b", 0.0)
+                            
+                            # Lab 색상 공간 값 매칭 (없으면 lighting의 brightness나 r, g, b 수치 활용)
+                            lab_a_val = skin_tone_data.get("r", 0.0)  # 예시: 임시로 R값 매핑
+                            lab_b_val = skin_tone_data.get("g", 0.0)  # 예시: 임시로 G값 매핑
+                            lab_c_val = skin_tone_data.get("b", 0.0)  # 예시: 임시로 B값 매핑
+                            
+                            # 3. 실제 repository.py 형식에 맞춰 파라미터 전달
+                            # (user_id=1은 임시 테스트용, type_id=1은 기본 웜톤으로 임시 세팅)
+                            add_diagnosis(
+                                user_id=1,
+                                rpv_a=float(rpv_a_val),
+                                rpv_b=float(rpv_b_val),
+                                lab_a=float(lab_a_val),
+                                lab_b=float(lab_b_val),
+                                lab_c=float(lab_c_val),
+                                landmark=0.0,      # 필요시 추가 구현
+                                type_id=1          # 분석된 결과 톤에 매칭되는 ID 값
+                            )
+                            print("SQLite 진단 결과 실시간 저장 성공")
+                            
+                        except Exception as db_err:
+                            # DB 저장 중 오류가 나도 카메라 스트리밍 스레드가 터지지 않도록 방어
+                            print(f"SQLite 저장 실패: {db_err}")
 
                 # CPU 부하 완화
                 time.sleep(0.001)

@@ -10,13 +10,14 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.IO;
+using Colorlog.Models;
 
 namespace Colorlog.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string userName = "유현성";
+    private string userName = "-";
 
     [ObservableProperty]
     private string userAge = string.Empty;
@@ -25,10 +26,16 @@ public partial class SettingsViewModel : ObservableObject
     private DateTime userBirthDate = DateTime.Today.AddYears(-24);
 
     [ObservableProperty]
-    private string personalColorName = "봄 웜 라이트";
+    private string userGender = "선택 안함";
 
     [ObservableProperty]
-    private string diagnosisCount = "12회";
+    private bool isGenderVisible;
+
+    [ObservableProperty]
+    private string personalColorName = "진단 미실시";
+
+    [ObservableProperty]
+    private string diagnosisCount = "0회";
 
     [ObservableProperty]
     private string joinDate = "2026.01.03";
@@ -53,9 +60,7 @@ public partial class SettingsViewModel : ObservableObject
     private string preferenceSelectionSummary = "아직 선택된 항목이 없습니다.";
 
     public ObservableCollection<SelectablePreferenceItem> MoodItems { get; } = new();
-
     public ObservableCollection<SelectablePreferenceItem> SkinItems { get; } = new();
-
     public ObservableCollection<SelectablePreferenceItem> ToneItems { get; } = new();
 
     public SettingsViewModel()
@@ -78,6 +83,28 @@ public partial class SettingsViewModel : ObservableObject
         CameraNames.CollectionChanged += OnCameraNamesChanged;
         SyncCameraAvailability();
         SyncUserAgeFromBirthDate();
+
+        //앱이 켜질 때 DB에서 가장 최근 유저 정보 로드하기
+        try
+        {
+            var dbService = new Services.DatabaseService();
+            var latestUser = dbService.GetLatestUser();
+
+            if (latestUser != null)
+            {
+                UserName = latestUser.UserName;
+                UserGender = latestUser.Gender ?? "선택 안함";
+
+                if (!string.IsNullOrWhiteSpace(latestUser.Age))
+                {
+                    UserAge = latestUser.Age;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"초기 유저 정보 로드 실패: {ex.Message}");
+        }
     }
 
     private void SyncUserAgeFromBirthDate()
@@ -110,7 +137,6 @@ public partial class SettingsViewModel : ObservableObject
             try
             {
                 string sourceFile = openFileDialog.FileName;
-
                 string targetDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UserData", "Profiles");
 
                 if (!Directory.Exists(targetDir))
@@ -120,7 +146,6 @@ public partial class SettingsViewModel : ObservableObject
                 string targetFile = Path.Combine(targetDir, fileName);
 
                 File.Copy(sourceFile, targetFile, true);
-
                 ProfileImagePath = targetFile;
 
                 MessageBox.Show("프로필 사진이 성공적으로 변경되었습니다!", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -219,6 +244,11 @@ public partial class SettingsViewModel : ObservableObject
     private void EditProfile()
     {
         var vm = new EditProfileViewModel(UserName, UserBirthDate);
+
+        if (UserGender == "남") { vm.IsGenderMale = true; vm.IsGenderFemale = false; vm.IsGenderNone = false; }
+        else if(UserGender == "여") { vm.IsGenderMale = false; vm.IsGenderFemale = true; vm.IsGenderNone = false; }
+        else { vm.IsGenderNone = true; }
+
         var dialog = new EditProfileView(vm)
         {
             Owner = Application.Current.MainWindow
@@ -231,6 +261,11 @@ public partial class SettingsViewModel : ObservableObject
 
         UserName = vm.Name.Trim();
         UserBirthDate = vm.BirthDate.Value.Date;
+
+        if (vm.IsGenderMale) UserGender = "남";
+        else if (vm.IsGenderFemale) UserGender = "여";
+        else UserGender = "선택 안 함";
+
         SyncUserAgeFromBirthDate();
     }
 }
