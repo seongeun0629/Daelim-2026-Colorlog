@@ -25,10 +25,6 @@ namespace Colorlog.Views.Pages
         public LiveAnalysisView()
         {
             InitializeComponent();
-
-            var pythonService = new PythonEngineService();
-
-            this.DataContext = new LiveAnalysisViewModel(pythonService);
         }
     }
 }

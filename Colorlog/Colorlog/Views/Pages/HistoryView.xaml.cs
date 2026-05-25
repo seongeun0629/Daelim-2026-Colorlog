@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Colorlog.ViewModels;
 
 namespace Colorlog.Views.Pages;
 
@@ -15,6 +16,12 @@ public partial class HistoryView : UserControl
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
         ApplyCardLayout(ActualWidth);
+    }
+
+    private void WeeklyChart_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (DataContext is HistoryViewModel vm && e.NewSize.Width > 0)
+            vm.OnChartSizeChanged(e.NewSize.Width, e.NewSize.Height);
     }
 
     private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)

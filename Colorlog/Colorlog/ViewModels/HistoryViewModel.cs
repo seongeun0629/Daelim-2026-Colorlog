@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using Colorlog.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Newtonsoft.Json.Linq;
 
 namespace Colorlog.ViewModels;
 
@@ -37,7 +41,19 @@ public partial class HistoryViewModel : ObservableObject
 {
     private const int WeeklyPointCount = 7;
 
+    private readonly PythonEngineService? _pythonService;
     private readonly Dictionary<DateTime, HistoryDayRecord> _sampleRecordsByDate = new();
+
+    private double _chartWidth;
+    private double _chartHeight = 88;
+
+    public void OnChartSizeChanged(double width, double height)
+    {
+        if (width <= 0) return;
+        _chartWidth = width;
+        if (height > 0) _chartHeight = height;
+        RebuildWeeklyGeometry();
+    }
 
     public ObservableCollection<DailyTrendVm> WeeklyTrend { get; } = new();
 
@@ -88,9 +104,11 @@ public partial class HistoryViewModel : ObservableObject
     [ObservableProperty]
     private bool _selectedDetailHasRecord;
 
-    public HistoryViewModel()
+    public HistoryViewModel() : this(null) { }
+
+    public HistoryViewModel(PythonEngineService? pythonService)
     {
-        SeedSampleRecords();
+        _pythonService = pythonService;
         BuildWeeklyTrend();
         DisplayMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
         RebuildWeeklyGeometry();
@@ -126,12 +144,14 @@ public partial class HistoryViewModel : ObservableObject
     private void PreviousMonth()
     {
         DisplayMonth = DisplayMonth.AddMonths(-1);
+        _ = LoadMonthDataAsync(DisplayMonth);
     }
 
     [RelayCommand]
     private void NextMonth()
     {
         DisplayMonth = DisplayMonth.AddMonths(1);
+        _ = LoadMonthDataAsync(DisplayMonth);
     }
 
     [RelayCommand]
@@ -161,18 +181,61 @@ public partial class HistoryViewModel : ObservableObject
         SelectedCell = null;
     }
 
-    private void SeedSampleRecords()
+    /// <summary>DB에서 현재 월 + 최근 7일 데이터를 불러와 캘린더·트렌드를 다시 그립니다.</summary>
+    public async Task LoadHistoryAsync()
     {
+        if (_pythonService == null) return;
+
         var today = DateTime.Today;
-        _sampleRecordsByDate[today.AddDays(-1)] = new HistoryDayRecord("봄 웜 라이트", 72, 38, "전일 대비 톤 안정적이에요.");
-        _sampleRecordsByDate[today.AddDays(-2)] = new HistoryDayRecord("봄 웜 라이트", 68, 44, "붉은기가 소폭 있었어요. 진정 케어 추천.");
-        _sampleRecordsByDate[today.AddDays(-3)] = new HistoryDayRecord("봄 웜 라이트", 70, 41, string.Empty);
-        _sampleRecordsByDate[today.AddDays(-5)] = new HistoryDayRecord("봄 웜 라이트", 65, 48, "수면 부족일 때 측정.");
-        _sampleRecordsByDate[today.AddDays(-8)] = new HistoryDayRecord("봄 웜 라이트", 63, 52, string.Empty);
-        _sampleRecordsByDate[new DateTime(today.Year, today.Month, 3)] = new HistoryDayRecord("봄 웜 라이트", 69, 40, "월초 베이스라인.");
-        _sampleRecordsByDate[new DateTime(today.Year, today.Month, 7)] = new HistoryDayRecord("봄 웜 라이트", 74, 36, "컨디션 좋은 날.");
-        _sampleRecordsByDate[new DateTime(today.Year, today.Month, 11)] = new HistoryDayRecord("봄 웜 라이트", 71, 43, string.Empty);
-        _sampleRecordsByDate[new DateTime(today.Year, today.Month, 14)] = new HistoryDayRecord("봄 웜 라이트", 73, 39, "오늘 촬영 기준.");
+        await LoadFromQueryAsync(today.Year, today.Month);
+    }
+
+    private async Task LoadMonthDataAsync(DateTime month)
+    {
+        if (_pythonService == null) return;
+        await LoadFromQueryAsync(month.Year, month.Month);
+    }
+
+    private async Task LoadFromQueryAsync(int year, int month)
+    {
+        var result = await _pythonService.QueryHistoryAsync(year, month);
+
+        var monthly = result["monthly"] as JArray ?? new JArray();
+        var weekly = result["weekly"] as JArray ?? new JArray();
+
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            _sampleRecordsByDate.Clear();
+
+            foreach (var item in monthly)
+                MergeRecord(item, withNote: true);
+
+            foreach (var item in weekly)
+                MergeRecord(item, withNote: false);
+
+            BuildWeeklyTrend();
+            RebuildWeeklyGeometry();
+            RebuildWeeklyInsight();
+            RebuildCalendarGrid();
+        });
+    }
+
+    private void MergeRecord(JToken item, bool withNote)
+    {
+        var dateStr = item["date"]?.ToString();
+        if (!DateTime.TryParse(dateStr, out var date))
+            return;
+
+        if (_sampleRecordsByDate.ContainsKey(date.Date))
+            return;
+
+        var rec = new HistoryDayRecord(
+            item["personal_color"]?.ToString() ?? "",
+            item["brightness"]?.Value<int>() ?? 0,
+            item["redness"]?.Value<int>() ?? 0,
+            withNote ? (item["note"]?.ToString() ?? "") : ""
+        );
+        _sampleRecordsByDate[date.Date] = rec;
     }
 
     private void BuildWeeklyTrend()
@@ -183,8 +246,8 @@ public partial class HistoryViewModel : ObservableObject
         {
             var d = today.AddDays(-i);
             _sampleRecordsByDate.TryGetValue(d.Date, out var rec);
-            var brightness = rec?.Brightness ?? InterpolateDemoBrightness(d);
-            var redness = rec?.Redness ?? InterpolateDemoRedness(d);
+            int? brightness = rec != null ? rec.Brightness : null;
+            int? redness   = rec != null ? rec.Redness   : null;
             WeeklyTrend.Add(new DailyTrendVm(d, brightness, redness));
         }
 
@@ -193,29 +256,31 @@ public partial class HistoryViewModel : ObservableObject
         WeeklyCaption = string.Create(CultureInfo.CurrentCulture, $"{first:yyyy.M.d} – {last:yyyy.M.d}");
     }
 
-    private static int InterpolateDemoBrightness(DateTime d)
-    {
-        var seed = (int)(d.Ticks % 997);
-        return 64 + seed % 12;
-    }
-
-    private static int InterpolateDemoRedness(DateTime d)
-    {
-        var seed = (int)(d.Ticks % 991);
-        return 36 + seed % 14;
-    }
-
     private void RebuildWeeklyGeometry()
     {
-        var values = WeeklyTrend.Select(p => ShowBrightness ? p.Brightness : p.Redness).ToArray();
-        if (values.Length == 0)
+        if (_chartWidth <= 0)
         {
             WeeklyLineGeometry = null;
             return;
         }
 
-        var min = values.Min();
-        var max = values.Max();
+        var indexed = WeeklyTrend
+            .Select((p, i) => (i, val: ShowBrightness ? p.Brightness : p.Redness))
+            .Where(x => x.val.HasValue)
+            .Select(x => (x.i, val: x.val!.Value))
+            .ToArray();
+
+        if (indexed.Length == 0)
+        {
+            WeeklyLineGeometry = null;
+            WeeklyYMaxLabel = "100";
+            WeeklyYMinLabel = "0";
+            return;
+        }
+
+        var allValues = indexed.Select(x => x.val).ToArray();
+        var min = allValues.Min();
+        var max = allValues.Max();
         if (max - min < 4)
         {
             min = Math.Max(0, min - 2);
@@ -225,25 +290,25 @@ public partial class HistoryViewModel : ObservableObject
         WeeklyYMinLabel = min.ToString(CultureInfo.CurrentCulture);
         WeeklyYMaxLabel = max.ToString(CultureInfo.CurrentCulture);
 
-        const double w = 100d;
-        const double h = 100d;
-        const double padX = 2d;
-        var usableW = w - padX * 2;
+        var w = _chartWidth;
+        var h = _chartHeight;
 
         var sg = new StreamGeometry();
         using (var ctx = sg.Open())
         {
-            for (var i = 0; i < values.Length; i++)
+            var started = false;
+            foreach (var (idx, val) in indexed)
             {
-                var v = values[i];
-                var t = values.Length == 1 ? 0.5 : (double)i / (values.Length - 1);
-                var x = padX + t * usableW;
-                var norm = (v - min) / (max - min);
+                var x = (idx + 0.5) / WeeklyPointCount * w;
+                var norm = max == min ? 0.5 : (double)(val - min) / (max - min);
                 var y = h - norm * h;
                 var pt = new System.Windows.Point(x, y);
-                if (i == 0)
+                if (!started)
                 {
                     ctx.BeginFigure(pt, isFilled: false, isClosed: false);
+                    started = true;
+                    if (indexed.Length == 1)
+                        ctx.LineTo(new System.Windows.Point(x + 0.5, y), isStroked: true, isSmoothJoin: false);
                 }
                 else
                 {
@@ -258,10 +323,21 @@ public partial class HistoryViewModel : ObservableObject
 
     private void RebuildWeeklyInsight()
     {
-        var values = WeeklyTrend.Select(p => ShowBrightness ? p.Brightness : p.Redness).ToArray();
-        if (values.Length < 2)
+        var values = WeeklyTrend
+            .Select(p => ShowBrightness ? p.Brightness : p.Redness)
+            .Where(v => v.HasValue)
+            .Select(v => v!.Value)
+            .ToArray();
+
+        if (values.Length == 0)
         {
-            WeeklyInsight = string.Empty;
+            WeeklyInsight = "최근 7일간 진단 기록이 없어요. 분석을 시작하면 여기에 트렌드가 표시됩니다.";
+            return;
+        }
+
+        if (values.Length == 1)
+        {
+            WeeklyInsight = "진단 기록이 1건 있어요. 더 많은 기록이 쌓이면 트렌드를 확인할 수 있어요.";
             return;
         }
 
@@ -406,15 +482,17 @@ public sealed class HistoryDayRecord
 public sealed class DailyTrendVm
 {
     public DateTime Date { get; }
-    public int Brightness { get; }
-    public int Redness { get; }
+    public int? Brightness { get; }
+    public int? Redness { get; }
     public string DayLabel { get; }
+    public bool HasData { get; }
 
-    public DailyTrendVm(DateTime date, int brightness, int redness)
+    public DailyTrendVm(DateTime date, int? brightness, int? redness)
     {
         Date = date;
         Brightness = brightness;
         Redness = redness;
+        HasData = brightness.HasValue || redness.HasValue;
         DayLabel = date.ToString("M/d (ddd)", CultureInfo.CurrentCulture);
     }
 }

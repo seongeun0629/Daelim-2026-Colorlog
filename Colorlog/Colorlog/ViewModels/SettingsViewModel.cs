@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Colorlog.Services;
 using Colorlog.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -15,6 +16,8 @@ namespace Colorlog.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
+    // [DB 연결] 이름/나이 변경 시 즉시 DB에 저장하기 위해 추가
+    private readonly PythonEngineService _pythonService;
     [ObservableProperty]
     private string userName = "유현성";
 
@@ -32,6 +35,15 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private string joinDate = "2026.01.03";
+
+    [ObservableProperty]
+    private string latestDiagnosisAtText = "없음";
+
+    [ObservableProperty]
+    private int latestBrightness = -1;
+
+    [ObservableProperty]
+    private int latestRedness = -1;
 
     public ObservableCollection<string> CameraNames { get; } = new();
 
@@ -58,8 +70,10 @@ public partial class SettingsViewModel : ObservableObject
 
     public ObservableCollection<SelectablePreferenceItem> ToneItems { get; } = new();
 
-    public SettingsViewModel()
+    // [DB 연결] PythonEngineService를 받아 저장
+    public SettingsViewModel(PythonEngineService pythonService)
     {
+        _pythonService = pythonService;
         foreach (var label in new[] { "청순", "화려", "스모키", "러블리", "시크", "데일리" })
         {
             MoodItems.Add(new SelectablePreferenceItem(label, RefreshPreferenceSummary));
@@ -184,8 +198,39 @@ public partial class SettingsViewModel : ObservableObject
             : $"선택 {picks.Count}개: {string.Join(" · ", picks)}{Environment.NewLine}다음 분석·추천에 반영됩니다.";
     }
 
+    public async Task LoadUserStatsAsync()
+    {
+        var stats = await _pythonService.QueryUserStatsAsync();
+
+        var dbUserName = stats["user_name"]?.ToString();
+        if (!string.IsNullOrEmpty(dbUserName))
+            UserName = dbUserName;
+
+        var count = stats["diagnosis_count"]?.ToObject<int>() ?? 0;
+        DiagnosisCount = $"{count}회";
+
+        var joinDateStr = stats["join_date"]?.ToString();
+        if (!string.IsNullOrEmpty(joinDateStr))
+            JoinDate = joinDateStr;
+
+        var latestColor = stats["latest_color_type"]?.ToString();
+        if (!string.IsNullOrEmpty(latestColor))
+            PersonalColorName = latestColor;
+
+        var latestAt = stats["latest_at"]?.ToString();
+        if (!string.IsNullOrEmpty(latestAt) && DateTime.TryParse(latestAt, out var dt))
+        {
+            LatestDiagnosisAtText = dt.Date == DateTime.Today
+                ? $"오늘 {dt:HH:mm}"
+                : dt.ToString("yyyy.M.d HH:mm");
+        }
+
+        LatestBrightness = stats["latest_brightness"]?.ToObject<int>() ?? -1;
+        LatestRedness = stats["latest_redness"]?.ToObject<int>() ?? -1;
+    }
+
     [RelayCommand]
-    private void ResetAllRecords()
+    private async Task ResetAllRecords()
     {
         var result = MessageBox.Show(
             "진단 기록과 추천 내역이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.\n계속하시겠습니까?",
@@ -194,11 +239,12 @@ public partial class SettingsViewModel : ObservableObject
             MessageBoxImage.Warning);
 
         if (result != MessageBoxResult.Yes)
-        {
             return;
-        }
 
-        _ = MessageBox.Show(
+        await _pythonService.DeleteRecordsAsync();
+        await LoadUserStatsAsync();
+
+        MessageBox.Show(
             "초기화를 완료했습니다.",
             "안내",
             MessageBoxButton.OK,
@@ -216,7 +262,7 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void EditProfile()
+    private async Task EditProfile()
     {
         var vm = new EditProfileViewModel(UserName, UserBirthDate);
         var dialog = new EditProfileView(vm)
@@ -232,5 +278,10 @@ public partial class SettingsViewModel : ObservableObject
         UserName = vm.Name.Trim();
         UserBirthDate = vm.BirthDate.Value.Date;
         SyncUserAgeFromBirthDate();
+
+        // [DB 연결] 이름/나이 변경을 완전히 저장한 후 반환 (fire-and-forget 제거)
+        var ageYears = EditProfileViewModel.GetCompletedAgeYears(UserBirthDate, DateTime.Today);
+        var ageDecade = $"{(ageYears / 10) * 10}대";
+        await _pythonService.SaveUserAsync(UserName, ageDecade);
     }
 }

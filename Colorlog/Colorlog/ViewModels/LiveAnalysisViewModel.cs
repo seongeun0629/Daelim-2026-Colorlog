@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 using Colorlog.Services;
@@ -11,6 +12,7 @@ namespace Colorlog.ViewModels
     {
 
         private readonly PythonEngineService _pythonService;
+        private readonly SettingsViewModel _settingsViewModel; // [DB 연결] 사용자 이름/나이 읽기 위해 추가
         private static readonly Brush HealthyStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF16A34A"));
         private static readonly Brush WarningStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF59E0B"));
         private static readonly Brush DangerStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFDC2626"));
@@ -50,6 +52,16 @@ namespace Colorlog.ViewModels
 
         [ObservableProperty]
         private string _worstType = "-";
+
+        // [DB 연결] personal_color_types 테이블에서 가져온 확정 진단 정보
+        [ObservableProperty]
+        private string _recommendedColors = "-";
+
+        [ObservableProperty]
+        private string _worstColors = "-";
+
+        [ObservableProperty]
+        private string _colorKeyword = "-";
 
         [ObservableProperty]
         private string _typeAnalysisNote = "데이터를 모으는 중입니다. 얼굴을 고정한 채 잠시만 기다려주세요.";
@@ -112,9 +124,11 @@ namespace Colorlog.ViewModels
         public string LightingStateText => IsLightingGood ? "조명 양호" : "조명 주의";
         public Brush LightingStateBrush => IsLightingGood ? HealthyStateBrush : WarningStateBrush;
 
-        public LiveAnalysisViewModel(PythonEngineService pythonService)
+        // [DB 연결] SettingsViewModel을 추가로 받아 사용자 정보를 Python 엔진에 전달
+        public LiveAnalysisViewModel(PythonEngineService pythonService, SettingsViewModel settingsViewModel)
         {
             _pythonService = pythonService;
+            _settingsViewModel = settingsViewModel;
 
             _pythonService.OnColorDetected += UpdateEngineData;
 
@@ -238,6 +252,21 @@ namespace Colorlog.ViewModels
                         GuidanceMessage = "데이터를 정밀 분석 중입니다. 얼굴을 고정하고 잠시만 기다려주세요.";
                     }
                 }
+                // [DB 연결] 진단 확정 시 personal_color_types 정보를 JSON에서 읽어 UI에 반영
+                var diagnosisSaved = json["diagnosis_saved"]?.Value<bool>() ?? false;
+                if (diagnosisSaved)
+                {
+                    var typeInfo = json["color_type_info"];
+                    if (typeInfo != null)
+                    {
+                        RecommendedColors = typeInfo["colors"]?.ToString() ?? "-";
+                        WorstColors = typeInfo["worst_colors"]?.ToString() ?? "-";
+                        ColorKeyword = typeInfo["keyword"]?.ToString() ?? "-";
+                        // Settings 화면의 퍼스널컬러 이름도 함께 업데이트
+                        _settingsViewModel.PersonalColorName = typeInfo["type_name"]?.ToString() ?? "-";
+                    }
+                }
+
                 RaiseStateChanged();
             });
         }
@@ -246,7 +275,15 @@ namespace Colorlog.ViewModels
         private void StartAnalysis()
         {
             IsAnalyzing = true;
-            _pythonService.Start();
+
+            // [DB 연결] Settings에서 이름과 생년월일을 읽어 나이대("20대" 형식)로 변환 후
+            //           Python 엔진에 전달 → users 테이블에 저장됨
+            var userName = _settingsViewModel.UserName;
+            var ageYears = EditProfileViewModel.GetCompletedAgeYears(
+                _settingsViewModel.UserBirthDate, DateTime.Today);
+            var ageDecade = $"{(ageYears / 10) * 10}대";
+
+            _pythonService.Start(userName, ageDecade);
 
             AnalysisStatus = "실시간 분석 진행 중";
             AnalysisProgress = 58;

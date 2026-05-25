@@ -1,16 +1,3 @@
-"""
-colorlog DB 스키마 설정 파일
-- 이 파일을 실행하면 colorlog.db 파일이 생성되고 테이블이 만들어집니다.
-- 설계 범위: 5개 테이블 전체 (ERD 기준)
-
-테이블 생성 순서 (외래키 때문에 참조되는 쪽을 먼저 만들어야 합니다)
-  1. personal_color_types  ← diagnosis가 참조
-  2. users                 ← diagnosis가 참조
-  3. diagnosis             ← rec_products가 참조
-  4. products              ← rec_products가 참조
-  5. rec_products
-"""
-
 import sqlite3
 import os
 
@@ -18,157 +5,234 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "colorlog.db")
 
 
 def get_connection():
-    """DB에 연결하고 연결 객체를 반환합니다."""
     conn = sqlite3.connect(DB_PATH)
-    # 외래 키(Foreign Key) 기능을 활성화
     conn.execute("PRAGMA foreign_keys = ON")
-    # 쿼리 결과를 컬럼 이름으로 접근할 수 있게 설정
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def create_tables():
-    """5개 테이블을 생성합니다. 이미 있으면 건너뜁니다."""
     conn = get_connection()
     cursor = conn.cursor()
 
-
-    # 테이블 1: personal_color_types (퍼스널컬러 유형)
-    
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS personal_color_types (
             type_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                         -- 유형 고유 번호 (자동 증가)
-
             type_name    TEXT    NOT NULL,
-                         -- 유형 이름 예: '봄 웜톤', '여름 쿨톤'
-
             colors       TEXT,
-                         -- 어울리는 컬러 목록 예: '코랄, 피치, 아이보리'
-
             worst_colors TEXT,
-                         -- 피해야 할 컬러 목록 예: '그레이, 블루블랙'
-
             tone         TEXT,
-                         -- 웜/쿨 구분 예: '웜', '쿨'
-
             keyword      TEXT
-                         -- 유형 키워드 예: '생기있는, 따뜻한, 화사한'
         )
     """)
-
-    # 테이블 2: users (사용자)
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-                        -- 사용자 고유 번호 (자동으로 1, 2, 3... 증가)
-
-            user_name   TEXT    NOT NULL,
-                        -- 사용자 이름 (반드시 입력해야 함)
-
+            user_name   TEXT    NOT NULL UNIQUE,
             gender      TEXT,
-                        -- 성별 예: '남', '여', NULL(입력 안 함)
-
             age         TEXT,
-                        -- 나이 예: '20대', '30대', NULL(입력 안 함)
-
             created_at  TEXT    NOT NULL
-                        -- 가입 날짜·시간 예: '2026-05-12 14:30:00'
         )
     """)
-
-    # 테이블 3: diagnosis (진단결과)
-    # users, personal_color_types 테이블을 참조
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS diagnosis (
             diagnosis_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-                            -- 진단 고유 번호 (자동 증가)
-
             diagnosis_at    TEXT    NOT NULL,
-                            -- 진단한 날짜·시간 예: '2026-05-12 14:35:00'
-
-            rpv_a           REAL    NOT NULL,
-                            -- 퍼스널컬러 측정값 A (소수점 포함 숫자, 필수)
-
-            rpv_b           REAL    NOT NULL,
-                            -- 퍼스널컬러 측정값 B (소수점 포함 숫자, 필수)
-
+            lab_l           REAL,
             lab_a           REAL,
-                            -- Lab 색상값 A (선택 입력)
-
             lab_b           REAL,
-                            -- Lab 색상값 B (선택 입력)
-
-            lab_c           REAL,
-                            -- Lab 색상값 C (선택 입력)
-
-            landmark        REAL,
-                            -- 얼굴 랜드마크 측정값 (선택 입력)
-
+            brightness      INTEGER,
+            redness         INTEGER,
+            note            TEXT,
             type_id         INTEGER,
-                            -- 진단 결과 퍼스널컬러 유형 번호
-                            -- personal_color_types 테이블의 type_id 참조
-
             user_id         INTEGER NOT NULL,
-                            -- 이 진단을 받은 사용자 번호 (users 테이블의 user_id 참조)
-
             FOREIGN KEY (user_id) REFERENCES users(user_id),
             FOREIGN KEY (type_id) REFERENCES personal_color_types(type_id)
         )
     """)
 
-
-    # 테이블 4: products (화장품)
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS products (
             product_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                            -- 화장품 고유 번호 (자동 증가)
-
             product_url     TEXT    NOT NULL,
-                            -- 화장품 상품 링크 (필수)
-
             product_name    TEXT,
-                            -- 화장품 이름 예: '데일리 수분 톤업 선크림'
-
             keyword         TEXT,
-                            -- 화장품 키워드 예: '수분, 자외선차단'
-
-            category        TEXT
-                            -- 화장품 카테고리 예: '선크림', '파운데이션', '립'
+            category        TEXT,
+            tone_type       TEXT
         )
     """)
 
-
-    # 테이블 5: rec_products (추천 화장품)
-    # diagnosis, products 두 테이블을 동시에 참조
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS rec_products (
             rec_id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                            -- 추천 기록 고유 번호 (자동 증가)
-
             product_id      INTEGER NOT NULL,
-                            -- 추천된 화장품 번호 (products 테이블의 product_id 참조)
-
             diagnosis_id    INTEGER NOT NULL,
-                            -- 어떤 진단에서 추천됐는지 (diagnosis 테이블의 diagnosis_id 참조)
-
             rec_reason      TEXT,
-                            -- 추천 이유 예: '웜톤에 어울리는 코랄 계열'
-
             FOREIGN KEY (product_id)   REFERENCES products(product_id),
             FOREIGN KEY (diagnosis_id) REFERENCES diagnosis(diagnosis_id)
         )
     """)
 
-    conn.commit()   
-    conn.close()   
-    print("테이블 생성 완료: personal_color_types, users, diagnosis, products, rec_products")
+    conn.commit()
+    conn.close()
+    _migrate()
 
 
-# 이 파일을 직접 실행할 때만 아래 코드가 동작
+def _migrate():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("PRAGMA table_info(diagnosis)")
+    diag_col_info = {row["name"]: row for row in cursor.fetchall()}
+    diag_cols = set(diag_col_info.keys())
+
+    # 구 스키마(rpv_a NOT NULL)가 있으면 테이블을 깨끗하게 재생성한다
+    if "rpv_a" in diag_col_info and diag_col_info["rpv_a"]["notnull"] == 1:
+        cursor.execute("""
+            CREATE TABLE diagnosis_new (
+                diagnosis_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+                diagnosis_at    TEXT    NOT NULL,
+                lab_l           REAL,
+                lab_a           REAL,
+                lab_b           REAL,
+                brightness      INTEGER,
+                redness         INTEGER,
+                note            TEXT,
+                type_id         INTEGER,
+                user_id         INTEGER NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(user_id),
+                FOREIGN KEY (type_id) REFERENCES personal_color_types(type_id)
+            )
+        """)
+        cursor.execute("""
+            INSERT INTO diagnosis_new
+                (diagnosis_id, diagnosis_at, lab_l, lab_a, lab_b,
+                 brightness, redness, note, type_id, user_id)
+            SELECT
+                diagnosis_id, diagnosis_at,
+                COALESCE(lab_l, lab_a),
+                rpv_a,
+                rpv_b,
+                brightness,
+                redness,
+                note, type_id, user_id
+            FROM diagnosis
+        """)
+        cursor.execute("DROP TABLE diagnosis")
+        cursor.execute("ALTER TABLE diagnosis_new RENAME TO diagnosis")
+        conn.commit()
+    else:
+        for col, typedef in [
+            ("brightness", "INTEGER"),
+            ("redness",    "INTEGER"),
+            ("note",       "TEXT"),
+            ("lab_l",      "REAL"),
+            ("lab_a",      "REAL"),
+            ("lab_b",      "REAL"),
+        ]:
+            if col not in diag_cols:
+                cursor.execute(f"ALTER TABLE diagnosis ADD COLUMN {col} {typedef}")
+        conn.commit()
+
+    cursor.execute("PRAGMA table_info(products)")
+    prod_cols = {row["name"] for row in cursor.fetchall()}
+    if "tone_type" not in prod_cols:
+        cursor.execute("ALTER TABLE products ADD COLUMN tone_type TEXT")
+        conn.commit()
+
+    conn.close()
+
+
+_PERSONAL_COLOR_TYPES = [
+    {
+        "type_name": "봄 웜톤 (Spring Warm)",
+        "colors": "코랄, 피치, 아이보리, 살구색",
+        "worst_colors": "그레이, 블루블랙, 형광색",
+        "tone": "웜",
+        "keyword": "생기있는, 따뜻한, 화사한",
+    },
+    {
+        "type_name": "여름 쿨톤 (Summer Cool)",
+        "colors": "라벤더, 블루, 로즈, 파우더핑크",
+        "worst_colors": "오렌지, 카키, 골드",
+        "tone": "쿨",
+        "keyword": "부드러운, 청량한, 투명한",
+    },
+    {
+        "type_name": "가을 웜톤 (Autumn Warm)",
+        "colors": "베이지, 브라운, 카키, 머스타드",
+        "worst_colors": "형광핑크, 네온, 블루블랙",
+        "tone": "웜",
+        "keyword": "차분한, 성숙한, 깊이있는",
+    },
+    {
+        "type_name": "겨울 쿨톤 (Winter Cool)",
+        "colors": "블랙, 화이트, 와인, 선명한 레드",
+        "worst_colors": "오렌지, 피치, 카멜",
+        "tone": "쿨",
+        "keyword": "강렬한, 또렷한, 도시적인",
+    },
+]
+
+
+def seed_personal_color_types():
+    conn = get_connection()
+    cursor = conn.cursor()
+    for t in _PERSONAL_COLOR_TYPES:
+        cursor.execute(
+            "SELECT COUNT(*) FROM personal_color_types WHERE type_name = ?",
+            (t["type_name"],)
+        )
+        if cursor.fetchone()[0] == 0:
+            cursor.execute(
+                """INSERT INTO personal_color_types
+                   (type_name, colors, worst_colors, tone, keyword)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (t["type_name"], t["colors"], t["worst_colors"], t["tone"], t["keyword"])
+            )
+    conn.commit()
+    conn.close()
+
+
+_PRODUCTS_SEED = [
+    # 봄 웜톤
+    ("https://example.com/p1", "코랄 무드 블러셔",     "코랄,피치,웜톤",   "치크",   "웜"),
+    ("https://example.com/p2", "살구빛 크림 립틴트",   "살구,피치,웜톤",   "립",     "웜"),
+    ("https://example.com/p3", "피치 아이 팔레트",     "피치,웜,골드",     "아이",   "웜"),
+    ("https://example.com/p4", "시카 진정 토너 패드",  "진정,저자극",      "스킨케어","웜"),
+    ("https://example.com/p5", "광채 세럼 쿠션 21N",  "밝기,웜베이지",    "베이스",  "웜"),
+    # 여름 쿨톤
+    ("https://example.com/p6", "라벤더 쉬머 블러셔",  "라벤더,핑크,쿨",   "치크",   "쿨"),
+    ("https://example.com/p7", "로즈 틴트",           "로즈,쿨핑크",      "립",     "쿨"),
+    ("https://example.com/p8", "블루 베이스 파운데이션","쿨베이지,투명",   "베이스",  "쿨"),
+    ("https://example.com/p9", "히알루론산 수분 크림", "수분,진정",        "스킨케어","쿨"),
+    ("https://example.com/p10","나이아신아마이드 세럼", "미백,쿨톤",       "스킨케어","쿨"),
+    # 가을 웜톤
+    ("https://example.com/p11","브라운 무드 블러셔",   "브라운,테라코타",  "치크",   "웜"),
+    ("https://example.com/p12","뮤트 버건디 립",       "버건디,웜브라운",  "립",     "웜"),
+    ("https://example.com/p13","머스타드 아이 팔레트", "머스타드,카키",    "아이",   "웜"),
+    # 겨울 쿨톤
+    ("https://example.com/p14","쿨 로즈 블러셔",       "로즈,쿨핑크",     "치크",   "쿨"),
+    ("https://example.com/p15","선명한 레드 립",        "레드,선명,쿨",    "립",     "쿨"),
+    ("https://example.com/p16","블루 언더톤 파운데이션","쿨,밝은베이지",  "베이스",  "쿨"),
+]
+
+
+def seed_products():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM products")
+    if cursor.fetchone()[0] == 0:
+        cursor.executemany(
+            "INSERT INTO products (product_url, product_name, keyword, category, tone_type) VALUES (?,?,?,?,?)",
+            _PRODUCTS_SEED
+        )
+        conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
     create_tables()
     print(f"DB 경로: {DB_PATH}")
