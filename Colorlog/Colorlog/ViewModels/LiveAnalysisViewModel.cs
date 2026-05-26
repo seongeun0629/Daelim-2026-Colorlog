@@ -1,7 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
+using System.Windows.Threading;
+using Colorlog.Helpers;
 using Colorlog.Services;
 using Newtonsoft.Json.Linq;
 using OpenCvSharp;
@@ -57,12 +59,14 @@ namespace Colorlog.ViewModels
         [ObservableProperty]
         private string _typeAnalysisNote = "데이터를 모으는 중입니다. 얼굴을 고정한 채 잠시만 기다려주세요.";
 
-        // 카메라 연동
-        private VideoCapture _capture;
-        private bool _isCamRunning;
+        // 카메라: SettingsView와 동일하게 UI 스레드 DispatcherTimer + VideoCapture(DSHOW)
+        private readonly SettingsViewModel? _settingsViewModel;
+        private VideoCapture? _capture;
+        private DispatcherTimer? _cameraTimer;
+        private readonly object _captureLock = new();
 
         [ObservableProperty]
-        private BitmapSource _cameraSource;
+        private BitmapSource? _cameraSource;
 
         [ObservableProperty]
         private bool _isAnalyzing;
@@ -126,9 +130,10 @@ namespace Colorlog.ViewModels
         public string LightingStateText => IsLightingGood ? "조명 양호" : "조명 주의";
         public Brush LightingStateBrush => IsLightingGood ? HealthyStateBrush : WarningStateBrush;
 
-        public LiveAnalysisViewModel(PythonEngineService pythonService)
+        public LiveAnalysisViewModel(PythonEngineService pythonService, SettingsViewModel? settingsViewModel = null)
         {
             _pythonService = pythonService;
+            _settingsViewModel = settingsViewModel;
 
             _pythonService.OnColorDetected += UpdateEngineData;
 
@@ -256,67 +261,128 @@ namespace Colorlog.ViewModels
             });
         }
 
-        [RelayCommand]
-        private async Task StartAnalysis()
+        /// <summary>페이지 진입 시 호출. 설정 화면과 동일한 방식으로 미리보기 스트림을 시작합니다.</summary>
+        public void InitializeCameraPreview()
         {
-            if (IsAnalyzing) return;
-            IsAnalyzing = true;
-
-            _pythonService.Start();
-
-            _capture = new VideoCapture(0, VideoCaptureAPIs.DSHOW);
-            _capture.FrameWidth = 640;
-            _capture.FrameHeight = 480;
-
-            if (!_capture.IsOpened())
+            lock (_captureLock)
             {
-                // 카메라 열기 실패 시 원상복구
-                _pythonService.Stop();
-                IsAnalyzing = false;
+                ReleaseCameraResourcesInternal();
+
+                var index = _settingsViewModel?.GetSelectedCameraIndex() ?? 0;
+                _capture = new VideoCapture(index, VideoCaptureAPIs.DSHOW);
+                if (!_capture.IsOpened())
+                {
+                    HasCameraPermission = false;
+                    CameraSource = null;
+                    RaiseStateChanged();
+                    return;
+                }
+
+                HasCameraPermission = true;
+                RaiseStateChanged();
+
+                _capture.FrameWidth = 640;
+                _capture.FrameHeight = 480;
+
+                _cameraTimer = new DispatcherTimer(DispatcherPriority.Render)
+                {
+                    Interval = TimeSpan.FromMilliseconds(33)
+                };
+                _cameraTimer.Tick += OnCameraFrameTick;
+                _cameraTimer.Start();
+            }
+        }
+
+        /// <summary>페이지 이탈 시 카메라·타이머 해제.</summary>
+        public void StopCameraPreview()
+        {
+            lock (_captureLock)
+            {
+                ReleaseCameraResourcesInternal();
+            }
+
+            CameraSource = null;
+        }
+
+        /// <summary>다른 메뉴로 이동할 때: 분석 중이면 중지 후 카메라 해제.</summary>
+        public void StopPage()
+        {
+            if (IsAnalyzing)
+            {
+                StopAnalysis();
+            }
+
+            StopCameraPreview();
+        }
+
+        private void ReleaseCameraResourcesInternal()
+        {
+            if (_cameraTimer != null)
+            {
+                _cameraTimer.Stop();
+                _cameraTimer.Tick -= OnCameraFrameTick;
+                _cameraTimer = null;
+            }
+
+            if (_capture != null)
+            {
+                _capture.Release();
+                _capture.Dispose();
+                _capture = null;
+            }
+        }
+
+        private void OnCameraFrameTick(object? sender, EventArgs e)
+        {
+            lock (_captureLock)
+            {
+                if (_capture == null || !_capture.IsOpened())
+                {
+                    return;
+                }
+
+                using var frame = new Mat();
+                if (_capture.Read(frame) && !frame.Empty())
+                {
+                    using var preview = CameraFrameHelper.PreparePreviewFrame(frame, flipHorizontal: true);
+                    CameraSource = preview.ToBitmapSource();
+                }
+            }
+        }
+
+        [RelayCommand]
+        private void StartAnalysis()
+        {
+            if (IsAnalyzing)
+            {
+                return;
+            }
+
+            if (_capture == null || !_capture.IsOpened())
+            {
+                InitializeCameraPreview();
+            }
+
+            if (_capture == null || !_capture.IsOpened())
+            {
                 AnalysisStatus = "카메라 연결 실패";
                 return;
             }
 
-            _isCamRunning = true;
+            IsAnalyzing = true;
+            _pythonService.Start();
 
             AnalysisStatus = "실시간 분석 진행 중";
             AnalysisProgress = 58;
             AnalysisPhase = "피부톤 추출";
             AnalysisPhaseDetail = "부위별 평균 색상과 홍조 지수를 계산 중";
             GuidanceMessage = "좋아요! 얼굴을 고정한 채 2~3초만 유지해주세요.";
-
-            //백그라운드 스레드에서 실시간 프레임 렌더링 루프 가동
-            await Task.Run(async () =>
-            {
-                using (Mat frame = new Mat())
-                {
-                    while (_isCamRunning)
-                    {
-                        _capture.Read(frame);
-                        if (frame.Empty()) continue;
-
-                        // UI 스레드에서 이미지 바인딩 소스 안전하게 갱신
-                        App.Current.Dispatcher.Invoke(() =>
-                        {
-                            CameraSource = frame.ToBitmapSource();
-                        });
-
-                        await Task.Delay(33); // 약 30 FPS 유지
-                    }
-                }
-            });
         }
 
         [RelayCommand]
         private void StopAnalysis()
         {
-            _isCamRunning = false;
             IsAnalyzing = false;
-
-            _capture?.Release();
-            _capture = null;
-            CameraSource = null;
-
             _pythonService.Stop();
 
             AnalysisStatus = "분석 일시 중지";

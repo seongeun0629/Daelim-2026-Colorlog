@@ -5,7 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
       d:DesignHeight="820" d:DesignWidth="1180"
-      Background="Transparent">
+      Background="Transparent"
+      Loaded="UserControl_Loaded"
+      Unloaded="UserControl_Unloaded">
 
     <UserControl.Resources>
         <Style x:Key="StartButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentPillButtonStyle}">
@@ -121,22 +123,27 @@
                                     </Border>
                                 </StackPanel>
 
-                                <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Image Source="{Binding CameraSource}"
-                                           Width="640" Height="480"
-                                           Stretch="UniformToFill"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           RenderTransformOrigin="0.5,0.5">
-                                        <Image.RenderTransform>
-                                            <ScaleTransform ScaleX="-1"/>
-                                        </Image.RenderTransform>
-                                        <Image.Clip>
-                                            <RectangleGeometry Rect="0,0,640,480" RadiusX="16" RadiusY="16"/>
-                                        </Image.Clip>
-                                    </Image>
+                                <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <!-- 뷰포트(640×480) 안에 영상·가이드·문구를 묶어 정렬이 깨지지 않게 함 -->
+                                    <Grid Width="640" Height="480"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center">
+                                    <!-- 영상은 VM에서 중앙 크롭·미러·640×480 처리 → UI는 중앙 정렬만 -->
+                                    <Border CornerRadius="16"
+                                            ClipToBounds="True"
+                                            Background="Transparent"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch">
+                                        <Image Source="{Binding CameraSource}"
+                                               Stretch="UniformToFill"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
 
                                     <Rectangle Width="360" Height="470"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
                                                Stroke="{StaticResource CameraGuideFrameStrokeBrush}"
                                                StrokeThickness="2"
                                                RadiusX="32" RadiusY="32"
@@ -145,6 +152,8 @@
                                                Opacity="0.92"/>
 
                                     <Ellipse Width="220" Height="280"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
                                              Stroke="{StaticResource CameraGuideEllipseStrokeBrush}"
                                              StrokeThickness="1.25"
                                              Fill="Transparent"
@@ -162,6 +171,7 @@
                                             <DropShadowEffect Color="#CC000000" BlurRadius="10" ShadowDepth="0" Opacity="0.85"/>
                                         </TextBlock.Effect>
                                     </TextBlock>
+                                    </Grid>
                                 </Grid>
 
                                 <Border Grid.Row="2" Style="{StaticResource CameraGuidanceBarStyle}">

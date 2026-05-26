@@ -94,26 +94,57 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- 사이드바 헤더 -->
-                                    <Grid Grid.Row="0" Margin="12,0,12,16" Height="50">
+                                    <!-- 사이드바 헤더: 접힘 시 네비와 동일하게 좌우 여백 축소 + 토글 전폭 중앙 정렬(고정 80열 제거로 클리핑 방지) -->
+                                    <Grid Grid.Row="0" Height="50">
+                                        <Grid.Style>
+                                            <Style TargetType="Grid">
+                                                <Setter Property="Margin" Value="12,0,12,16"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                                        <Setter Property="Margin" Value="4,0,4,16"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Style>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
+                                        <StackPanel x:Name="SidebarBrandText" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center">
+                                            <StackPanel.Style>
+                                                <Style TargetType="StackPanel">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </StackPanel.Style>
+                                            <TextBlock Style="{StaticResource SidebarBrandTitleStyle}" Text="Colorlog"/>
+                                            <TextBlock Style="{StaticResource SidebarBrandSubtitleStyle}" Text="Personal color studio"/>
+                                        </StackPanel>
+
                                         <ToggleButton x:Name="SidebarToggleButton" Content="&#xE700;"
                                             Grid.Column="0" HorizontalAlignment="Center" Margin="0,2,0,0"
-                                            Style="{StaticResource SidebarToggleButtonStyle}"
                                             FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                             FontSize="14"
                                             ToolTip="사이드바 접기/펼치기" Width="40" Height="40"
                                             IsChecked="{Binding IsSidebarExpanded, Mode=TwoWay}"  
-                                            VerticalAlignment="Center"/>
-
-                                        <StackPanel x:Name="SidebarBrandText" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center">
-                                            <TextBlock Style="{StaticResource SidebarBrandTitleStyle}" Text="Colorlog"/>
-                                            <TextBlock Style="{StaticResource SidebarBrandSubtitleStyle}" Text="Personal color studio"/>
-                                        </StackPanel>
+                                            VerticalAlignment="Center">
+                                            <ToggleButton.Style>
+                                                <Style TargetType="ToggleButton" BasedOn="{StaticResource SidebarToggleButtonStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding DataContext.IsSidebarExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                                            <Setter Property="Grid.ColumnSpan" Value="2"/>
+                                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                            <Setter Property="Margin" Value="0,0,0,0"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ToggleButton.Style>
+                                        </ToggleButton>
                                     </Grid>
 
                                     <StackPanel Grid.Row="2" Margin="0,0,0,16">

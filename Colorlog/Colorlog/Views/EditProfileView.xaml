@@ -21,6 +21,7 @@
 
     <Border Padding="20" Background="Transparent">
         <Border Style="{StaticResource CardStyle}"
+                Background="{StaticResource WhiteBrush}" 
                 CornerRadius="20"
                 Padding="26,22,26,26">
 
