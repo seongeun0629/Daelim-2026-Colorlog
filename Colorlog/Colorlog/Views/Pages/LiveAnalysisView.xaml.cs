@@ -22,7 +22,7 @@ public partial class LiveAnalysisView : UserControl
     {
         if (DataContext is LiveAnalysisViewModel vm)
         {
-            vm.StopPage();
+            vm.Dispose();
         }
     }
 }
