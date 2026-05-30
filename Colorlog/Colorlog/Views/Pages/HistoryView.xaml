@@ -16,6 +16,7 @@
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 
+
         <Style x:Key="HistorySegmentButtonStyle" TargetType="Button" BasedOn="{StaticResource OutlineButtonStyle}">
             <Setter Property="Padding" Value="14,8"/>
             <Setter Property="FontSize" Value="13"/>
@@ -98,7 +99,7 @@
                         <TextBlock Text="일주일 히스토리" Style="{StaticResource DashboardCardTitleStyle}"/>
                         <TextBlock Text="최근 7일 밝기·붉은기 추이"
                                    Style="{StaticResource DashboardCardSubTextStyle}"
-                                   Margin="0,8,0,0"/>
+                                   Margin="0,6,0,0"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
                             <Button Content="밝기"
@@ -149,34 +150,28 @@
                                 <TextBlock Grid.Row="2" Text="{Binding WeeklyYMinLabel}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Right"/>
                             </Grid>
                             <Border Grid.Column="1"
-                                    CornerRadius="12"
-                                    Background="{StaticResource SurfaceMutedBrush}"
-                                    BorderBrush="{StaticResource NeutralBorderBrush}"
-                                    BorderThickness="1"
-                                    Padding="10,10,10,6"
-                                    MinHeight="132">
+                                CornerRadius="12"
+                                Background="{StaticResource SurfaceMutedBrush}"
+                                BorderBrush="{StaticResource NeutralBorderBrush}"
+                                BorderThickness="1"
+                                Padding="10,10,10,6"
+                                MinHeight="180">
                                 <Grid>
-                                    <Viewbox Stretch="Uniform" MaxHeight="88" VerticalAlignment="Top" Margin="0,4,0,0">
+                                    <Viewbox Stretch="Uniform" MaxHeight="130" VerticalAlignment="Top" Margin="0,4,0,0">
                                         <Canvas Width="100" Height="100" ClipToBounds="True">
                                             <Path Data="{Binding WeeklyLineGeometry}"
-                                                  Stroke="{StaticResource PrimaryBrush}"
-                                                  StrokeThickness="2.5"
-                                                  StrokeStartLineCap="Round"
-                                                  StrokeEndLineCap="Round"
-                                                  StrokeLineJoin="Round"
-                                                  Fill="Transparent"
-                                                  Stretch="None"/>
+                                              Stroke="{StaticResource PrimaryBrush}"
+                                              StrokeThickness="2.5"
+                                              StrokeStartLineCap="Round"
+                                              StrokeEndLineCap="Round"
+                                              StrokeLineJoin="Round"
+                                              Fill="Transparent"
+                                              Stretch="None"/>
                                         </Canvas>
                                     </Viewbox>
                                 </Grid>
                             </Border>
                         </Grid>
-
-                        <TextBlock Text="{Binding WeeklyCaption}"
-                                   FontSize="12"
-                                   Foreground="{StaticResource MutedTextBrush}"
-                                   HorizontalAlignment="Right"
-                                   Margin="0,6,0,0"/>
 
                         <ItemsControl ItemsSource="{Binding WeeklyTrend}" Margin="0,10,0,0">
                             <ItemsControl.ItemsPanel>
@@ -196,19 +191,34 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
+                        <TextBlock Text="{Binding WeeklyCaption}"
+                                   FontSize="11"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,8,0,0"/>
+
                         <Border Style="{StaticResource GlassDividerStyle}" Margin="0,18,0,14"/>
 
-                        <TextBlock Text="한 줄 요약" FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource TitleTextBrush}"/>
+                        <!--한줄 요약-->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <Border Width="3" CornerRadius="2"
+                                    Background="{StaticResource PrimaryBrush}"
+                                    Margin="0,0,10,0"/>
+                            <TextBlock Text="한 줄 요약" FontWeight="SemiBold" FontSize="13"
+                                       Foreground="{StaticResource TitleTextBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock Text="{Binding WeeklyInsight}"
                                    Style="{StaticResource DashboardCardSubTextStyle}"
-                                   Margin="0,8,0,0"
+                                   Margin="13,6,0,0"
                                    TextWrapping="Wrap"
-                                   LineHeight="20"/>
+                                   LineHeight="22"/>
                     </StackPanel>
                 </Border>
 
                 <!-- 월별 달력 + 상세 -->
-                <Border x:Name="MonthHistoryCard" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3" Style="{StaticResource DashboardCardStyle}">
+                <Border x:Name="MonthHistoryCard" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                        Style="{StaticResource DashboardCardStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -217,6 +227,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
+                        <!-- 헤더 -->
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -226,34 +237,55 @@
                                 <TextBlock Text="월별 히스토리" Style="{StaticResource DashboardCardTitleStyle}"/>
                                 <TextBlock Text="날짜를 눌러 퍼스널 컬러와 지표를 확인하세요."
                                            Style="{StaticResource DashboardCardSubTextStyle}"
-                                           Margin="0,8,0,0"/>
+                                           Margin="0,6,0,0"/>
                             </StackPanel>
                             <Button Grid.Column="1"
                                     Content="선택 해제"
                                     Style="{StaticResource OutlineButtonStyle}"
-                                    Height="30" FontSize="12" Padding="10,0"
+                                    Height="30" FontSize="12" Padding="12,0"
                                     VerticalAlignment="Top"
                                     Command="{Binding ClearCalendarSelectionCommand}"/>
                         </Grid>
 
-                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,12">
-                            <Button Content="‹" Style="{StaticResource CalendarNavButtonStyle}" Command="{Binding PreviousMonthCommand}" Margin="0,0,12,0"/>
-                            <TextBlock Text="{Binding DisplayMonthLabel}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TitleTextBrush}" VerticalAlignment="Center" MinWidth="120" TextAlignment="Center"/>
-                            <Button Content="›" Style="{StaticResource CalendarNavButtonStyle}" Command="{Binding NextMonthCommand}" Margin="12,0,0,0"/>
-                        </StackPanel>
+                        <!-- 월 네비게이션 -->
+                        <Border Grid.Row="1"
+                                CornerRadius="12"
+                                Margin="0,16,0,12"
+                                Padding="8,6">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="‹" Style="{StaticResource CalendarNavButtonStyle}"
+                                        Command="{Binding PreviousMonthCommand}" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding DisplayMonthLabel}"
+                                           FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TitleTextBrush}"
+                                           VerticalAlignment="Center"
+                                           MinWidth="130" TextAlignment="Center"/>
+                                <Button Content="›" Style="{StaticResource CalendarNavButtonStyle}"
+                                        Command="{Binding NextMonthCommand}" Margin="8,0,0,0"/>
+                            </StackPanel>
+                        </Border>
 
-                        <UniformGrid Grid.Row="2" Columns="7" Margin="0,0,0,6">
-                            <TextBlock Text="일" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="월" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="화" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="수" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="목" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="금" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="토" FontSize="11" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                        <!-- 요일 헤더 -->
+                        <UniformGrid Grid.Row="2" Columns="7" Margin="0,0,0,4">
+                            <TextBlock Text="일" FontSize="11" FontWeight="Medium"
+                                       Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="월" FontSize="11" FontWeight="Medium"
+                                       Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="화" FontSize="11" FontWeight="Medium"
+                                       Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="수" FontSize="11" FontWeight="Medium"
+                                       Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="목" FontSize="11" FontWeight="Medium"
+                                       Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="금" FontSize="11" FontWeight="Medium"
+                                       Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="토" FontSize="11" FontWeight="Medium"
+                                       Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
                         </UniformGrid>
 
                         <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
+                                <!-- 달력 셀 -->
                                 <ItemsControl ItemsSource="{Binding CalendarCells}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -262,19 +294,23 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid MinHeight="52" Margin="2">
+                                            <!-- ✅ 개선: 셀 높이 증가 -->
+                                            <Grid MinHeight="62" Margin="2,2">
+                                                <!-- 이전/다음 달 placeholder -->
                                                 <Border Visibility="{Binding IsPlaceholder, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                        CornerRadius="10"
+                                                        CornerRadius="12"
                                                         Background="{StaticResource SurfaceSubtleBrush}"
-                                                        Opacity="0.65">
+                                                        Opacity="0.5">
                                                     <TextBlock Text="{Binding DisplayDay}"
                                                                FontSize="12"
                                                                Foreground="{StaticResource MutedTextBrush}"
                                                                HorizontalAlignment="Right"
                                                                VerticalAlignment="Top"
-                                                               Margin="0,2,6,0"
-                                                               Opacity="0.55"/>
+                                                               Margin="0,4,6,0"
+                                                               Opacity="0.4"/>
                                                 </Border>
+
+                                                <!-- 실제 날짜 셀 -->
                                                 <Button Visibility="{Binding IsPlaceholder, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}"
                                                         Command="{Binding DataContext.SelectCalendarDayCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}">
@@ -301,14 +337,22 @@
                                                             <RowDefinition Height="Auto"/>
                                                             <RowDefinition Height="*"/>
                                                         </Grid.RowDefinitions>
-                                                        <TextBlock Grid.Row="0" Text="{Binding DisplayDay}" FontSize="12" FontWeight="SemiBold"
-                                                                   Foreground="{StaticResource TitleTextBrush}" HorizontalAlignment="Right"/>
-                                                        <Border Grid.Row="1" Height="4" CornerRadius="2" Margin="0,6,0,0"
-                                                                Background="{Binding IndicatorBrush}"/>
-                                                        <TextBlock Grid.Row="2" Text="{Binding PersonalShort}" FontSize="10"
+                                                        <TextBlock Grid.Row="0"
+                                                                   Text="{Binding DisplayDay}"
+                                                                   FontSize="12" FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource TitleTextBrush}"
+                                                                   HorizontalAlignment="Right"/>
+                                                        <!-- ✅ 개선: 인디케이터 바 두께/투명도 강화 -->
+                                                        <Border Grid.Row="1" Height="5" CornerRadius="3"
+                                                                Margin="0,5,0,0"
+                                                                Background="{Binding IndicatorBrush}"
+                                                                Opacity="{Binding HasRecord, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                        <TextBlock Grid.Row="2"
+                                                                   Text="{Binding PersonalShort}"
+                                                                   FontSize="10"
                                                                    Foreground="{StaticResource MutedTextBrush}"
                                                                    TextTrimming="CharacterEllipsis"
-                                                                   Margin="0,4,0,0"
+                                                                   Margin="0,3,0,0"
                                                                    Visibility="{Binding HasRecord, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                                     </Grid>
                                                 </Button>
@@ -317,44 +361,72 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
 
+                                <!-- ✅ 개선: 선택한 날 상세 카드 -->
                                 <Border Margin="0,16,0,0"
-                                        Padding="14,12"
-                                        CornerRadius="12"
+                                        Padding="16,14"
+                                        CornerRadius="14"
                                         Background="{StaticResource SurfaceElevatedBrush}"
                                         BorderBrush="{StaticResource NeutralBorderBrush}"
                                         BorderThickness="1">
                                     <StackPanel>
-                                        <TextBlock Text="선택한 날"
-                                                   FontSize="12"
-                                                   Foreground="{StaticResource MutedTextBrush}"/>
-                                        <TextBlock Text="{Binding SelectedDetailDateText}"
-                                                   FontSize="15" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TitleTextBrush}"
-                                                   Margin="0,6,0,0"
-                                                   Visibility="{Binding SelectedCell, Converter={StaticResource NullToVisibilityConverter}}"/>
-                                        <TextBlock Text="달력에서 날짜를 선택하면 상세가 표시됩니다."
-                                                   Style="{StaticResource DashboardCardSubTextStyle}"
-                                                   Margin="0,8,0,0"
-                                                   TextWrapping="Wrap"
-                                                   Visibility="{Binding SelectedCell, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Inverse}"/>
-
-                                        <StackPanel Margin="0,14,0,0"
-                                                    Visibility="{Binding SelectedCell, Converter={StaticResource NullToVisibilityConverter}}">
-                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                                <Border Width="28" Height="28" CornerRadius="8"
-                                                        Background="{Binding SelectedDetailSwatchBrush}"
-                                                        BorderBrush="{StaticResource NeutralBorderBrush}" BorderThickness="1"/>
-                                                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding SelectedDetailPersonalColor}" FontWeight="SemiBold" FontSize="14"
+                                        <!-- 날짜 미선택 상태 -->
+                                        <StackPanel Visibility="{Binding SelectedCell, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Inverse}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Border Width="32" Height="32" CornerRadius="8"
+                                                        Background="{StaticResource SurfaceSubtleBrush}"
+                                                        Margin="0,0,12,0">
+                                                    <TextBlock Text="📅" FontSize="16"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <TextBlock Text="날짜를 선택하세요"
+                                                               FontWeight="SemiBold" FontSize="13"
                                                                Foreground="{StaticResource TitleTextBrush}"/>
-                                                    <TextBlock Text="{Binding SelectedDetailMetricsLine}" FontSize="12"
-                                                               Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="달력에서 날짜를 누르면 상세 기록이 표시됩니다."
+                                                               Style="{StaticResource DashboardCardSubTextStyle}"
+                                                               Margin="0,3,0,0"/>
                                                 </StackPanel>
                                             </StackPanel>
-                                            <TextBlock Text="{Binding SelectedDetailNote}"
-                                                       Style="{StaticResource DashboardCardSubTextStyle}"
-                                                       TextWrapping="Wrap"
-                                                       LineHeight="20"/>
+                                        </StackPanel>
+
+                                        <!-- 날짜 선택 상태 -->
+                                        <StackPanel Visibility="{Binding SelectedCell, Converter={StaticResource NullToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding SelectedDetailDateText}"
+                                                       FontSize="12"
+                                                       Foreground="{StaticResource MutedTextBrush}"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                <!-- ✅ 개선: 스와치 크기 확대 + 그림자 -->
+                                                <Border Width="36" Height="36" CornerRadius="10"
+                                                        Background="{Binding SelectedDetailSwatchBrush}"
+                                                        BorderBrush="{StaticResource NeutralBorderBrush}"
+                                                        BorderThickness="1">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect Color="#20000000" BlurRadius="6"
+                                                                          ShadowDepth="1" Opacity="0.4"/>
+                                                    </Border.Effect>
+                                                </Border>
+                                                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding SelectedDetailPersonalColor}"
+                                                               FontWeight="SemiBold" FontSize="14"
+                                                               Foreground="{StaticResource TitleTextBrush}"/>
+                                                    <TextBlock Text="{Binding SelectedDetailMetricsLine}"
+                                                               FontSize="12"
+                                                               Foreground="{StaticResource MutedTextBrush}"
+                                                               Margin="0,3,0,0"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <!-- 메모 -->
+                                            <Border Margin="0,12,0,0"
+                                                    Padding="10,8"
+                                                    CornerRadius="8"
+                                                    Background="{StaticResource SurfaceSubtleBrush}">
+                                                <TextBlock Text="{Binding SelectedDetailNote}"
+                                                           Style="{StaticResource DashboardCardSubTextStyle}"
+                                                           TextWrapping="Wrap"
+                                                           LineHeight="20"/>
+                                            </Border>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
@@ -363,15 +435,17 @@
                     </Grid>
                 </Border>
 
-                <Border x:Name="HistoryHintCard" Grid.Row="2" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
+                <!-- ✅ 개선: 기록에 대해 → 실제 안내 문구로 교체 -->
+                <Border x:Name="HistoryHintCard" Grid.Row="2" Grid.Column="0"
+                    Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="기록에 대해" Style="{StaticResource DashboardCardTitleStyle}"/>
-                        <!--실서비스에서는 분석 API·로컬 DB와 연동해 자동으로 채워지게, 지금 화면은 흐름 확인용 샘플 데이터
-                        같은 날 여러 번 측정했다면 가장 최근 결과만 달력에 표시하는 식으로?-->
-                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}" TextWrapping="Wrap" LineHeight="20" Margin="0,8,0,0"
-                                   Text="샘플 샘플샘플샘플 샘플샘플샘플샘플샘플 샘플샘플샘플샘플샘플샘플샘플샘플샘플 샘플 샘플샘플 샘플"/>
-                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}" TextWrapping="Wrap" LineHeight="20" Margin="0,10,0,0"
-                                   Text="샘플 샘플샘플샘플 샘플샘플샘플샘플샘플 샘플샘플샘플샘플샘플샘플샘플샘플샘플 샘플 샘플샘플 샘플"/>
+                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}"
+                           TextWrapping="Wrap" LineHeight="20" Margin="0,8,0,0"
+                           Text="같은 날 여러 번 측정한 경우 가장 최근 결과만 달력에 표시됩니다."/>
+                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}"
+                           TextWrapping="Wrap" LineHeight="20" Margin="0,10,0,0"
+                           Text="밝기·붉은기 수치는 0~100 기준이며, 조명과 촬영 환경에 따라 차이가 있을 수 있습니다. 꾸준히 측정할수록 더 정확한 퍼스널 컬러 결과를 얻을 수 있습니다."/>
                     </StackPanel>
                 </Border>
             </Grid>
