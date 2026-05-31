@@ -42,10 +42,12 @@ namespace Colorlog.ViewModels
         
         public MainViewModel()
         {
+            var databaseService = new Services.DatabaseService();
+
             DashboardViewModel = new DashboardViewModel();
-            SettingsViewModel = new SettingsViewModel();
+            SettingsViewModel = new SettingsViewModel(databaseService);
             LiveAnalysisViewModel = new LiveAnalysisViewModel(new PythonEngineService(), SettingsViewModel);
-            HistoryViewModel = new HistoryViewModel();
+            HistoryViewModel = new HistoryViewModel(databaseService);
             BeautyLogViewModel = new BeautyLogViewModel();
 
             UpdateView();
@@ -57,7 +59,6 @@ namespace Colorlog.ViewModels
             };
 
             _ = LoadUserStatsAsync();
-            //_engineService.Start();
         }
 
         partial void OnSelectedMenuTagChanged(string value)

@@ -10,30 +10,22 @@ public partial class EditProfileViewModel : ObservableObject
 {
     public Action<bool>? CloseRequested { get; set; }
 
-    private readonly DatabaseService _databaseService = new DatabaseService();
+    private readonly DatabaseService _databaseService;
 
-    [ObservableProperty]
-    private string name = string.Empty;
-
-    [ObservableProperty]
-    private DateTime? birthDate;
-
-    [ObservableProperty]
-    private bool isGenderNone = true;
-
-    [ObservableProperty]
-    private bool isGenderMale;
-
-    [ObservableProperty]
-    private bool isGenderFemale;
+    [ObservableProperty] private string name = string.Empty;
+    [ObservableProperty] private DateTime? birthDate;
+    [ObservableProperty] private bool isGenderNone = true;
+    [ObservableProperty] private bool isGenderMale;
+    [ObservableProperty] private bool isGenderFemale;
 
     public EditProfileViewModel()
-        : this(string.Empty, DateTime.Today.AddYears(-24))
+        : this(new DatabaseService(), string.Empty, DateTime.Today.AddYears(-24))
     {
     }
 
-    public EditProfileViewModel(string initialName, DateTime initialBirthDate)
+    public EditProfileViewModel(DatabaseService databaseService, string initialName, DateTime initialBirthDate)
     {
+        _databaseService = databaseService;
         Name = initialName;
         var d = initialBirthDate.Date;
         if (d > DateTime.Today)

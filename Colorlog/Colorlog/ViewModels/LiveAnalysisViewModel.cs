@@ -23,12 +23,15 @@ namespace Colorlog.ViewModels
 
         private static class AnalysisProgressStep
         {
-            public const double Idle = 18;
-            public const double Analyzing = 58;
+            public const double Idle = 0;
             public const double Completed = 100;
         }
 
+        private const int ResultBufferSize = 50;
+        private const int DiagnosisTargetFrames = 30;
+
         [ObservableProperty] private double _analysisProgress = AnalysisProgressStep.Idle;
+        [ObservableProperty] private bool _isDiagnosisCompleted;
         [ObservableProperty] private string _analysisStatus = "분석 준비 완료";
         [ObservableProperty] private string _analysisPhase = "캘리브레이션";
         [ObservableProperty] private string _analysisPhaseDetail = "카메라 밝기/노출 점검 중";
@@ -56,7 +59,6 @@ namespace Colorlog.ViewModels
         };
 
         private readonly LinkedList<string> _resultBuffer = new();
-        private const int ResultBufferSize = 50;
 
         public string AnalysisStageText => $"{AnalysisPhase} · {AnalysisPhaseDetail}";
         public string PreviewBasisText => "수치는 최근 1초 평균값 기준";
@@ -67,16 +69,8 @@ namespace Colorlog.ViewModels
         {
             get
             {
-                if (!HasCameraPermission)
-                {
-                    return "카메라 권한이 필요합니다";
-                }
-
-                if (!IsFaceDetected)
-                {
-                    return "얼굴이 감지되지 않습니다";
-                }
-
+                if (!HasCameraPermission) return "카메라 권한이 필요합니다";
+                if (!IsFaceDetected) return "얼굴이 감지되지 않습니다";
                 return "진단 준비가 필요합니다";
             }
         }
@@ -85,16 +79,8 @@ namespace Colorlog.ViewModels
         {
             get
             {
-                if (!HasCameraPermission)
-                {
-                    return "설정에서 카메라 권한을 허용한 뒤 다시 시도해주세요.";
-                }
-
-                if (!IsFaceDetected)
-                {
-                    return "얼굴을 가이드 중앙에 맞추고 마스크/모자를 제거해주세요.";
-                }
-
+                if (!HasCameraPermission) return "설정에서 카메라 권한을 허용한 뒤 다시 시도해주세요.";
+                if (!IsFaceDetected) return "얼굴을 가이드 중앙에 맞추고 마스크/모자를 제거해주세요.";
                 return "진단을 시작하기 전에 입력 상태를 확인해주세요.";
             }
         }
@@ -107,30 +93,23 @@ namespace Colorlog.ViewModels
         public string LightingStateText => IsLightingGood ? "조명 양호" : "조명 주의";
         public Brush LightingStateBrush => IsLightingGood ? HealthyStateBrush : WarningStateBrush;
 
-
         public LiveAnalysisViewModel(PythonEngineService pythonService, SettingsViewModel? settingsViewModel = null)
         {
             _pythonService = pythonService;
             _settingsViewModel = settingsViewModel;
-
             _pythonService.OnColorDetected += UpdateEngineData;
         }
 
-
-        //파이썬 데이터 수신 
         private void UpdateEngineData(JObject json)
         {
             App.Current.Dispatcher.Invoke(() =>
             {
-                // 1. 얼굴 감지 상태
                 IsFaceDetected = json["face_detected"]?.Value<bool>() ?? false;
 
-                //2. 조명 상태 연동
                 var lightingStatus = json["lighting"]?["status"]?.ToString();
                 if (lightingStatus != null)
                     IsLightingGood = lightingStatus == "Good";
 
-                // 3. 얼굴 감지 됐을 떄만 피부톤, 퍼스널컬러 데이터 업데이트
                 if (IsFaceDetected)
                 {
                     UpdateSkinTonePreviews(json);
@@ -144,7 +123,6 @@ namespace Colorlog.ViewModels
                     FaceTonePreviews.Clear();
                 }
 
-                // 4. 진단 저장 완료 이벤트 (Python 30프레임 집계 후 1회)
                 if (json["diagnosis_saved"]?.Value<bool>() == true)
                     HandleDiagnosisSaved(json);
 
@@ -152,11 +130,14 @@ namespace Colorlog.ViewModels
             });
         }
 
-        // 부위별 피부톤 미리보기 갱신
         private void UpdateSkinTonePreviews(JObject json)
         {
             var skin = json["skin_tone"];
-            if (skin == null) return;
+            if (skin == null)
+            {
+                Debug.WriteLine("[SkinTone] skin_tone 키가 null입니다.");
+                return;
+            }
 
             FaceTonePreviews.Clear();
             AddTonePreview("이마", skin["forehead"] ?? skin);
@@ -170,7 +151,6 @@ namespace Colorlog.ViewModels
             AnalysisPhaseDetail = $"R:{skin["r"]} G:{skin["g"]} B:{skin["b"]} 추출 완료";
         }
 
-        //퍼스널컬러 버퍼 집계 + 가이드 메세지
         private void UpdatePersonalColorBuffer(JObject json)
         {
             var personalColor = json["personal_color"]?["type"]?.ToString();
@@ -179,6 +159,16 @@ namespace Colorlog.ViewModels
             _resultBuffer.AddLast(personalColor);
             if (_resultBuffer.Count > ResultBufferSize)
                 _resultBuffer.RemoveFirst();
+
+            // Python 실제 수집 진행률 사용 — 없으면 버퍼 기반 폴백
+            var pythonProgress = json["diagnosis_progress"]?.Value<double>();
+            if (pythonProgress.HasValue)
+                AnalysisProgress = pythonProgress.Value;
+            else
+            {
+                var bufferRatio = Math.Min(_resultBuffer.Count / (double)DiagnosisTargetFrames, 1.0);
+                AnalysisProgress = 5.0 + bufferRatio * 85.0;
+            }
 
             var statistics = _resultBuffer
                 .GroupBy(x => x)
@@ -208,7 +198,6 @@ namespace Colorlog.ViewModels
                     : $"{BestType}의 특징이 매우 확고하여 세컨드 타입의 영향이 적습니다.";
             }
 
-            // GuidanceMessage
             GuidanceMessage = personalColor switch
             {
                 var s when s.Contains("봄 웜") || s.Contains("Spring Warm") =>
@@ -223,7 +212,6 @@ namespace Colorlog.ViewModels
             };
         }
 
-        //진단 저장 완료 -> 파이썬 데이터로 
         private void HandleDiagnosisSaved(JObject json)
         {
             var colorTypeInfo = json["color_type_info"];
@@ -235,7 +223,11 @@ namespace Colorlog.ViewModels
             if (!string.IsNullOrEmpty(worstColors))
                 WorstType = worstColors;
 
-            AnalysisProgress = 100;
+            IsAnalyzing = false;
+            IsDiagnosisCompleted = true;
+            _pythonService.Stop();
+
+            AnalysisProgress = AnalysisProgressStep.Completed;
             AnalysisPhase = "진단 완료";
             AnalysisPhaseDetail = keyword ?? "퍼스널컬러 분석이 완료되었습니다.";
             AnalysisStatus = $"진단 완료 · {BestType}";
@@ -243,7 +235,6 @@ namespace Colorlog.ViewModels
             Debug.WriteLine($"[진단 확정] ID:{json["diagnosis_id"]} / {BestType}");
         }
 
-        // 카메라
         public void InitializeCameraPreview()
         {
             lock (_captureLock)
@@ -276,21 +267,13 @@ namespace Colorlog.ViewModels
 
         public void StopCameraPreview()
         {
-            lock (_captureLock)
-            {
-                ReleaseCameraResourcesInternal();
-            }
-
+            lock (_captureLock) { ReleaseCameraResourcesInternal(); }
             CameraSource = null;
         }
 
         public void StopPage()
         {
-            if (IsAnalyzing)
-            {
-                StopAnalysisCore();
-            }
-
+            if (IsAnalyzing) StopAnalysisCore();
             StopCameraPreview();
         }
 
@@ -302,7 +285,6 @@ namespace Colorlog.ViewModels
                 _cameraTimer.Tick -= OnCameraFrameTick;
                 _cameraTimer = null;
             }
-
             if (_capture != null)
             {
                 _capture.Release();
@@ -315,11 +297,7 @@ namespace Colorlog.ViewModels
         {
             lock (_captureLock)
             {
-                if (_capture == null || !_capture.IsOpened())
-                {
-                    return;
-                }
-
+                if (_capture == null || !_capture.IsOpened()) return;
                 using var frame = new Mat();
                 if (_capture.Read(frame) && !frame.Empty())
                 {
@@ -332,15 +310,10 @@ namespace Colorlog.ViewModels
         [RelayCommand]
         private void StartAnalysis()
         {
-            if (IsAnalyzing)
-            {
-                return;
-            }
+            if (IsAnalyzing) return;
 
             if (_capture == null || !_capture.IsOpened())
-            {
                 InitializeCameraPreview();
-            }
 
             if (_capture == null || !_capture.IsOpened())
             {
@@ -348,10 +321,13 @@ namespace Colorlog.ViewModels
                 return;
             }
 
+            IsDiagnosisCompleted = false;
+            _resultBuffer.Clear();
+
             IsAnalyzing = true;
             _pythonService.Start();
             AnalysisStatus = "실시간 분석 진행 중";
-            AnalysisProgress = AnalysisProgressStep.Analyzing;
+            AnalysisProgress = AnalysisProgressStep.Idle;
             AnalysisPhase = "피부톤 추출";
             AnalysisPhaseDetail = "부위별 평균 색상과 홍조 지수를 계산 중";
             GuidanceMessage = "좋아요! 얼굴을 고정한 채 2~3초만 유지해주세요.";
@@ -408,18 +384,15 @@ namespace Colorlog.ViewModels
             }
         }
 
-        // 이벤트 핸들러 해제 및 리소스 정리
         public void Dispose()
         {
             if (_disposed) return;
             _disposed = true;
-
             _pythonService.OnColorDetected -= UpdateEngineData;
             StopPage();
         }
-
     }
-        
+
     public sealed class FaceTonePreview
     {
         public string ZoneName { get; }

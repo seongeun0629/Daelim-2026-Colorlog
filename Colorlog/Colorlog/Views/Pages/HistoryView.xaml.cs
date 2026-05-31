@@ -1,3 +1,4 @@
+using Colorlog.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -14,7 +15,8 @@ public partial class HistoryView : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        ApplyCardLayout(ActualWidth);
+        if (DataContext is HistoryViewModel vm)
+            vm.LoadFromDatabase();
     }
 
     private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)

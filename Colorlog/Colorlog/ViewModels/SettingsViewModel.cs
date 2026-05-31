@@ -15,29 +15,23 @@ namespace Colorlog.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
-    [ObservableProperty]
-    private string userName = "-";
+    [ObservableProperty] private string userName = "-";
 
-    [ObservableProperty]
-    private string userAge = string.Empty;
+    [ObservableProperty] private string userAge = string.Empty;
 
-    [ObservableProperty]
-    private DateTime userBirthDate = DateTime.Today.AddYears(-24);
+    [ObservableProperty] private DateTime userBirthDate = DateTime.Today.AddYears(-24);
 
-    [ObservableProperty]
-    private string userGender = "선택 안함";
+    [ObservableProperty] private string userGender = "선택 안함";
 
-    [ObservableProperty]
-    private bool isGenderVisible;
+    [ObservableProperty] private bool isGenderVisible;
 
-    [ObservableProperty]
-    private string personalColorName = "진단 미실시";
+    [ObservableProperty] private string personalColorName = "진단 미실시";
 
-    [ObservableProperty]
-    private string diagnosisCount = "0회";
+    [ObservableProperty] private string diagnosisCount = "0회";
 
-    [ObservableProperty]
-    private string joinDate = "2026.01.03";
+    [ObservableProperty] private string joinDate = "2026.01.03";
+
+    private readonly Services.DatabaseService _databaseService;
 
     public ObservableCollection<string> CameraNames { get; } = new();
 
@@ -62,8 +56,10 @@ public partial class SettingsViewModel : ObservableObject
     public ObservableCollection<SelectablePreferenceItem> SkinItems { get; } = new();
     public ObservableCollection<SelectablePreferenceItem> ToneItems { get; } = new();
 
-    public SettingsViewModel()
+    public SettingsViewModel(Services.DatabaseService databaseService)
     {
+        _databaseService = databaseService;
+
         foreach (var label in new[] { "청순", "화려", "스모키", "러블리", "시크", "데일리" })
         {
             MoodItems.Add(new SelectablePreferenceItem(label, RefreshPreferenceSummary));
@@ -87,18 +83,13 @@ public partial class SettingsViewModel : ObservableObject
         //앱이 켜질 때 DB에서 가장 최근 유저 정보 로드하기
         try
         {
-            var dbService = new Services.DatabaseService();
-            var latestUser = dbService.GetLatestUser();
-
+            var latestUser = _databaseService.GetLatestUser();
             if (latestUser != null)
             {
                 UserName = latestUser.UserName;
                 UserGender = latestUser.Gender ?? "선택 안함";
-
                 if (!string.IsNullOrWhiteSpace(latestUser.Age))
-                {
                     UserAge = latestUser.Age;
-                }
             }
         }
         catch (Exception ex)
@@ -221,21 +212,15 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void EditProfile()
     {
-        var vm = new EditProfileViewModel(UserName, UserBirthDate);
+        var vm = new EditProfileViewModel(_databaseService, UserName, UserBirthDate);
 
         if (UserGender == "남") { vm.IsGenderMale = true; vm.IsGenderFemale = false; vm.IsGenderNone = false; }
         else if (UserGender == "여") { vm.IsGenderMale = false; vm.IsGenderFemale = true; vm.IsGenderNone = false; }
         else { vm.IsGenderNone = true; }
 
-        var dialog = new EditProfileView(vm)
-        {
-            Owner = Application.Current.MainWindow
-        };
+        var dialog = new EditProfileView(vm) { Owner = Application.Current.MainWindow };
 
-        if (dialog.ShowDialog() != true || !vm.BirthDate.HasValue)
-        {
-            return;
-        }
+        if (dialog.ShowDialog() != true || !vm.BirthDate.HasValue) return;
 
         UserName = vm.Name.Trim();
         UserBirthDate = vm.BirthDate.Value.Date;

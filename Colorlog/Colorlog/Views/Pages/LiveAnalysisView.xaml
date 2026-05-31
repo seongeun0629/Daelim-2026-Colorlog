@@ -194,21 +194,92 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.Column="0" Height="12" Minimum="0" Maximum="100" Value="{Binding AnalysisProgress}"
-                                             Style="{StaticResource DashboardProgressBarStyle}"/>
+                                <ProgressBar Grid.Column="0" Height="12" Minimum="0" Maximum="100"
+                                    Value="{Binding AnalysisProgress}">
+                                    <ProgressBar.Style>
+                                        <Style TargetType="ProgressBar" BasedOn="{StaticResource DashboardProgressBarStyle}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDiagnosisCompleted}" Value="True">
+                                                    <Setter Property="Foreground" Value="#FF16A34A"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ProgressBar.Style>
+                                </ProgressBar>
                                 <TextBlock Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource MutedTextBrush}" Text="{Binding AnalysisProgress, StringFormat={}{0:0}%}"/>
                             </Grid>
 
+                            <!-- 버튼 영역 -->
                             <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                                <Button Content="진단 시작"
-                                        Width="120"
-                                        Command="{Binding StartAnalysisCommand}"
-                                        Style="{StaticResource StartButtonStyle}"/>
-                                <Button Content="진단 중지"
-                                        Width="120"
-                                        Margin="8,0,0,0"
-                                        Command="{Binding StopAnalysisCommand}"
-                                        Style="{StaticResource StopButtonStyle}"/>
+
+                                <!-- 진단 시작 -->
+                                <Button Content="진단 시작" Width="120" Command="{Binding StartAnalysisCommand}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource AccentPillButtonStyle}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAnalyzing}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsDiagnosisCompleted}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!-- 진단 중지 -->
+                                <Button Content="진단 중지" Width="120" Margin="8,0,0,0"
+            Command="{Binding StopAnalysisCommand}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource AccentOutlinePillButtonStyle}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAnalyzing}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!-- 다시 진단 -->
+                                <Button Content="다시 진단" Width="120" Margin="8,0,0,0"
+            Command="{Binding StartAnalysisCommand}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource AccentPillButtonStyle}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDiagnosisCompleted}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!-- 진단 완료 배지 -->
+                                <Border Margin="12,0,0,0" VerticalAlignment="Center"
+                                    Background="#F0FDF4" CornerRadius="20" Padding="12,6">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDiagnosisCompleted}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="#16A34A"
+                                            VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                        <TextBlock Text="진단 완료" FontSize="12" FontWeight="SemiBold"
+                                            Foreground="#16A34A" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
                             </StackPanel>
 
                             <Border DataContext="{Binding HasBlockingIssue}">

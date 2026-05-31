@@ -58,8 +58,7 @@ def main():
                 timestamp += TIMESTAMP_STEP_MS
 
                 result = detect_face(landmarker, mp_image, timestamp, use_video_mode=True)
-                frame_data = process_frame(frame, result, timestamp, smoother)
-
+                frame_data = process_frame(frame, result, timestamp, smoother) 
                 if not diagnosis_saved:
                     pc = frame_data.get("personal_color")
                     if pc:
@@ -70,6 +69,11 @@ def main():
                             "a": lab.get("a", 0.0),
                             "b": lab.get("b", 0.0),
                         })
+
+                        # ✅ sample_buffer에 추가한 후에 진행률 계산
+                        frame_data["diagnosis_progress"] = min(
+                            int(len(sample_buffer) / DB_SAVE_THRESHOLD * 100), 95
+                        )
 
                         if len(sample_buffer) >= DB_SAVE_THRESHOLD:
                             n = len(sample_buffer)
