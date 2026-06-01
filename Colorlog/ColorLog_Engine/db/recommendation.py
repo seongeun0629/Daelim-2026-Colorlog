@@ -35,15 +35,17 @@ def get_ai_recommendation(color_type: str, preferred_style: str) -> list[dict]:
         return []
 
     try:
-        import google.generativeai as genai
+        from google import genai
 
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        client = genai.Client(api_key=api_key)
         prompt = _PROMPT_TEMPLATE.format(
             color_type=color_type,
             preferred_style=preferred_style,
         )
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt,
+        )
         text = response.text.strip()
 
         # 코드블록으로 감싸진 경우 제거
