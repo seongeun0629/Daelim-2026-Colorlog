@@ -14,7 +14,9 @@ from core.json_output import JsonOutputThrottler
 from db import (
     create_tables, seed_personal_color_types, seed_products,
     get_or_create_user, add_diagnosis, get_color_type_by_name,
+    save_ai_recommendations, get_recommended_products,
 )
+from db.recommendation import get_ai_recommendation
 
 DB_SAVE_THRESHOLD = 30
 
@@ -93,6 +95,28 @@ def main():
                                 redness=redness_val,
                                 type_id=type_id,
                             )
+
+                            # AI 제품 추천 (실패 시 더미 시드 폴백)
+                            preferred_style = color_type.get("keyword", "") if color_type else ""
+                            ai_recs = get_ai_recommendation(best_type_name, preferred_style)
+
+                            if ai_recs:
+                                recommendations = save_ai_recommendations(diagnosis_id, ai_recs)
+                            else:
+                                tone_type = "쿨" if "쿨" in best_type_name else "웜"
+                                fallback = get_recommended_products(tone_type)
+                                recommendations = [
+                                    {
+                                        "product_id": p["product_id"],
+                                        "product_name": p.get("product_name", ""),
+                                        "product_url": p.get("product_url", ""),
+                                        "category": p.get("category", ""),
+                                        "reason": "퍼스널컬러 기반 추천",
+                                    }
+                                    for p in fallback[:3]
+                                ]
+
+                            frame_data["recommendations"] = recommendations
 
                             frame_data["diagnosis_saved"] = True
                             frame_data["diagnosis_id"] = diagnosis_id
