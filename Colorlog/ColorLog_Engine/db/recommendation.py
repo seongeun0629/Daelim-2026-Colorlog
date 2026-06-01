@@ -46,13 +46,20 @@ def get_ai_recommendation(color_type: str, preferred_style: str) -> list[dict]:
         response = model.generate_content(prompt)
         text = response.text.strip()
 
-        # 코드블록 감싸진 경우 제거
+        # 코드블록으로 감싸진 경우 제거
         if text.startswith("```"):
-            text = text.split("```")[1]
+            parts = text.split("```")
+            text = parts[1] if len(parts) > 1 else text
             if text.startswith("json"):
                 text = text[4:]
 
-        data = json.loads(text)
+        text = text.strip()
+
+        try:
+            data = json.loads(text)
+        except (json.JSONDecodeError, ValueError):
+            return []
+
         recs = data.get("recommendations", [])
 
         for item in recs:
