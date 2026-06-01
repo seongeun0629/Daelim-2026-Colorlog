@@ -314,33 +314,31 @@ def save_ai_recommendations(diagnosis_id: int, recommendations: list[dict]) -> l
     """AI 추천 결과를 products + rec_products에 저장. 저장된 레코드 리스트 반환."""
     conn = get_connection()
     saved = []
-    try:
-        for item in recommendations:
-            cur = conn.execute(
-                """INSERT INTO products (product_url, product_name, keyword, category, tone_type)
-                   VALUES (?, ?, ?, ?, ?)""",
-                (
-                    item.get("product_url", ""),
-                    item.get("product_name", ""),
-                    item.get("keyword", ""),
-                    item.get("category", ""),
-                    item.get("tone_type", ""),
-                ),
-            )
-            product_id = cur.lastrowid
-            conn.execute(
-                """INSERT INTO rec_products (product_id, diagnosis_id, rec_reason)
-                   VALUES (?, ?, ?)""",
-                (product_id, diagnosis_id, item.get("reason", "")),
-            )
-            saved.append({
-                "product_id": product_id,
-                "product_name": item.get("product_name", ""),
-                "product_url": item.get("product_url", ""),
-                "category": item.get("category", ""),
-                "reason": item.get("reason", ""),
-            })
-        conn.commit()
-    finally:
-        conn.close()
+    for item in recommendations:
+        cur = conn.execute(
+            """INSERT INTO products (product_url, product_name, keyword, category, tone_type)
+               VALUES (?, ?, ?, ?, ?)""",
+            (
+                item.get("product_url", ""),
+                item.get("product_name", ""),
+                item.get("keyword", ""),
+                item.get("category", ""),
+                item.get("tone_type", ""),
+            ),
+        )
+        product_id = cur.lastrowid
+        conn.execute(
+            """INSERT INTO rec_products (product_id, diagnosis_id, rec_reason)
+               VALUES (?, ?, ?)""",
+            (product_id, diagnosis_id, item.get("reason", "")),
+        )
+        saved.append({
+            "product_id": product_id,
+            "product_name": item.get("product_name", ""),
+            "product_url": item.get("product_url", ""),
+            "category": item.get("category", ""),
+            "reason": item.get("reason", ""),
+        })
+    conn.commit()
+    conn.close()
     return saved
