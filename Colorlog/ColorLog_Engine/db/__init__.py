@@ -20,4 +20,7 @@ from .repository import (
     get_recommended_products,
     add_rec_product,
     get_rec_products_by_diagnosis,
+    save_ai_recommendations,
 )
+
+from .recommendation import get_ai_recommendation
