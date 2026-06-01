@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Colorlog.Models;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -11,7 +12,7 @@ namespace Colorlog.Services
 
         public event Action<JObject>? OnColorDetected;
 
-        public void Start()
+        public void Start(int userId = 1)
         {
             if (_process != null && !_process.HasExited)
                 Stop();
@@ -38,7 +39,7 @@ namespace Colorlog.Services
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = pythonPath,
-                    Arguments = $"\"{scriptPath}\"",
+                    Arguments = $"\"{scriptPath}\" --user-id {userId}", 
                     WorkingDirectory = engineDir,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,

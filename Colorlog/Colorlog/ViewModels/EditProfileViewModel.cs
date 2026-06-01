@@ -11,6 +11,7 @@ public partial class EditProfileViewModel : ObservableObject
     public Action<bool>? CloseRequested { get; set; }
 
     private readonly DatabaseService _databaseService;
+    private readonly int? _existingUserId;
 
     [ObservableProperty] private string name = string.Empty;
     [ObservableProperty] private DateTime? birthDate;
@@ -19,13 +20,14 @@ public partial class EditProfileViewModel : ObservableObject
     [ObservableProperty] private bool isGenderFemale;
 
     public EditProfileViewModel()
-        : this(new DatabaseService(), string.Empty, DateTime.Today.AddYears(-24))
+        : this(new DatabaseService(),null, string.Empty, DateTime.Today.AddYears(-24))
     {
     }
 
-    public EditProfileViewModel(DatabaseService databaseService, string initialName, DateTime initialBirthDate)
+    public EditProfileViewModel(DatabaseService databaseService, int? userId, string initialName, DateTime initialBirthDate)
     {
         _databaseService = databaseService;
+        _existingUserId = userId;
         Name = initialName;
         var d = initialBirthDate.Date;
         if (d > DateTime.Today)
@@ -94,7 +96,7 @@ public partial class EditProfileViewModel : ObservableObject
             return;
         }
 
-        var age = GetCompletedAgeYears(birth, DateTime.Today);
+        var age = GetCompletedAgeYears(BirthDate!.Value.Date, DateTime.Today);
         if (age is < 5 or > 120)
         {
             _ = MessageBox.Show(
@@ -113,14 +115,20 @@ public partial class EditProfileViewModel : ObservableObject
             else if (IsGenderFemale) genderStr = "여";
             //IsGenderNone 이면 null 상태 유지 (파이썬 스키마 null 허용 따라서)
 
-            User newUser = new User
+            if (_existingUserId.HasValue)
             {
-                UserName = this.Name,
-                Gender = genderStr,
-                Age = $"만 {age}세"
-            };
+                _databaseService.UpdateUser(_existingUserId.Value, Name, genderStr, $"만 {age}세");
+            }
+            else
+            {
+                _databaseService.InsertUser(new User
+                {
+                    UserName = Name,
+                    Gender = genderStr,
+                    Age = $"만 {age}세"
+                });
+            }
 
-            _databaseService.InsertUser(newUser);
         }
         catch(Exception ex)
         {
@@ -135,6 +143,8 @@ public partial class EditProfileViewModel : ObservableObject
         // DB 저장이 완벽히 끝나면 
         CloseRequested?.Invoke(true);
     }
+
+
 
     [RelayCommand]
     private void Cancel() => CloseRequested?.Invoke(false);

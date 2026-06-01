@@ -40,13 +40,18 @@ namespace Colorlog.ViewModels
 
         private readonly PythonEngineService _engineService;
         
-        public MainViewModel()
+        public MainViewModel(Services.DatabaseService databaseService, int userId)
         {
-            var databaseService = new Services.DatabaseService();
+            
+
+            //var databaseService = new Services.DatabaseService();
 
             DashboardViewModel = new DashboardViewModel();
             SettingsViewModel = new SettingsViewModel(databaseService);
-            LiveAnalysisViewModel = new LiveAnalysisViewModel(new PythonEngineService(), SettingsViewModel);
+            LiveAnalysisViewModel = new LiveAnalysisViewModel(new PythonEngineService(), SettingsViewModel)
+            {
+                CurrentUserId = userId
+            };
             HistoryViewModel = new HistoryViewModel(databaseService);
             BeautyLogViewModel = new BeautyLogViewModel();
 
@@ -58,7 +63,7 @@ namespace Colorlog.ViewModels
                 PersonalColorResult = $"진단 결과: {result}";
             };
 
-            _ = LoadUserStatsAsync();
+            _ = LoadUserStatsAsync(userId);
         }
 
         partial void OnSelectedMenuTagChanged(string value)
@@ -96,7 +101,6 @@ namespace Colorlog.ViewModels
 
                 string arguments = userId.HasValue ? $"--user-id {userId.Value}" : "";
 
-                // ⭕ 이렇게 수정해 주세요!
                 ProcessStartInfo startInfo = CreateProcessStartInfo(scriptPath, arguments);
                 using (Process? process = Process.Start(startInfo))
                 {
@@ -107,8 +111,10 @@ namespace Colorlog.ViewModels
 
                     if (!string.IsNullOrWhiteSpace(jsonOutput))
                     {
-                        // 1단계에서 만든 데이터 가방(DTO)에 파싱해서 쏙 넣기
                         CurrentUserStats = JsonSerializer.Deserialize<UserStatsDto>(jsonOutput);
+
+                        if (CurrentUserStats?.UserId is int uid)
+                            LiveAnalysisViewModel.CurrentUserId = uid;
 
                         Debug.WriteLine($"[성공] {CurrentUserStats?.UserName}님의 통계 데이터를 불러왔습니다.");
                     }
@@ -180,7 +186,7 @@ namespace Colorlog.ViewModels
 
             try
             {
-                string resetScript = "ColorLog_Engine/delete_records.py"; // 팀원이 준 초기화 파일명
+                string resetScript = "ColorLog_Engine/delete_records.py"; 
                 string arguments = $"--user-id {CurrentUserStats.UserId}";
 
                 using (Process? process = Process.Start(CreateProcessStartInfo(resetScript, arguments)))
@@ -192,7 +198,6 @@ namespace Colorlog.ViewModels
                     if (result.Trim() == "ok")
                     {
                         Debug.WriteLine("유저 데이터 및 진단 기록 초기화 완료!");
-                        // 초기화 완료 후 대시보드 데이터를 새로고침합니다.
                         await LoadUserStatsAsync(CurrentUserStats.UserId);
                     }
                 }

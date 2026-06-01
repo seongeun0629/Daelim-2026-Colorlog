@@ -30,6 +30,8 @@ namespace Colorlog.ViewModels
         private const int ResultBufferSize = 50;
         private const int DiagnosisTargetFrames = 30;
 
+        public int CurrentUserId { get; set; } = 1;
+
         [ObservableProperty] private double _analysisProgress = AnalysisProgressStep.Idle;
         [ObservableProperty] private bool _isDiagnosisCompleted;
         [ObservableProperty] private string _analysisStatus = "분석 준비 완료";
@@ -325,7 +327,7 @@ namespace Colorlog.ViewModels
             _resultBuffer.Clear();
 
             IsAnalyzing = true;
-            _pythonService.Start();
+            _pythonService.Start(CurrentUserId);
             AnalysisStatus = "실시간 분석 진행 중";
             AnalysisProgress = AnalysisProgressStep.Idle;
             AnalysisPhase = "피부톤 추출";

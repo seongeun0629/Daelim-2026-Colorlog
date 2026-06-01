@@ -212,7 +212,10 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void EditProfile()
     {
-        var vm = new EditProfileViewModel(_databaseService, UserName, UserBirthDate);
+        var currentUser = _databaseService.GetLatestUser();
+        int? userId = currentUser?.UserId;
+
+        var vm = new EditProfileViewModel(_databaseService, userId,  UserName, UserBirthDate);
 
         if (UserGender == "남") { vm.IsGenderMale = true; vm.IsGenderFemale = false; vm.IsGenderNone = false; }
         else if (UserGender == "여") { vm.IsGenderMale = false; vm.IsGenderFemale = true; vm.IsGenderNone = false; }

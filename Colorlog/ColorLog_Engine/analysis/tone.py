@@ -110,3 +110,36 @@ def get_personal_color_season(L, a, b):
         else:
             return "겨울 쿨톤 (Winter Cool)" # 대비가 강하거나 창백함
 
+def get_skin_tone_by_zone(frame, face_landmarks, w, h):
+    """
+    C# FaceTonePreview의 5개 부위(이마/왼볼/오른볼/코/턱)에 대응하는
+    부위별 평균 RGB를 딕셔너리로 반환합니다.
+    """
+    ZONE_INDICES = {
+        "forehead":    [10, 338, 297],
+        "left_cheek":  [205, 118, 50],
+        "right_cheek": [425, 347, 280],
+        "nose":        [1, 2, 98],
+        "chin":        [199, 175, 152],
+    }
+    patch_size = 5
+    result = {}
+
+    for zone_name, indices in ZONE_INDICES.items():
+        colors = []
+        for idx in indices:
+            lm = face_landmarks[idx]
+            x, y = int(lm.x * w), int(lm.y * h)
+            x1, y1 = max(0, x - patch_size), max(0, y - patch_size)
+            x2, y2 = min(w, x + patch_size), min(h, y + patch_size)
+            patch = frame[y1:y2, x1:x2]
+            if patch.size > 0:
+                colors.append(np.median(patch, axis=(0, 1)))
+
+        if len(colors) == len(indices):
+            avg_bgr = np.mean(colors, axis=0)
+            result[zone_name] = (int(avg_bgr[2]), int(avg_bgr[1]), int(avg_bgr[0]))
+        else:
+            result[zone_name] = None
+
+    return result

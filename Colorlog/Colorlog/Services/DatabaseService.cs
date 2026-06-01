@@ -7,13 +7,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Colorlog.Services
 {
     public class DatabaseService
     {
         // 1. 파이썬이랑 동일한 db 파일 이름 사용해야됨
-        private readonly string _connectionString = "Data Source=colorlog.db";
+        private readonly string _connectionString;
+
+        public DatabaseService()
+        {
+            var dbPath = Path.GetFullPath(
+                Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    @"..\..\..\..\ColorLog_Engine\db\colorlog.db"
+                )
+            );
+            Debug.WriteLine($"[DB] 경로: {dbPath}");
+            _connectionString = $"Data Source={dbPath}";
+        }
 
         private SqliteConnection OpenConnection()
         {
@@ -51,6 +64,50 @@ namespace Colorlog.Services
             cmd.Parameters.AddWithValue("$age",      (object?)user.Age      ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             cmd.ExecuteNonQuery();
+        }
+
+        public void UpdateUser(int userId, string userName, string? gender, string? age)
+        {
+            using var connection = OpenConnection();
+            using var cmd = new SqliteCommand(@"
+        UPDATE users
+        SET user_name = $userName,
+            gender    = $gender,
+            age       = $age
+        WHERE user_id = $userId;", connection);
+
+            cmd.Parameters.AddWithValue("$userName", userName);
+            cmd.Parameters.AddWithValue("$gender", (object?)gender ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$age", (object?)age ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$userId", userId);
+            cmd.ExecuteNonQuery();
+        }
+
+        public List<User> GetAllUsers()
+        {
+            var result = new List<User>();
+            try
+            {
+                using var connection = OpenConnection();
+                using var cmd = new SqliteCommand(@"
+                    SELECT user_id, user_name, gender, age, FROM users
+                    ORDER BY created_at DESC;", connection);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read()) {
+                    result.Add(new User
+                    {
+                        UserId = reader.GetInt32(0),
+                        UserName = reader.GetString(1),
+                        Gender = reader.IsDBNull(2) ? "선택 안 함" : reader.GetString(2),
+                        Age = reader.IsDBNull(3) ? string.Empty : reader.GetString(3)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DB] GetAllUsers 오류: {ex.Message}");
+            }
+            return result;
         }
 
         /// <summary>
@@ -179,5 +236,7 @@ namespace Colorlog.Services
 
             return result;
         }
+
+
     }
 }
