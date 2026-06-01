@@ -4,3 +4,5 @@ numpy
 scikit-image
 flask
 flask-cors
+google-generativeai
+python-dotenv
