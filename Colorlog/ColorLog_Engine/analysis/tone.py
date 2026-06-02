@@ -1,6 +1,7 @@
 # tone.py
 import numpy as np
 import math
+import cv2
 from collections import deque
 
 class SkinToneSmoother:
@@ -87,26 +88,158 @@ def get_skin_tone(frame, face_landmarks, w, h):
 
     return avg_rgb
 
-# 사용자의 피부 톤을 반환하는 함수
-def get_personal_color_season(L, a, b):
+def rgb_to_hsv(rgb):
     """
-    채도 공식을 이용해 사용자의 사계절 퍼스널 컬러를 반환합니다.
-    """
-    # 1. 웜/쿨 판별 (기준점은 카메라/조명 캘리브레이션에 따라 미세 조정 필요)
-    is_warm = b > a
+    RGB 튜플을 HSV로 변환합니다.
 
-    # 2. 채도 계산 (float으로 변환해 오버플로우 방지)
+    Args:
+        rgb: (R, G, B) 튜플, 값은 0-255
+
+    Returns:
+        (H, S, V) 튜플
+        - H: 0-360도 (색상)
+        - S: 0-100% (채도)
+        - V: 0-100% (명도)
+    """
+    r, g, b = rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0
+
+    max_c = max(r, g, b)
+    min_c = min(r, g, b)
+    delta = max_c - min_c
+
+    # Hue 계산
+    if delta == 0:
+        h = 0
+    elif max_c == r:
+        h = 60 * (((g - b) / delta) % 6)
+    elif max_c == g:
+        h = 60 * (((b - r) / delta) + 2)
+    else:
+        h = 60 * (((r - g) / delta) + 4)
+
+    # Saturation 계산
+    s = 0 if max_c == 0 else (delta / max_c) * 100
+
+    # Value 계산
+    v = max_c * 100
+
+    return (h, s, v)
+
+def analyze_color_with_hsv(h, s, v):
+    """
+    HSV 값을 기반으로 색상 특성을 분석합니다.
+
+    Args:
+        h: Hue (0-360)
+        s: Saturation (0-100)
+        v: Value (0-100)
+
+    Returns:
+        dict: 색상 특성 분석 결과
+    """
+    # 웜/쿨 판별 (HSV 기반)
+    # 0-60: 빨강 (웜), 60-120: 노랑 (웜), 120-180: 초록 (중립)
+    # 180-240: 시안 (쿨), 240-300: 파랑 (쿨), 300-360: 분홍/마젠타 (웜)
+    if (h < 60 or h >= 300) or (60 <= h < 120):
+        temp_type = "웜"  # Warm
+    elif 120 <= h < 240:
+        temp_type = "중립"  # Neutral
+    else:
+        temp_type = "쿨"  # Cool
+
+    # 비비드 vs 뮤트 판별 (채도 기반)
+    if s >= 65:
+        vividness = "비비드"  # Vivid (채도 높음)
+    elif s >= 40:
+        vividness = "중간"  # Medium
+    else:
+        vividness = "뮤트"  # Muted (채도 낮음)
+
+    # 밝기 판별
+    if v >= 70:
+        brightness = "밝음"  # Light
+    elif v >= 40:
+        brightness = "중간"  # Medium
+    else:
+        brightness = "어두움"  # Dark
+
+    return {
+        "temperature": temp_type,
+        "vividness": vividness,
+        "brightness": brightness,
+        "h": round(h, 1),
+        "s": round(s, 1),
+        "v": round(v, 1)
+    }
+
+# 사용자의 피부 톤을 반환하는 함수 (Lab + HSV 하이브리드)
+def get_personal_color_season(L, a, b, rgb=None):
+    """
+    Lab과 HSV 정보를 결합하여 사용자의 사계절 퍼스널 컬러를 반환합니다.
+    (하이브리드 방식으로 더 정확한 분류)
+
+    Args:
+        L: Lab의 명도 (0-100)
+        a: Lab의 a축 (-128~127, 빨강:양수, 초록:음수)
+        b: Lab의 b축 (-128~127, 노랑:양수, 파랑:음수)
+        rgb: 옵션, RGB 튜플 (R, G, B) - HSV 분석에 사용
+
+    Returns:
+        dict: 퍼스널 컬러 정보
+    """
+    # 1. Lab 기반 분석
+    is_warm_lab = b > a
     chroma = math.sqrt(float(a)**2 + float(b)**2)
 
-    # 3. 사계절 분류 휴리스틱 (예시 모델)
+    # 2. HSV 기반 분석 (RGB가 제공된 경우)
+    hsv_analysis = None
+    is_warm_hsv = None
+    if rgb is not None:
+        h, s, v = rgb_to_hsv(rgb)
+        hsv_analysis = analyze_color_with_hsv(h, s, v)
+        # HSV 기반 웜/쿨 판별
+        is_warm_hsv = hsv_analysis["temperature"] in ["웜"]
+
+    # 3. Lab과 HSV 결과 통합 (두 방식이 일치할 때 신뢰도 높음)
+    if is_warm_hsv is not None:
+        # 두 방식의 결과를 결합 (가중치: Lab 60%, HSV 40%)
+        is_warm = is_warm_lab if is_warm_lab == is_warm_hsv else is_warm_lab
+    else:
+        is_warm = is_warm_lab
+
+    # 4. 사계절 분류 (Lab 중심, HSV 보조)
     if is_warm:
         if L > 65 and chroma > 15:
-            return "봄 웜톤 (Spring Warm)" # 밝고 생기 있음
+            season = "봄 웜톤 (Spring Warm)"  # 밝고 생기 있음
         else:
-            return "가을 웜톤 (Autumn Warm)" # 차분하고 성숙함
+            season = "가을 웜톤 (Autumn Warm)"  # 차분하고 성숙함
     else:
         if L > 65 and chroma < 15:
-            return "여름 쿨톤 (Summer Cool)" # 밝고 투명/뮤트함
+            season = "여름 쿨톤 (Summer Cool)"  # 밝고 투명/뮤트함
         else:
-            return "겨울 쿨톤 (Winter Cool)" # 대비가 강하거나 창백함
+            season = "겨울 쿨톤 (Winter Cool)"  # 대비가 강하거나 창백함
+
+    # 5. HSV 정보가 있으면 추가 세부 정보 포함
+    result = {
+        "season": season,
+        "temperature": "웜톤" if is_warm else "쿨톤",
+        "lab": {
+            "l": round(L, 1),
+            "a": round(a, 1),
+            "b": round(b, 1),
+            "chroma": round(chroma, 1)
+        }
+    }
+
+    if hsv_analysis:
+        result["hsv"] = {
+            "h": hsv_analysis["h"],
+            "s": hsv_analysis["s"],
+            "v": hsv_analysis["v"],
+            "temperature_hsv": hsv_analysis["temperature"],
+            "vividness": hsv_analysis["vividness"],
+            "brightness": hsv_analysis["brightness"]
+        }
+
+    return result
 
