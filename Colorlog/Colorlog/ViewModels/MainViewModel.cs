@@ -47,12 +47,12 @@ namespace Colorlog.ViewModels
             //var databaseService = new Services.DatabaseService();
 
             DashboardViewModel = new DashboardViewModel();
-            SettingsViewModel = new SettingsViewModel(databaseService);
+            SettingsViewModel = new SettingsViewModel(databaseService, userId);
             LiveAnalysisViewModel = new LiveAnalysisViewModel(new PythonEngineService(), SettingsViewModel)
             {
                 CurrentUserId = userId
             };
-            HistoryViewModel = new HistoryViewModel(databaseService);
+            HistoryViewModel = new HistoryViewModel(databaseService, userId);
             BeautyLogViewModel = new BeautyLogViewModel();
 
             UpdateView();

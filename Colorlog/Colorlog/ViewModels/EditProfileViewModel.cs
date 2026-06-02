@@ -9,6 +9,7 @@ namespace Colorlog.ViewModels;
 public partial class EditProfileViewModel : ObservableObject
 {
     public Action<bool>? CloseRequested { get; set; }
+    public string WindowTitle { get; }
 
     private readonly DatabaseService _databaseService;
     private readonly int? _existingUserId;
@@ -28,6 +29,7 @@ public partial class EditProfileViewModel : ObservableObject
     {
         _databaseService = databaseService;
         _existingUserId = userId;
+        WindowTitle = userId.HasValue ? "프로필 수정" : "새 프로필 추가"; 
         Name = initialName;
         var d = initialBirthDate.Date;
         if (d > DateTime.Today)

@@ -35,7 +35,7 @@
 
                 <!-- 커스텀 타이틀 바 (드래그) -->
                 <Grid Grid.Row="0" Margin="0,0,0,8" MouseLeftButtonDown="Chrome_MouseLeftButtonDown">
-                    <TextBlock Text="프로필 수정"
+                    <TextBlock Text="{Binding WindowTitle}"
                                Style="{StaticResource DashboardCardTitleStyle}"
                                FontSize="20"
                                VerticalAlignment="Center"/>

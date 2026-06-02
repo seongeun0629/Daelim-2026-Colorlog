@@ -6,93 +6,169 @@
         mc:Ignorable="d"
         Title="Colorlog"
         Width="480" SizeToContent="Height"
-        MinHeight="320"
+        MinHeight="400"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         SnapsToDevicePixels="True"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
     <Grid>
-        <!-- 배경 레이어 -->
-        <Border Background="{StaticResource AppShellBackgroundBrush}"/>
-        <Border Background="{StaticResource AppShellAuroraOrbRoseBrush}"  IsHitTestVisible="False"/>
-        <Border Background="{StaticResource AppShellAuroraOrbLilacBrush}" IsHitTestVisible="False"/>
-        <Border Background="{StaticResource AppShellAuroraOrbMintBrush}"  IsHitTestVisible="False"/>
+        <!-- 배경 -->
+        <Border CornerRadius="16">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FFF2F6" Offset="0"/>
+                    <GradientStop Color="#EDF7FF" Offset="0.42"/>
+                    <GradientStop Color="#F5F0FF" Offset="0.72"/>
+                    <GradientStop Color="#FFFAF2" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        <Border CornerRadius="16" Background="{StaticResource AppShellAuroraOrbRoseBrush}"  IsHitTestVisible="False"/>
+        <Border CornerRadius="16" Background="{StaticResource AppShellAuroraOrbLilacBrush}" IsHitTestVisible="False"/>
+        <Border CornerRadius="16" Background="{StaticResource AppShellAuroraOrbMintBrush}"  IsHitTestVisible="False"/>
 
-        <!-- 컨텐츠 -->
-        <StackPanel Margin="40,36">
+        <StackPanel Margin="36,28">
 
-            <TextBlock Text="Colorlog"
-                       FontSize="26" FontWeight="Bold"
-                       Foreground="{StaticResource TitleTextBrush}"
-                       HorizontalAlignment="Center"/>
+            <!--상단 닫기 버튼 -->
+            <Grid Margin="0,0,0,20">
+                <TextBlock Text="Colorlog"
+                           FontSize="22" FontWeight="Bold"
+                           Foreground="{StaticResource TitleTextBrush}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                <Button Content="✕"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Width="32" Height="32"
+                        FontSize="13"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="{StaticResource MutedTextBrush}"
+                        Cursor="Hand"
+                        Click="CloseButton_Click"/>
+            </Grid>
+
             <TextBlock Text="프로필을 선택하거나 새로 만드세요."
                        FontSize="13"
                        Foreground="{StaticResource MutedTextBrush}"
                        HorizontalAlignment="Center"
-                       Margin="0,8,0,28"/>
+                       Margin="0,0,0,24"/>
 
-            <ItemsControl ItemsSource="{Binding Profiles}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Margin="0,0,0,10"
+            <!-- 프로필 목록 -->
+            <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Profiles}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Margin="0,0,0,10"
                                 Command="{Binding DataContext.SelectProfileCommand,
-                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
-                                Style="{StaticResource OutlineButtonStyle}"
+                                Style="{StaticResource OutlineButtonStyle}" 
+                                Height="60"
                                 HorizontalContentAlignment="Left"
-                                Padding="16,12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                                Padding="16,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <Border Width="40" Height="40" CornerRadius="20"
-                                        Background="{StaticResource RoseSoftBackgroundBrush}"
-                                        Margin="0,0,14,0">
-                                    <TextBlock Text="{Binding UserName[0]}"
-                                               FontSize="18" FontWeight="SemiBold"
-                                               Foreground="{StaticResource PrimaryBrush}"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                                </Border>
+                                    <Border Width="40" Height="40" CornerRadius="20"
+                                            Background="{StaticResource RoseSoftBackgroundBrush}"
+                                            Margin="0,0,14,0"
+                                            ClipToBounds="True">
+                                        <Grid>
+                                            <!-- 사진 없을 때 — 이니셜 -->
+                                            <TextBlock Text="{Binding UserName[0]}"
+                                                   FontSize="18" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource PrimaryBrush}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasProfileImage}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
 
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding UserName}"
-                                               FontSize="15" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TitleTextBrush}"/>
-                                    <TextBlock FontSize="12"
-                                               Foreground="{StaticResource MutedTextBrush}"
-                                               Margin="0,2,0,0">
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} · {1}">
-                                                <Binding Path="Gender"/>
-                                                <Binding Path="Age"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
+                                            <!-- 사진 있을 때 — 이미지 -->
+                                            <Border CornerRadius="20" ClipToBounds="True">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasProfileImage}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <Border.Background>
+                                                    <ImageBrush ImageSource="{Binding ProfileImagePath}"
+                                                            Stretch="UniformToFill"/>
+                                                </Border.Background>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
 
-                                <TextBlock Grid.Column="2" Text="›"
-                                           FontSize="20"
-                                           Foreground="{StaticResource MutedTextBrush}"
-                                           VerticalAlignment="Center"/>
-                            </Grid>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding UserName}"
+                                            FontSize="15" FontWeight="SemiBold"
+                                            Foreground="{StaticResource TitleTextBrush}"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                            <TextBlock Text="{Binding Gender}"
+                                                FontSize="12"
+                                                Foreground="{StaticResource MutedTextBrush}"/>
+                                            <TextBlock Text=" · "
+                                                FontSize="12"
+                                                Foreground="{StaticResource MutedTextBrush}"/>
+                                            <TextBlock Text="{Binding Age}"
+                                                FontSize="12"
+                                                Foreground="{StaticResource MutedTextBrush}"/>
+                                        </StackPanel>
+                                    </StackPanel>
 
-            <Button Content="+ 새 프로필 추가"
+                                    <TextBlock Grid.Column="2" Text="›"
+                                        FontSize="20"
+                                        Foreground="{StaticResource MutedTextBrush}"
+                                        VerticalAlignment="Center"
+                                        Margin="16,0,0,0"/>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- 구분선 -->
+            <Border Height="1" Background="{StaticResource NeutralBorderBrush}"
+                    Margin="0,8,0,12" Opacity="0.5"/>
+
+            <!-- 새 프로필 추가 버튼 -->
+            <Button Command="{Binding AddNewProfileCommand}"
                     Style="{StaticResource OutlineButtonStyle}"
-                    Height="48"
-                    Margin="0,4,0,0"
-                    Command="{Binding AddNewProfileCommand}"/>
+                    Height="44"
+                    HorizontalContentAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="+" FontSize="16" FontWeight="Light"
+                               Margin="0,0,8,0" VerticalAlignment="Center"
+                               Foreground="{StaticResource PrimaryBrush}"/>
+                    <TextBlock Text="새 프로필 추가" FontSize="13" FontWeight="Medium"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource PrimaryBrush}"/>
+                </StackPanel>
+            </Button>
 
         </StackPanel>
     </Grid>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Colorlog.Models
 {
@@ -13,5 +14,9 @@ namespace Colorlog.Models
         public string Gender { get; set; }
         public string Age { get; set; }
         public string CreateAt { get; set; }
+        public string? ProfileImagePath { get; set; }
+
+        public bool HasProfileImage =>
+        !string.IsNullOrEmpty(ProfileImagePath) && File.Exists(ProfileImagePath);
     }
 }

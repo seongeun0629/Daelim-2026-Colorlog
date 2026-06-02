@@ -58,5 +58,11 @@ namespace Colorlog.Views
         {
             Application.Current.Shutdown();
         }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            Application.Current.Shutdown();
+        }
     }
 }

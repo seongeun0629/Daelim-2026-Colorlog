@@ -61,9 +61,10 @@ public partial class HistoryViewModel : ObservableObject
     [ObservableProperty] private bool _selectedDetailHasRecord;
 
 
-    public HistoryViewModel(DatabaseService databaseService)
+    public HistoryViewModel(DatabaseService databaseService, int userId)
     {
         _databaseService = databaseService;
+        _currentUserId = userId;
         DisplayMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
         UpdateDisplayMonthLabel();
     }
@@ -72,15 +73,11 @@ public partial class HistoryViewModel : ObservableObject
     {
         try
         {
-            var user = _databaseService.GetLatestUser();
-            if (user == null)
+            if (_currentUserId <= 0)
             {
-                Debug.WriteLine("[History] 저장된 사용자가 없습니다.");
                 RenderEmptyState();
                 return;
             }
-
-            _currentUserId = user.UserId;
 
             LoadMonthRecords(DisplayMonth.Year, DisplayMonth.Month);
             LoadWeeklyRecords();

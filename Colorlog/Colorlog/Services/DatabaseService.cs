@@ -4,10 +4,11 @@ using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
+using WPF.UI.Common;
 
 namespace Colorlog.Services
 {
@@ -50,20 +51,31 @@ namespace Colorlog.Services
             cmd.ExecuteNonQuery();
         }
 
-        public void InsertUser(User user)
+        public int InsertUser(User user)
         {
             using var connection = OpenConnection();
             CreateUserTableIfNotExist(connection);
+
+            using var checkCmd = new SqliteCommand(
+                "SELECT user_id FROM users WHERE user_name = $userName;", connection);
+            checkCmd.Parameters.AddWithValue("$userName", user.UserName);
+            var existing = checkCmd.ExecuteScalar();
+            if (existing != null)
+                return Convert.ToInt32(existing);
 
             using var cmd = new SqliteCommand(@"
                 INSERT INTO users (user_name, gender, age, created_at)
                 VALUES ($userName, $gender, $age, $createdAt);", connection);
 
             cmd.Parameters.AddWithValue("$userName", user.UserName);
-            cmd.Parameters.AddWithValue("$gender",   (object?)user.Gender   ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("$age",      (object?)user.Age      ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$gender", (object?)user.Gender ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$age", (object?)user.Age ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             cmd.ExecuteNonQuery();
+
+            using var idCmd = new SqliteCommand("SELECT last_insert_rowid();", connection);
+
+            return Convert.ToInt32(idCmd.ExecuteScalar());
         }
 
         public void UpdateUser(int userId, string userName, string? gender, string? age)
@@ -90,8 +102,9 @@ namespace Colorlog.Services
             {
                 using var connection = OpenConnection();
                 using var cmd = new SqliteCommand(@"
-                    SELECT user_id, user_name, gender, age, FROM users
-                    ORDER BY created_at DESC;", connection);
+                    SELECT user_id, user_name, gender, age, profile_image_path
+                    FROM users
+                    ORDER BY created_at DESC ;", connection);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read()) {
                     result.Add(new User
@@ -99,7 +112,8 @@ namespace Colorlog.Services
                         UserId = reader.GetInt32(0),
                         UserName = reader.GetString(1),
                         Gender = reader.IsDBNull(2) ? "선택 안 함" : reader.GetString(2),
-                        Age = reader.IsDBNull(3) ? string.Empty : reader.GetString(3)
+                        Age = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                        ProfileImagePath = reader.IsDBNull(4) ? null : reader.GetString(4)
                     });
                 }
             }
@@ -110,16 +124,14 @@ namespace Colorlog.Services
             return result;
         }
 
-        /// <summary>
-        /// 설정창 진입 시 DB에서 가장 최근에 저장된 사용자 한 명을 불러오는 함수 (Read)
-        /// </summary>
+
         public User? GetLatestUser()
         {
             using var connection = OpenConnection();
             CreateUserTableIfNotExist(connection);
 
             using var cmd = new SqliteCommand(@"
-                SELECT user_id, user_name, gender, age
+                SELECT user_id, user_name, gender, age, profile_image_path
                 FROM users
                 ORDER BY user_id DESC
                 LIMIT 1;", connection);
@@ -132,7 +144,32 @@ namespace Colorlog.Services
                     UserId = reader.GetInt32(0),
                     UserName = reader.GetString(1),
                     Gender = reader.IsDBNull(2) ? "선택 안 함" : reader.GetString(2),
-                    Age = reader.IsDBNull(3) ? string.Empty : reader.GetString(3)
+                    Age = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                    ProfileImagePath = reader.IsDBNull(4) ? null : reader.GetString(4)
+                };
+            }
+            return null;
+        }
+
+        public User? GetUserById(int userId)
+        {
+            using var connection = OpenConnection();
+            using var cmd = new SqliteCommand(@"
+        SELECT user_id, user_name, gender, age, profile_image_path
+        FROM users
+        WHERE user_id = $userId;", connection);
+            cmd.Parameters.AddWithValue("$userId", userId);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new User
+                {
+                    UserId = reader.GetInt32(0),
+                    UserName = reader.GetString(1),
+                    Gender = reader.IsDBNull(2) ? "선택 안 함" : reader.GetString(2),
+                    Age = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                    ProfileImagePath = reader.IsDBNull(4) ? null : reader.GetString(4)
                 };
             }
             return null;
@@ -237,6 +274,16 @@ namespace Colorlog.Services
             return result;
         }
 
-
+        // 프로필 이미지 경로 업데이트 함수
+        public void UpdateUserProfileImage(int userId, string imagePath)
+        {
+            using var connection = OpenConnection();
+            using var cmd = new SqliteCommand(@"
+                UPDATE users SET profile_image_path = $path
+                WHERE user_id = $userId;", connection);
+            cmd.Parameters.AddWithValue("$path", imagePath);
+            cmd.Parameters.AddWithValue("$userId", userId);
+            cmd.ExecuteNonQuery();
+        }
     }
 }

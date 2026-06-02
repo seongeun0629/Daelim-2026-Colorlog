@@ -23,5 +23,17 @@ namespace Colorlog.Views
         {
             InitializeComponent();
         }
+
+        // 드래그 이동
+        private void Window_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+
+        // 닫기 버튼
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }

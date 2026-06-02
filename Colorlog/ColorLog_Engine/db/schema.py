@@ -32,7 +32,8 @@ def create_tables():
             user_name   TEXT    NOT NULL UNIQUE,
             gender      TEXT,
             age         TEXT,
-            created_at  TEXT    NOT NULL
+            created_at  TEXT    NOT NULL,
+            profile_image_path TEXT
         )
     """)
 
@@ -140,6 +141,12 @@ def _migrate():
     prod_cols = {row["name"] for row in cursor.fetchall()}
     if "tone_type" not in prod_cols:
         cursor.execute("ALTER TABLE products ADD COLUMN tone_type TEXT")
+        conn.commit()
+
+    cursor.execute("PRAGMA table_info(users)")
+    user_cols = {row["name"] for row in cursor.fetchall()}
+    if "profile_image_path" not in user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN profile_image_path TEXT")
         conn.commit()
 
     conn.close()

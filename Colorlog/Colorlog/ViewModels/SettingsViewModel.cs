@@ -1,15 +1,16 @@
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
+using Colorlog.Models;
 using Colorlog.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
-using Colorlog.Models;
+using System.Linq;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Colorlog.ViewModels;
 
@@ -49,6 +50,8 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool isCameraLoading;
 
+    private int _currentUserId;
+
     [ObservableProperty]
     private string preferenceSelectionSummary = "아직 선택된 항목이 없습니다.";
 
@@ -56,9 +59,10 @@ public partial class SettingsViewModel : ObservableObject
     public ObservableCollection<SelectablePreferenceItem> SkinItems { get; } = new();
     public ObservableCollection<SelectablePreferenceItem> ToneItems { get; } = new();
 
-    public SettingsViewModel(Services.DatabaseService databaseService)
+    public SettingsViewModel(Services.DatabaseService databaseService, int userId)
     {
         _databaseService = databaseService;
+        _currentUserId = userId;
 
         foreach (var label in new[] { "청순", "화려", "스모키", "러블리", "시크", "데일리" })
         {
@@ -80,21 +84,23 @@ public partial class SettingsViewModel : ObservableObject
         SyncCameraAvailability();
         SyncUserAgeFromBirthDate();
 
-        //앱이 켜질 때 DB에서 가장 최근 유저 정보 로드하기
         try
         {
-            var latestUser = _databaseService.GetLatestUser();
-            if (latestUser != null)
+            var user = _databaseService.GetUserById(userId);
+            if (user != null)
             {
-                UserName = latestUser.UserName;
-                UserGender = latestUser.Gender ?? "선택 안함";
-                if (!string.IsNullOrWhiteSpace(latestUser.Age))
-                    UserAge = latestUser.Age;
+                UserName = user.UserName;
+                UserGender = user.Gender ?? "선택 안함";
+                if (!string.IsNullOrWhiteSpace(user.Age))
+                    UserAge = user.Age;
+                if (!string.IsNullOrEmpty(user.ProfileImagePath)
+                    && File.Exists(user.ProfileImagePath))
+                    ProfileImagePath = user.ProfileImagePath;
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"초기 유저 정보 로드 실패: {ex.Message}");
+            Debug.WriteLine($"초기 유저 정보 로드 실패: {ex.Message}");
         }
     }
 
@@ -138,7 +144,11 @@ public partial class SettingsViewModel : ObservableObject
 
                 File.Copy(sourceFile, targetFile, true);
                 ProfileImagePath = targetFile;
-
+                
+                if(_currentUserId > 0)
+                {
+                    _databaseService.UpdateUserProfileImage(_currentUserId, targetFile);
+                }
                 MessageBox.Show("프로필 사진이 성공적으로 변경되었습니다!", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -146,6 +156,8 @@ public partial class SettingsViewModel : ObservableObject
                 MessageBox.Show($"이미지를 불러오는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        
     }
 
     private void OnCameraNamesChanged(object? sender, NotifyCollectionChangedEventArgs e) => SyncCameraAvailability();
