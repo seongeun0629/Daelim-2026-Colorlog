@@ -134,6 +134,33 @@ def get_status():
     ), 200
 
 
+def convert_personal_color_to_legacy_format(personal_color):
+    """
+    새로운 Lab + HSV 하이브리드 형식을 기존 형식으로 변환 (호환성 유지)
+    
+    New format: {"season": "...", "temperature": "...", "lab": {...}, "hsv": {...}}
+    Legacy format: {"type": "...", "lab": {"L": ..., "a": ..., "b": ...}}
+    """
+    if not personal_color:
+        return {}
+    
+    # 새 형식에서 개의 필드 추출
+    season = personal_color.get("season", "")
+    lab = personal_color.get("lab", {})
+    
+    # 기존 형식으로 변환
+    legacy_format = {
+        "type": season,  # "season"을 "type"으로 변환
+        "lab": {
+            "L": lab.get("l", lab.get("L")),  # l 또는 L을 L로 통일
+            "a": lab.get("a"),
+            "b": lab.get("b")
+        }
+    }
+    
+    return legacy_format
+
+
 @app.route("/api/result", methods=["GET"])
 def get_result():
     """최신 분석 결과 조회 (디버그 모드 지원)"""
@@ -148,14 +175,16 @@ def get_result():
         if is_debug:
             return jsonify(current_result), 200
 
-        # 일반 모드일 경우 핵심 데이터만 필터링하여 반환
+        # 일반 모드일 경우 핵심 데이터만 필터링하여 반환 (기존 형식 유지)
+        pc = current_result.get("personal_color", {})
+        
         core_data = {
             "timestamp": current_result.get("timestamp", 0),
             "face_detected": current_result.get("face_detected", False),
             "lighting": current_result.get("lighting", {}),
             "oily": current_result.get("oily", {}),
             "skin_tone": current_result.get("skin_tone", {}),
-            "personal_color": current_result.get("personal_color", {})
+            "personal_color": convert_personal_color_to_legacy_format(pc)
         }
 
         # 편의를 위해 피부색 Hex 코드 변환 로직 추가 (선택 사항)
