@@ -1,11 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Colorlog.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Windows.Media;
 
 namespace Colorlog.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
+        private readonly DatabaseService _databaseService;
+        private readonly int _userId;
+
         [ObservableProperty]
         private string _userDisplayName = "사용자";
 
@@ -14,32 +20,16 @@ namespace Colorlog.ViewModels
 
         [ObservableProperty]
         public string _personalColorName = "봄 웜 라이트";
-        public ObservableCollection<ColorChip> BestColors { get; }
-
+        public ObservableCollection<ColorChip> BestColors { get; } = new();
         public ObservableCollection<ProductRecommendation> RecentRecommendations { get; }
-
-        public ObservableCollection<SkinMetric> SkinMetrics { get; }
-
+        public ObservableCollection<SkinMetric> SkinMetrics { get; } = new();
         public ObservableCollection<FaceZoneTone> FaceZoneTones { get; }
-
-        public DashboardViewModel()
+        public DashboardViewModel(DatabaseService databaseService, int userId)
         {
-            // 생성자 실행 시 DB에서 최신 저장된 이름 긁어오기
-            try
-            {
-                var dbService = new Colorlog.Services.DatabaseService();
-                var latestUser = dbService.GetLatestUser();
+            _databaseService = databaseService;
+            _userId = userId;
 
-                if (latestUser != null && !string.IsNullOrEmpty(latestUser.UserName))
-                {
-                    UserDisplayName = latestUser.UserName;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"대시보드 유저 이름 로드 실패: {ex.Message}");
-            }
-
+            //더비 데이터 유지 (나중에 교체)!!!
             BestColors = new ObservableCollection<ColorChip>
             {
                 new("Peach Coral", "#FFEEA39A"),
@@ -68,7 +58,66 @@ namespace Colorlog.ViewModels
                 new("코 주변", "#FFE6C5AF"),
                 new("턱", "#FFD4B49F")
             };
+
+            LoadFromDatabase();
         }
+
+        private void LoadFromDatabase()
+        {
+            try
+            {
+                // 1. 유저 이름
+                var user = _databaseService.GetUserById(_userId);
+                if (user != null)
+                    UserDisplayName = user.UserName;
+
+                // 2. 최근 진단 결과
+                var diagnosis = _databaseService.GetLatestDiagnosis(_userId);
+                if (diagnosis != null)
+                {
+                    // 퍼스널 컬러
+                    PersonalColorName = string.IsNullOrEmpty(diagnosis.PersonalColorName)
+                        ? "진단 미실시" : diagnosis.PersonalColorName;
+
+                    // 마지막 진단 시각
+                    if (DateTime.TryParse(diagnosis.DiagnosisAt, out var dt))
+                        LastDiagnosisAtText = dt.ToString("yyyy.MM.dd HH:mm",
+                            CultureInfo.CurrentCulture);
+
+                    // 피부 지표
+                    SkinMetrics.Clear();
+                    SkinMetrics.Add(new SkinMetric("홍조 지수", diagnosis.Redness, 100,
+                        GetMetricLabel(diagnosis.Redness), "#FFFB923C"));
+                    SkinMetrics.Add(new SkinMetric("밝기 지수", diagnosis.Brightness, 100,
+                        GetMetricLabel(diagnosis.Brightness), "#FF22C55E"));
+
+                    // BestColors — personal_color_types에서 가져오기
+                    // (나중에 교체!!!!!, 지금은 진단 타입 기반 색상 표시)
+                    BestColors.Clear();
+                    BestColors.Add(new ColorChip(PersonalColorName, "#FFDAB9A5"));
+                }
+                else
+                {
+                    PersonalColorName = "진단 미실시";
+                    LastDiagnosisAtText = "진단 기록 없음";
+
+                    SkinMetrics.Clear();
+                    SkinMetrics.Add(new SkinMetric("홍조 지수", 0, 100, "-", "#FFFB923C"));
+                    SkinMetrics.Add(new SkinMetric("밝기 지수", 0, 100, "-", "#FF22C55E"));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Dashboard] LoadFromDatabase 오류: {ex.Message}");
+            }
+        }
+
+        private static string GetMetricLabel(int value) => value switch
+        {
+            >= 70 => "좋음",
+            >= 40 => "보통",
+            _ => "나쁨"
+        };
     }
 
     public sealed class ColorChip

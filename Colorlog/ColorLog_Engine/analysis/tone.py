@@ -175,51 +175,55 @@ def analyze_color_with_hsv(h, s, v):
 # 사용자의 피부 톤을 반환하는 함수 (Lab + HSV 하이브리드)
 def get_personal_color_season(L, a, b, rgb=None):
     """
-    Lab과 HSV 정보를 결합하여 사용자의 사계절 퍼스널 컬러를 반환합니다.
-    (하이브리드 방식으로 더 정확한 분류)
-
-    Args:
-        L: Lab의 명도 (0-100)
-        a: Lab의 a축 (-128~127, 빨강:양수, 초록:음수)
-        b: Lab의 b축 (-128~127, 노랑:양수, 파랑:음수)
-        rgb: 옵션, RGB 튜플 (R, G, B) - HSV 분석에 사용
-
-    Returns:
-        dict: 퍼스널 컬러 정보
+    Lab과 HSV 정보를 결합하여 9분류 퍼스널 컬러를 반환합니다.
     """
     # 1. Lab 기반 분석
-    is_warm_lab = b > a
     chroma = math.sqrt(float(a)**2 + float(b)**2)
+    is_warm_lab = b > a
 
-    # 2. HSV 기반 분석 (RGB가 제공된 경우)
+    # 2. HSV 기반 분석
     hsv_analysis = None
     is_warm_hsv = None
     if rgb is not None:
         h, s, v = rgb_to_hsv(rgb)
         hsv_analysis = analyze_color_with_hsv(h, s, v)
-        # HSV 기반 웜/쿨 판별
-        is_warm_hsv = hsv_analysis["temperature"] in ["웜"]
+        is_warm_hsv = hsv_analysis["temperature"] == "웜"
 
-    # 3. Lab과 HSV 결과 통합 (두 방식이 일치할 때 신뢰도 높음)
+    # 3. 웜/쿨 통합 판별
     if is_warm_hsv is not None:
-        # 두 방식의 결과를 결합 (가중치: Lab 60%, HSV 40%)
         is_warm = is_warm_lab if is_warm_lab == is_warm_hsv else is_warm_lab
     else:
         is_warm = is_warm_lab
 
-    # 4. 사계절 분류 (Lab 중심, HSV 보조)
-    if is_warm:
-        if L > 65 and chroma > 15:
-            season = "봄 웜톤 (Spring Warm)"  # 밝고 생기 있음
-        else:
-            season = "가을 웜톤 (Autumn Warm)"  # 차분하고 성숙함
-    else:
-        if L > 65 and chroma < 15:
-            season = "여름 쿨톤 (Summer Cool)"  # 밝고 투명/뮤트함
-        else:
-            season = "겨울 쿨톤 (Winter Cool)"  # 대비가 강하거나 창백함
+    # 4. 뉴트럴 판별 — 웜/쿨 구분이 애매하고 채도가 낮을 때
+    warm_diff = abs(float(b) - float(a))
+    if warm_diff < 3.0 and chroma < 10.0:
+        season = "뉴트럴톤 (Neutral)"
 
-    # 5. HSV 정보가 있으면 추가 세부 정보 포함
+    # 5. 9분류
+    elif is_warm:
+        if L > 65:
+            if chroma > 20:
+                season = "봄 비비드 웜톤 (Spring Vivid Warm)"
+            else:
+                season = "봄 라이트 웜톤 (Spring Light Warm)"
+        else:
+            if chroma > 15:
+                season = "가을 딥 웜톤 (Autumn Deep Warm)"
+            else:
+                season = "가을 뮤트 웜톤 (Autumn Mute Warm)"
+    else:
+        if L > 65:
+            if chroma < 12:
+                season = "여름 라이트 쿨톤 (Summer Light Cool)"
+            else:
+                season = "여름 뮤트 쿨톤 (Summer Mute Cool)"
+        else:
+            if chroma > 18:
+                season = "겨울 비비드 쿨톤 (Winter Vivid Cool)"
+            else:
+                season = "겨울 딥 쿨톤 (Winter Deep Cool)"
+
     result = {
         "season": season,
         "temperature": "웜톤" if is_warm else "쿨톤",

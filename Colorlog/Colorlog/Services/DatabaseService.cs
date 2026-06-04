@@ -285,5 +285,41 @@ namespace Colorlog.Services
             cmd.Parameters.AddWithValue("$userId", userId);
             cmd.ExecuteNonQuery();
         }
+
+        //-------------------------------
+        //대시보드용
+        //-------------------------------
+        public DiagnosisSummary? GetLatestDiagnosis(int userId)
+        {
+            try
+            {
+                using var connection = OpenConnection();
+                using var cmd = new SqliteCommand(@"
+                    SELECT d.diagnosis_at, d.brightness, d.redness, pct.type_name
+                    FROM diagnosis d
+                    LEFT JOIN personal_color_types pct ON d.type_id = pct.type_id
+                    WHERE d.user_id = $userId
+                    ORDER BY d.diagnosis_at DESC
+                    LIMIT 1;", connection);
+                cmd.Parameters.AddWithValue("$userId", userId);
+
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new DiagnosisSummary
+                    {
+                        DiagnosisAt = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
+                        Brightness = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
+                        Redness = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
+                        PersonalColorName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3)
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DB] GetLatestDiagnosis 오류: {ex.Message}");
+            }
+            return null;
+        }
     }
 }

@@ -202,14 +202,24 @@ namespace Colorlog.ViewModels
 
             GuidanceMessage = personalColor switch
             {
-                var s when s.Contains("봄 웜") || s.Contains("Spring Warm") =>
-                    "생기 넘치는 봄 웜톤! 밝고 화사한 코랄과 노란색 계열이 베스트예요. 😊",
-                var s when s.Contains("가을 웜") || s.Contains("Autumn Warm") =>
-                    "분위기 여신 가을 웜톤! 깊이 있는 베이지와 브라운, 카키색이 정말 잘 어울려요. 🍂",
-                var s when s.Contains("여름 쿨") || s.Contains("Summer Cool") =>
-                    "청량한 여름 쿨톤! 시원한 블루와 라벤더 컬러로 지적인 이미지를 연출해보세요. ❄️",
-                var s when s.Contains("겨울 쿨") || s.Contains("Winter Cool") =>
-                    "강렬한 겨울 쿨톤! 블랙 & 화이트나 선명한 레드 컬러로 또렷한 인상을 완성해보세요. 💄",
+                var s when s.Contains("봄 라이트 웜") || s.Contains("Spring Light Warm") =>
+                    "밝고 따뜻한 봄 라이트 웜톤! 피치와 살구색 계열이 얼굴을 화사하게 밝혀줘요. 🌸",
+                var s when s.Contains("봄 비비드 웜") || s.Contains("Spring Vivid Warm") =>
+                    "생기 넘치는 봄 비비드 웜톤! 선명한 코랄과 오렌지 컬러로 활기찬 인상을 연출해보세요. 🌺",
+                var s when s.Contains("여름 라이트 쿨") || s.Contains("Summer Light Cool") =>
+                    "청량한 여름 라이트 쿨톤! 라벤더와 파우더핑크로 부드럽고 투명한 이미지를 완성해보세요. ❄️",
+                var s when s.Contains("여름 뮤트 쿨") || s.Contains("Summer Mute Cool") =>
+                    "우아한 여름 뮤트 쿨톤! 로즈와 모브 컬러로 차분하고 세련된 분위기를 연출해보세요. 🌙",
+                var s when s.Contains("가을 딥 웜") || s.Contains("Autumn Deep Warm") =>
+                    "깊이 있는 가을 딥 웜톤! 브라운과 버건디 컬러로 클래식하고 성숙한 매력을 살려보세요. 🍂",
+                var s when s.Contains("가을 뮤트 웜") || s.Contains("Autumn Mute Warm") =>
+                    "내추럴한 가을 뮤트 웜톤! 베이지와 머스타드 컬러가 따뜻하고 편안한 인상을 만들어줘요. 🍁",
+                var s when s.Contains("겨울 비비드 쿨") || s.Contains("Winter Vivid Cool") =>
+                    "강렬한 겨울 비비드 쿨톤! 블랙 & 화이트나 선명한 레드로 또렷한 인상을 완성해보세요. 💄",
+                var s when s.Contains("겨울 딥 쿨") || s.Contains("Winter Deep Cool") =>
+                    "도시적인 겨울 딥 쿨톤! 네이비와 다크 버건디로 깊고 미스터리한 매력을 표현해보세요. 🌃",
+                var s when s.Contains("뉴트럴") || s.Contains("Neutral") =>
+                    "균형 잡힌 뉴트럴톤! 웜과 쿨 컬러를 모두 소화할 수 있는 versatile한 톤이에요. 🎨",
                 _ => "데이터를 정밀 분석 중입니다. 얼굴을 고정하고 잠시만 기다려주세요."
             };
         }

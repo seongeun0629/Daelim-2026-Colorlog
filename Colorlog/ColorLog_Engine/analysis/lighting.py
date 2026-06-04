@@ -140,7 +140,7 @@ def rgb_to_lab(r, g, b):
     rgb = np.uint8([[[b, g, r]]])  # OpenCV는 BGR
     lab = cv2.cvtColor(rgb, cv2.COLOR_BGR2LAB)
 
-    L = lab[0][0][0]
+    L = lab[0][0][0] / 255.0 * 100.0
     a = lab[0][0][1] - 128
     b = lab[0][0][2] - 128
 
