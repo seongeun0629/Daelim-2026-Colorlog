@@ -69,11 +69,9 @@ def process_frame(frame, result, timestamp, smoother):
 
     if light_status == "Good":
         L, a_val, b_val = rgb_to_lab(r, g, b)
-        personal = get_personal_color_season(L, a_val, b_val)
-        frame_data["personal_color"] = {
-            "type": personal,
-            "lab": {"L": float(L), "a": float(a_val), "b": float(b_val)},
-        }
+        # RGB를 함께 전달하여 HSV 기반 분석 활성화 (하이브리드 방식)
+        personal = get_personal_color_season(L, a_val, b_val, rgb=tone_rgb)
+        frame_data["personal_color"] = personal
 
     return frame_data
 
