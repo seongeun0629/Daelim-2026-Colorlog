@@ -14,7 +14,7 @@ from core.json_output import JsonOutputThrottler
 from db import (
     create_tables, seed_personal_color_types, seed_products,
     get_or_create_user, add_diagnosis, get_color_type_by_name,
-    save_ai_recommendations, get_recommended_products,
+    save_ai_recommendations, get_recommended_products, add_rec_product,
 )
 from db.recommendation import get_ai_recommendation
 
@@ -98,13 +98,21 @@ def main():
 
                             # AI 제품 추천 (실패 시 더미 시드 폴백)
                             preferred_style = color_type.get("keyword", "") if color_type else ""
-                            ai_recs = get_ai_recommendation(best_type_name, preferred_style)
+                            ai_recs = get_ai_recommendation(
+                                best_type_name, preferred_style,
+                                brightness=brightness_val,
+                                redness=redness_val,
+                            )
 
                             if ai_recs:
                                 recommendations = save_ai_recommendations(diagnosis_id, ai_recs)
                             else:
                                 tone_type = "쿨" if "쿨" in best_type_name else "웜"
                                 fallback = get_recommended_products(tone_type)
+                                makeup_cats = {"치크", "립", "아이", "베이스"}
+                                makeup_items = [p for p in fallback if p.get("category") in makeup_cats][:3]
+                                skincare_items = [p for p in fallback if p.get("category") not in makeup_cats][:2]
+                                selected = makeup_items + skincare_items
                                 recommendations = [
                                     {
                                         "product_id": p["product_id"],
@@ -113,8 +121,11 @@ def main():
                                         "category": p.get("category", ""),
                                         "reason": "퍼스널컬러 기반 추천",
                                     }
-                                    for p in fallback[:3]
+                                    for p in selected
                                 ]
+                                # 폴백 추천도 DB에 저장하여 히스토리에서 확인 가능하도록
+                                for item in recommendations:
+                                    add_rec_product(item["product_id"], diagnosis_id, item["reason"])
 
                             frame_data["recommendations"] = recommendations
 

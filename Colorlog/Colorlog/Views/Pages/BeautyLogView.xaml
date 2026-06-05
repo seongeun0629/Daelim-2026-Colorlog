@@ -55,7 +55,29 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
+                    <TextBlock Margin="0,8,0,0" FontSize="12" FontWeight="SemiBold">
+                        <Hyperlink NavigateUri="{Binding ProductUrl}" RequestNavigate="Hyperlink_RequestNavigate" Foreground="{StaticResource PrimaryBrush}">🛒 올리브영에서 보기</Hyperlink>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasUrl}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요.">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasUrl}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </Border>
         </DataTemplate>
@@ -104,7 +126,30 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요."/>
+                    <TextBlock Margin="0,8,0,0" FontSize="12" FontWeight="SemiBold">
+                        <Hyperlink NavigateUri="{Binding ProductUrl}" RequestNavigate="Hyperlink_RequestNavigate"
+                                   Foreground="{StaticResource SuccessBrush}">🛒 올리브영에서 보기</Hyperlink>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasUrl}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="자세히 보려면 카드에 마우스를 올려보세요.">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasUrl}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </Border>
         </DataTemplate>
@@ -127,10 +172,15 @@
 
             <Border x:Name="BeautyCriteriaCard" Grid.Row="1" Style="{StaticResource DashboardCardStyle}" Margin="10,10,10,16">
                 <StackPanel>
-                    <TextBlock Text="오늘의 추천 기준" Style="{StaticResource BeautyHeaderStyle}"/>
-                    <TextBlock Text="{Binding ToneSummary}" Margin="0,8,0,0" FontSize="14" 
+                    <Grid>
+                        <TextBlock Text="오늘의 추천 기준" Style="{StaticResource BeautyHeaderStyle}"/>
+                        <TextBlock Text="{Binding LastDiagnosisAtText, StringFormat=마지막 진단: {0}}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   FontSize="12" Foreground="{StaticResource MutedTextBrush}"/>
+                    </Grid>
+                    <TextBlock Text="{Binding ToneSummary}" Margin="0,8,0,0" FontSize="14"
                                FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
-                    <TextBlock Text="{Binding SkinConditionSummary}" Margin="0,8,0,8" 
+                    <TextBlock Text="{Binding SkinConditionSummary}" Margin="0,8,0,8"
                                Style="{StaticResource BeautySubStyle}"/>
 
                     <ItemsControl ItemsSource="{Binding FocusKeywords}" Margin="0,0,0,8">

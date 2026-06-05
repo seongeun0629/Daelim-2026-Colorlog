@@ -372,12 +372,27 @@
                 <Border x:Name="HistoryHintCard" Grid.Row="2" Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
                     <StackPanel>
                         <TextBlock Text="기록에 대해" Style="{StaticResource DashboardCardTitleStyle}"/>
-                        <!--실서비스에서는 분석 API·로컬 DB와 연동해 자동으로 채워지게, 지금 화면은 흐름 확인용 샘플 데이터
-                        같은 날 여러 번 측정했다면 가장 최근 결과만 달력에 표시하는 식으로?-->
-                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}" TextWrapping="Wrap" LineHeight="20" Margin="0,8,0,0"
-                                   Text="샘플 샘플샘플샘플 샘플샘플샘플샘플샘플 샘플샘플샘플샘플샘플샘플샘플샘플샘플 샘플 샘플샘플 샘플"/>
-                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}" TextWrapping="Wrap" LineHeight="20" Margin="0,10,0,0"
-                                   Text="샘플 샘플샘플샘플 샘플샘플샘플샘플샘플 샘플샘플샘플샘플샘플샘플샘플샘플샘플 샘플 샘플샘플 샘플"/>
+
+                        <TextBlock Text="📅  달력 표시 방식"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TitleTextBrush}"
+                                   Margin="0,14,0,0"/>
+                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}" TextWrapping="Wrap" LineHeight="20" Margin="0,6,0,0"
+                                   Text="같은 날 여러 번 측정한 경우 가장 최근 결과만 달력에 표시됩니다. 날짜 셀의 색상 바는 퍼스널 컬러 계열(웜·쿨)을 나타냅니다."/>
+
+                        <TextBlock Text="📊  지표 의미"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TitleTextBrush}"
+                                   Margin="0,14,0,0"/>
+                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}" TextWrapping="Wrap" LineHeight="20" Margin="0,6,0,0"
+                                   Text="밝기는 피부의 명도(L*) 값을 0–100으로 환산한 수치입니다. 높을수록 밝은 피부톤을 의미합니다. 붉은기는 피부의 적색도(a*) 값을 기반으로 하며, 높을수록 홍조·혈색이 강한 상태를 나타냅니다."/>
+
+                        <TextBlock Text="💡  더 정확한 측정을 위해"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TitleTextBrush}"
+                                   Margin="0,14,0,0"/>
+                        <TextBlock Style="{StaticResource DashboardCardSubTextStyle}" TextWrapping="Wrap" LineHeight="20" Margin="0,6,0,0"
+                                   Text="자연광 또는 밝은 실내 조명 아래에서, 정면을 바라보며 측정하면 일관된 결과를 얻을 수 있습니다. 메이크업 전·세안 직후 측정을 권장합니다."/>
                     </StackPanel>
                 </Border>
             </Grid>

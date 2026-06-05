@@ -31,7 +31,7 @@ namespace Colorlog.ViewModels
             DashboardViewModel = new DashboardViewModel(SettingsViewModel);
             LiveAnalysisViewModel = new LiveAnalysisViewModel(pythonService, SettingsViewModel);
             HistoryViewModel = new HistoryViewModel(pythonService);
-            BeautyLogViewModel = new BeautyLogViewModel();
+            BeautyLogViewModel = new BeautyLogViewModel(SettingsViewModel);
 
             UpdateView();
 
@@ -45,6 +45,8 @@ namespace Colorlog.ViewModels
             {
                 _ = HistoryViewModel.LoadHistoryAsync();
                 _ = SettingsViewModel.LoadUserStatsAsync();
+                BeautyLogViewModel.UpdateFromDiagnosis(json);
+                DashboardViewModel.UpdateFromDiagnosis(json);
             };
 
             // DB에서 가장 최근 사용자 조회 → user_id 직접 설정 (이름 기반 재조회 불필요)

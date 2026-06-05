@@ -252,13 +252,48 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ExportBackup()
+    private async Task ExportBackup()
     {
-        _ = MessageBox.Show(
-            "@@추후 연결하기@@",
-            "데이터 백업",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        var saveDialog = new SaveFileDialog
+        {
+            Title = "백업 파일 저장",
+            Filter = "JSON 파일 (*.json)|*.json",
+            FileName = $"colorlog_backup_{DateTime.Now:yyyyMMdd_HHmmss}.json",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        };
+
+        if (saveDialog.ShowDialog() != true)
+            return;
+
+        var json = await _pythonService.ExportBackupAsync();
+
+        if (string.IsNullOrWhiteSpace(json) || json.TrimStart().StartsWith("{\"error\""))
+        {
+            MessageBox.Show(
+                "백업 데이터를 불러오지 못했습니다.\n진단 기록이 없거나 서비스가 준비되지 않았습니다.",
+                "백업 실패",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+
+        try
+        {
+            File.WriteAllText(saveDialog.FileName, json, System.Text.Encoding.UTF8);
+            MessageBox.Show(
+                $"백업이 완료되었습니다.\n저장 위치: {saveDialog.FileName}",
+                "백업 성공",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"파일 저장 중 오류가 발생했습니다.\n{ex.Message}",
+                "오류",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
 
     [RelayCommand]

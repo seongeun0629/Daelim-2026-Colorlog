@@ -48,39 +48,55 @@ namespace Colorlog.Services
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
+                    StandardOutputEncoding = System.Text.Encoding.UTF8,
+                    StandardErrorEncoding = System.Text.Encoding.UTF8,
                     CreateNoWindow = true
                 }
             };
+
+            _process.StartInfo.EnvironmentVariables["PYTHONUTF8"] = "1";
 
             _process.OutputDataReceived += (s, e) =>
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
+                    JObject? json = null;
+                    try { json = JObject.Parse(e.Data); }
+                    catch { return; }
+
                     try
                     {
-                        var json = JObject.Parse(e.Data);
                         if (json["diagnosis_saved"]?.Value<bool>() == true)
                         {
-                            // main.py가 실제로 사용한 user_id로 CurrentUserId 동기화
                             var uid = json["user_id"]?.Value<int>() ?? -1;
                             if (uid >= 0) CurrentUserId = uid;
+                            System.IO.File.AppendAllText(
+                                @"C:\Users\alice\colorlog_debug.txt",
+                                $"[{DateTime.Now:HH:mm:ss}] diagnosis_saved fired. recs={json["recommendations"]?.Count() ?? -1}\n");
                             OnDiagnosisSaved?.Invoke(json);
-                            Debug.WriteLine($"[DB] 진단 저장 완료 (user_id={CurrentUserId})");
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.IO.File.AppendAllText(
+                            @"C:\Users\alice\colorlog_debug.txt",
+                            $"[{DateTime.Now:HH:mm:ss}] OnDiagnosisSaved ERROR: {ex.Message}\n{ex.StackTrace}\n");
+                    }
 
+                    try
+                    {
                         if (json["face_detected"]?.Value<bool>() == true)
                         {
                             var colorType = json["personal_color"]?["type"]?.ToString();
                             if (!string.IsNullOrEmpty(colorType))
-                            {
                                 OnColorDetected?.Invoke(json);
-                                Debug.WriteLine($"[성공] 분석된 컬러: {colorType}");
-                            }
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        Debug.WriteLine("[Parsing Skip]: 아직 얼굴이 감지되지 않았습니다.");
+                        System.IO.File.AppendAllText(
+                            @"C:\Users\alice\colorlog_debug.txt",
+                            $"[{DateTime.Now:HH:mm:ss}] OnColorDetected ERROR: {ex.Message}\n");
                     }
                 }
             };
@@ -141,6 +157,15 @@ namespace Colorlog.Services
             var engineDir = GetEngineDir();
             var arguments = $"-m db.delete_records --user-id {CurrentUserId}";
             await RunScriptAsync(engineDir, arguments);
+        }
+
+        /// <summary>현재 유저의 설정·분석 결과 전체를 JSON 문자열로 반환합니다.</summary>
+        public async Task<string> ExportBackupAsync()
+        {
+            if (CurrentUserId < 0) return string.Empty;
+            var engineDir = GetEngineDir();
+            var arguments = $"-m db.export_backup --user-id {CurrentUserId}";
+            return await RunScriptAsync(engineDir, arguments);
         }
 
         /// <summary>Settings 화면용 유저 통계(진단 횟수, 가입일, 최근 퍼스널컬러)를 반환합니다.</summary>
