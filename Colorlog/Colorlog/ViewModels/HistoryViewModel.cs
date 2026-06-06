@@ -60,13 +60,18 @@ public partial class HistoryViewModel : ObservableObject
     [ObservableProperty] private Brush? _selectedDetailSwatchBrush;
     [ObservableProperty] private bool _selectedDetailHasRecord;
 
-
     public HistoryViewModel(DatabaseService databaseService, int userId)
     {
         _databaseService = databaseService;
         _currentUserId = userId;
         DisplayMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
         UpdateDisplayMonthLabel();
+    }
+
+    public void UpdateUserId(int userId)
+    {
+        _currentUserId = userId;
+        LoadFromDatabase();
     }
 
     public void LoadFromDatabase()
@@ -168,7 +173,6 @@ public partial class HistoryViewModel : ObservableObject
         SelectedCell = null;
     }
 
-    // 그래프
     private void RebuildWeeklyGeometry()
     {
         var values = WeeklyTrend.Select(p => ShowBrightness ? p.Brightness : p.Redness).ToArray();

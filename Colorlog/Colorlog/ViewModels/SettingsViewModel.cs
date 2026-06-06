@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Colorlog.ViewModels;
 
@@ -245,5 +246,48 @@ public partial class SettingsViewModel : ObservableObject
         else UserGender = "선택 안 함";
 
         SyncUserAgeFromBirthDate();
+    }
+
+    [RelayCommand]
+    private void SwitchProfile()
+    {
+        Debug.WriteLine("[SwitchProfile] 커맨드 실행됨");
+
+        var profileVm = new ProfileSelectViewModel(_databaseService);
+        var profileView = new Views.ProfileSelectView { DataContext = profileVm };
+
+        profileVm.ProfileSelected = (selectedUser) =>
+        {
+            Debug.WriteLine($"[SwitchProfile] 프로필 선택됨: {selectedUser.UserId} - {selectedUser.UserName}");
+
+            profileView.Close();
+            WeakReferenceMessenger.Default.Send(new ProfileSwitchedMessage(selectedUser.UserId));
+        };
+
+        profileVm.AddNewProfileRequested = () =>
+        {
+            var editVm = new EditProfileViewModel(_databaseService, null, string.Empty, DateTime.Today.AddYears(-24));
+            var editView = new Views.EditProfileView(editVm) { Owner = profileView };
+
+            editVm.CloseRequested = (saved) =>
+            {
+                editView.DialogResult = saved;
+                editView.Close();
+
+                if (saved)
+                {
+                    var newUser = _databaseService.GetLatestUser();
+                    if (newUser != null)
+                    {
+                        profileView.Close();
+                        WeakReferenceMessenger.Default.Send(new ProfileSwitchedMessage(newUser.UserId));
+                    }
+                }
+            };
+
+            editView.ShowDialog();
+        };
+
+        profileView.ShowDialog();
     }
 }

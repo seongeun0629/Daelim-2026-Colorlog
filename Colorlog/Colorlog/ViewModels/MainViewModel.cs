@@ -1,7 +1,9 @@
 using Colorlog.Models;
 using Colorlog.Services;
+using Colorlog.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Diagnostics;
 using System.Net.Http;
@@ -9,11 +11,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Colorlog.ViewModels;
 
 namespace Colorlog.ViewModels
 {
-    public partial class MainViewModel : ObservableObject
+    public partial class MainViewModel : ObservableObject, IDisposable
     {
         [ObservableProperty]
         private object? _currentView;
@@ -64,6 +65,30 @@ namespace Colorlog.ViewModels
             };
 
             _ = LoadUserStatsAsync(userId);
+
+            WeakReferenceMessenger.Default.Register<ProfileSwitchedMessage>(this, (r, m) =>
+            {
+                var newUserId = m.Value;
+                LiveAnalysisViewModel.CurrentUserId = newUserId;
+                HistoryViewModel.UpdateUserId(newUserId);
+                DashboardViewModel.UpdateUserId(newUserId);
+                _ = LoadUserStatsAsync(newUserId);
+            });
+
+            WeakReferenceMessenger.Default.Unregister<ProfileSwitchedMessage>(this);
+            WeakReferenceMessenger.Default.Register<ProfileSwitchedMessage>(this, (r, m) =>
+            {
+                var newUserId = m.Value;
+                Debug.WriteLine($"[MainViewModel] 프로필 전환 수신: {newUserId}");
+
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    LiveAnalysisViewModel.CurrentUserId = newUserId;
+                    HistoryViewModel.UpdateUserId(newUserId);
+                    DashboardViewModel.UpdateUserId(newUserId);
+                    _ = LoadUserStatsAsync(newUserId);
+                });
+            });
         }
 
         partial void OnSelectedMenuTagChanged(string value)
@@ -220,6 +245,11 @@ namespace Colorlog.ViewModels
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };
+        }
+
+        public void Dispose()
+        {
+            WeakReferenceMessenger.Default.UnregisterAll(this);
         }
     }
 }

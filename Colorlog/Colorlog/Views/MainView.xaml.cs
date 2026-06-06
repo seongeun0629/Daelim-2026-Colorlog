@@ -1,7 +1,8 @@
+using Colorlog.Platform;
+using Colorlog.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
-using Colorlog.Platform;
 
 namespace Colorlog.Views
 {
@@ -62,6 +63,8 @@ namespace Colorlog.Views
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
+            if (DataContext is MainViewModel vm)
+                vm.Dispose();
             Application.Current.Shutdown();
         }
     }

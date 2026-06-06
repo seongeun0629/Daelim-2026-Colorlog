@@ -10,7 +10,8 @@ namespace Colorlog.ViewModels
     public partial class DashboardViewModel : ObservableObject
     {
         private readonly DatabaseService _databaseService;
-        private readonly int _userId;
+        private int _userId;
+
 
         [ObservableProperty]
         private string _userDisplayName = "사용자";
@@ -118,6 +119,14 @@ namespace Colorlog.ViewModels
             >= 40 => "보통",
             _ => "나쁨"
         };
+
+        public void UpdateUserId(int userId)
+        {
+            Debug.WriteLine($"[Dashboard] UpdateUserId 호출: {userId}");
+
+            _userId = userId;
+            LoadFromDatabase();
+        }
     }
 
     public sealed class ColorChip
