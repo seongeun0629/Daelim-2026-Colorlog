@@ -92,10 +92,74 @@ namespace Colorlog.ViewModels
                     SkinMetrics.Add(new SkinMetric("밝기 지수", diagnosis.Brightness, 100,
                         GetMetricLabel(diagnosis.Brightness), "#FF22C55E"));
 
+                    if (diagnosis.OilyScore.HasValue)
+                    {
+                        var oilyInt = (int)diagnosis.OilyScore.Value;
+                        var oilyLabel = diagnosis.OilyStatus switch
+                        {
+                            "Oily" => "유분 많음",
+                            "Normal" => "정상",
+                            "Not Oily" => "건조",
+                            _ => "-"
+                        };
+                        SkinMetrics.Add(new SkinMetric("유분 지수", oilyInt, 100, oilyLabel, "#FF8B5CF6"));
+                    }
+
                     // BestColors — personal_color_types에서 가져오기
-                    // (나중에 교체!!!!!, 지금은 진단 타입 기반 색상 표시)
                     BestColors.Clear();
-                    BestColors.Add(new ColorChip(PersonalColorName, "#FFDAB9A5"));
+                    if (diagnosis.TypeId > 0)
+                    {
+                        var colorNames = _databaseService.GetColorsByTypeId(diagnosis.TypeId);
+                        var colorMap = new Dictionary<string, string>
+                        {
+                            { "피치",         "#FFFFA07A" },
+                            { "살구색",       "#FFFFD4A8" },
+                            { "아이보리",     "#FFFFF0E0" },
+                            { "연한 코랄",    "#FFFF9988" },
+                            { "코랄",         "#FFFF6B6B" },
+                            { "오렌지",       "#FFFFA500" },
+                            { "선명한 노랑",  "#FFFFE066" },
+                            { "밝은 그린",    "#FF90EE90" },
+                            { "라벤더",       "#FFE6CCFF" },
+                            { "파우더핑크",   "#FFFFB6C1" },
+                            { "블루",         "#FFADD8E6" },
+                            { "민트",         "#FF98FFD2" },
+                            { "로즈",         "#FFFF9999" },
+                            { "모브",         "#FFCC99BB" },
+                            { "회색빛 블루",  "#FF99AABB" },
+                            { "연보라",       "#FFCC99FF" },
+                            { "브라운",       "#FFA0785A" },
+                            { "버건디",       "#FF8B1A2A" },
+                            { "카키",         "#FF8B8B6B" },
+                            { "올리브",       "#FF808000" },
+                            { "베이지",       "#FFF5F0E8" },
+                            { "머스타드",     "#FFFFE066" },
+                            { "테라코타",     "#FFCC6644" },
+                            { "카멜",         "#FFC19A6B" },
+                            { "블랙",         "#FF2D2D2D" },
+                            { "화이트",       "#FFF8F8F8" },
+                            { "선명한 레드",  "#FFEE1122" },
+                            { "로얄블루",     "#FF4169E1" },
+                            { "네이비",       "#FF001F5B" },
+                            { "다크 버건디",  "#FF5C0A14" },
+                            { "차콜",         "#FF444444" },
+                            { "다크 플럼",    "#FF4A0040" },
+                            { "누드",         "#FFE8CEB0" },
+                            { "그레이지",     "#FFBDB5A6" },
+                            { "내추럴 베이지","#FFF0DEC0" },
+                            { "소프트 화이트","#FFF5F5F0" },
+                        };
+
+                        foreach (var name in colorNames)
+                        {
+                            var hex = colorMap.TryGetValue(name, out var h) ? h : "#FFDAB9A5";
+                            BestColors.Add(new ColorChip(name, hex));
+                        }
+                    }
+                    else
+                    {
+                        BestColors.Add(new ColorChip(PersonalColorName, "#FFDAB9A5"));
+                    }
                 }
                 else
                 {
@@ -105,6 +169,7 @@ namespace Colorlog.ViewModels
                     SkinMetrics.Clear();
                     SkinMetrics.Add(new SkinMetric("홍조 지수", 0, 100, "-", "#FFFB923C"));
                     SkinMetrics.Add(new SkinMetric("밝기 지수", 0, 100, "-", "#FF22C55E"));
+                    SkinMetrics.Add(new SkinMetric("유분 지수", 0, 100, "-", "#FF8B5CF6"));
                 }
             }
             catch (Exception ex)

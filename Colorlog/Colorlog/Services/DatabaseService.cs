@@ -82,11 +82,11 @@ namespace Colorlog.Services
         {
             using var connection = OpenConnection();
             using var cmd = new SqliteCommand(@"
-        UPDATE users
-        SET user_name = $userName,
-            gender    = $gender,
-            age       = $age
-        WHERE user_id = $userId;", connection);
+                UPDATE users
+                SET user_name = $userName,
+                    gender    = $gender,
+                    age       = $age
+                WHERE user_id = $userId;", connection);
 
             cmd.Parameters.AddWithValue("$userName", userName);
             cmd.Parameters.AddWithValue("$gender", (object?)gender ?? DBNull.Value);
@@ -155,9 +155,9 @@ namespace Colorlog.Services
         {
             using var connection = OpenConnection();
             using var cmd = new SqliteCommand(@"
-        SELECT user_id, user_name, gender, age, profile_image_path
-        FROM users
-        WHERE user_id = $userId;", connection);
+                SELECT user_id, user_name, gender, age, profile_image_path
+                FROM users
+                WHERE user_id = $userId;", connection);
             cmd.Parameters.AddWithValue("$userId", userId);
 
             using var reader = cmd.ExecuteReader();
@@ -313,8 +313,8 @@ namespace Colorlog.Services
                         Redness = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
                         PersonalColorName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
                         TypeId = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
-                        OilyStatus = reader.IsDBNull(5) ? null : reader.GetString(5),  // ✅
-                        OilyScore = reader.IsDBNull(6) ? null : reader.GetDouble(6),  // ✅
+                        OilyStatus = reader.IsDBNull(5) ? null : reader.GetString(5),  
+                        OilyScore = reader.IsDBNull(6) ? null : reader.GetDouble(6),  
                     };
                 }
             }
@@ -323,6 +323,30 @@ namespace Colorlog.Services
                 Debug.WriteLine($"[DB] GetLatestDiagnosis 오류: {ex.Message}");
             }
             return null;
+        }
+
+        public List<string> GetColorsByTypeId(int typeId)
+        {
+            var result = new List<string>();
+            try
+            {
+                using var connection = OpenConnection();
+                using var cmd = new SqliteCommand(@"
+            SELECT colors FROM personal_color_types
+            WHERE type_id = $typeId;", connection);
+                cmd.Parameters.AddWithValue("$typeId", typeId);
+
+                var colors = cmd.ExecuteScalar()?.ToString();
+                if (!string.IsNullOrEmpty(colors))
+                    result = colors.Split(',')
+                                   .Select(c => c.Trim())
+                                   .ToList();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DB] GetColorsByTypeId 오류: {ex.Message}");
+            }
+            return result;
         }
     }
 }

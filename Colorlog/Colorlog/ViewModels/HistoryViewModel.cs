@@ -149,6 +149,11 @@ public partial class HistoryViewModel : ObservableObject
         RebuildCalendarGrid();
     }
 
+    public void OnChartSizeChanged(double width, double height)
+    {
+        RebuildWeeklyGeometry();
+    }
+
     partial void OnSelectedCellChanged(CalendarCellVm? value) => UpdateSelectedDetail(value);
 
     [RelayCommand] private void SelectBrightness() => ShowBrightness = true;

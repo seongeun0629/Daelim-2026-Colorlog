@@ -11,6 +11,7 @@ namespace Colorlog.Models
         public string DiagnosisAt { get; set; } = string.Empty;
         public int Brightness { get; set; }
         public int Redness { get; set; }
+        public int TypeId { get; set; }
         public string PersonalColorName { get; set; } = string.Empty;
         public string? OilyStatus { get; set; }
         public double? OilyScore { get; set; }
