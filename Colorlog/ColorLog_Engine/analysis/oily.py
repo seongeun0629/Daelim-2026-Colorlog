@@ -129,54 +129,34 @@ def analyze_oiliness(frame_bgr, face_landmarks, w: int, h: int) -> Tuple[str, in
     overall_mean_l = float(np.mean(l_channel))
     overall_std_l = float(np.std(l_channel))
 
-    # 밝은 점들이 여러 개로 분산되어 있는지 확인합니다. (최소 크기 필터링 적용)
+    # 밝은 점들이 여러 개로 분산되어 있는지 확인합니다.
     num_labels, _labels, stats, _ = cv2.connectedComponentsWithStats(bright_mask.astype(np.uint8), connectivity=8)
-    # 너무 작은 덩어리(< 20 픽셀)는 제외 — 국소적 하이라이트/노이즈 필터링
-    component_areas = [int(stats[i, cv2.CC_STAT_AREA]) for i in range(1, num_labels) if int(stats[i, cv2.CC_STAT_AREA]) >= 20]
+    component_areas = [int(stats[i, cv2.CC_STAT_AREA]) for i in range(1, num_labels) if int(stats[i, cv2.CC_STAT_AREA]) >= 3]
     component_count = len(component_areas)
     largest_component = max(component_areas) if component_areas else 0
 
     spot_density_score = _clip01(bright_density / 0.025)
-    # T-zone 밀도 임계값을 엄격하게: 0.08 → 0.06 (실제 유분만 카운트)
-    tzone_density_score = _clip01(tzone_density / 0.06)
+    tzone_density_score = _clip01(tzone_density / 0.08)
     tzone_focus_score = _clip01(tzone_focus)
-    # 컴포넌트 스코어를 더 엄격하게: 기준을 3.0 → 2.0으로 높여 많은 작은 덩어리는 최댓값 못 도달하도록
-    component_score = _clip01(component_count / 2.0)
+    component_score = _clip01(component_count / 5.0)
     residual_score = _clip01((residual_strength - 4.0) / 12.0)
-    # 볼의 유분이 많으면 감점 강화: 계수 0.03 → 0.02
-    cheek_penalty = _clip01(1.0 - cheek_density / 0.02)
+    cheek_penalty = _clip01(1.0 - cheek_density / 0.03)
     contrast_gate = _clip01((overall_std_l - 5.0) / 15.0)
     brightness_gate = _clip01((overall_mean_l - 55.0) / 110.0)
 
-    # 기본 점수 구성 재설계: T-zone 중심 (합 = 1.0)
-    # - T-zone 밀도(40%) + 집중도(25%) = 65% (T-zone이 주요 지표)
-    # - 전체 밀도(10%) + 컴포넌트(5%) = 15% (보조 지표)
-    # - 잔차(10%) + 페널티(10%) = 20% (보정)
     base_score = (
-        0.10 * spot_density_score       # 내려감: 25% → 10% (전체 밀도 감소)
-        + 0.05 * component_score        # 내려감: 20% → 5% (컴포넌트 감소 + 크기 필터링)
-        + 0.40 * tzone_density_score    # 올려감: 25% → 40% (T-zone 밀도 강조)
-        + 0.25 * tzone_focus_score      # 올려감: 15% → 25% (T-zone 집중도 강조)
-        + 0.10 * residual_score         # 내려감: 15% → 10%
-        + 0.10 * (1.0 - cheek_penalty)  # 추가: 10% (볼에 많으면 감점)
+        0.25 * spot_density_score
+        + 0.20 * component_score
+        + 0.25 * tzone_density_score
+        + 0.15 * tzone_focus_score
+        + 0.15 * residual_score
     )
-    score01 = base_score * (0.55 + 0.45 * contrast_gate) * (0.55 + 0.45 * brightness_gate)
-    
-    # T-zone 집중도 게이트: T-zone에 집중되지 않으면 점수 페널티
-    # tzone_focus < 0.30이면 점수 반감 (T-zone에 집중된 유분이 아니면 무시)
-    if tzone_focus < 0.30:
-        score01 *= 0.5
-    elif tzone_focus < 0.50:
-        score01 *= (0.5 + 0.5 * tzone_focus / 0.50)  # 0.30~0.50 범위에서 선형 보정
-    
+    score01 = base_score * (0.55 + 0.45 * contrast_gate) * (0.55 + 0.45 * brightness_gate) * (0.65 + 0.35 * cheek_penalty)
     score = int(round(np.clip(score01, 0.0, 1.0) * 100.0))
 
-    # 조정된 판정 기준: T-zone 중심의 엄격한 기준
-    # 이전: Oily >= 55, Possibly Oily >= 35
-    # 개선: Oily >= 65, Possibly Oily >= 45 (Normal 이미지와의 구분을 위해 기준 상향)
     if score >= 65:
         status = "Oily"
-    elif score >= 45:
+    elif score >= 40:
         status = "Possibly Oily"
     else:
         status = "Not Oily"

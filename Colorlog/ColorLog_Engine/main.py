@@ -1,4 +1,3 @@
-# main.py
 import argparse
 import cv2
 import mediapipe as mp
@@ -14,7 +13,9 @@ from core.json_output import JsonOutputThrottler
 from db import (
     create_tables, seed_personal_color_types, seed_products,
     get_or_create_user, add_diagnosis, get_color_type_by_name,
+    save_ai_recommendations, get_recommended_products, add_rec_product,
 )
+from db.recommendation import get_ai_recommendation
 
 DB_SAVE_THRESHOLD = 30
 
@@ -38,11 +39,9 @@ def main():
 
     options = build_landmarker_options()
 
-    # 동영상 또는 카메라 선택
     if args.video:
         cap = cv2.VideoCapture(args.video)
     else:
-        # cap = cv2.VideoCapture(0)  # 실제 카메라 사용 시 주석 해제
         cap = cv2.VideoCapture(0)
 
     timestamp = 0
@@ -76,7 +75,7 @@ def main():
                             "b": lab.get("b", 0.0),
                         })
 
-                        # sample_buffer에 추가한 후에 진행률 계산
+                        # 진행률 계산
                         frame_data["diagnosis_progress"] = min(
                             int(len(sample_buffer) / DB_SAVE_THRESHOLD * 100), 95
                         )
@@ -86,6 +85,7 @@ def main():
                             avg_L = float(sum(s["L"] for s in sample_buffer)) / n
                             avg_a = float(sum(s["a"] for s in sample_buffer)) / n
                             avg_b = float(sum(s["b"] for s in sample_buffer)) / n
+
                             best_type_name = Counter(s["type"] for s in sample_buffer).most_common(1)[0][0]
                             color_type = get_color_type_by_name(best_type_name)
                             type_id = color_type["type_id"] if color_type else None
@@ -103,6 +103,37 @@ def main():
                                 type_id=type_id,
                             )
 
+                            # AI 제품 추천 (실패 시 더미 시드 폴백)
+                            preferred_style = color_type.get("keyword", "") if color_type else ""
+                            ai_recs = get_ai_recommendation(
+                                best_type_name, preferred_style,
+                                brightness=brightness_val,
+                                redness=redness_val,
+                            )
+
+                            if ai_recs:
+                                recommendations = save_ai_recommendations(diagnosis_id, ai_recs)
+                            else:
+                                tone_type = "쿨" if "쿨" in best_type_name else "웜"
+                                fallback = get_recommended_products(tone_type)
+                                makeup_cats = {"치크", "립", "아이", "베이스"}
+                                makeup_items = [p for p in fallback if p.get("category") in makeup_cats][:3]
+                                skincare_items = [p for p in fallback if p.get("category") not in makeup_cats][:2]
+                                selected = makeup_items + skincare_items
+                                recommendations = [
+                                    {
+                                        "product_id": p["product_id"],
+                                        "product_name": p.get("product_name", ""),
+                                        "product_url": p.get("product_url", ""),
+                                        "category": p.get("category", ""),
+                                        "reason": "퍼스널컬러 기반 추천",
+                                    }
+                                    for p in selected
+                                ]
+                                for item in recommendations:
+                                    add_rec_product(item["product_id"], diagnosis_id, item["reason"])
+
+                            frame_data["recommendations"] = recommendations
                             frame_data["diagnosis_saved"] = True
                             frame_data["diagnosis_id"] = diagnosis_id
                             frame_data["user_id"] = user_id
@@ -114,7 +145,6 @@ def main():
                                 "keyword": color_type["keyword"] if color_type else None,
                             }
                             diagnosis_saved = True
-                            # throttle을 우회하여 diagnosis_saved 프레임을 즉시 강제 출력
                             output.last_output_time = 0
 
                 output.emit(frame_data)

@@ -1,11 +1,10 @@
 from datetime import datetime
-from typing import Optional, List, Dict
 from .schema import get_connection
 
 
 # ── personal_color_types ─────────────────────────────────────────────────────
 
-def get_color_type(type_id: int) -> Optional[dict]: 
+def get_color_type(type_id: int) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM personal_color_types WHERE type_id = ?", (type_id,))
@@ -14,7 +13,7 @@ def get_color_type(type_id: int) -> Optional[dict]:
     return dict(row) if row else None
 
 
-def get_color_type_by_name(type_name: str) -> Optional[dict]:
+def get_color_type_by_name(type_name: str) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM personal_color_types WHERE type_name = ?", (type_name,))
@@ -23,7 +22,7 @@ def get_color_type_by_name(type_name: str) -> Optional[dict]:
     return dict(row) if row else None
 
 
-def get_all_color_types() -> List[dict]:
+def get_all_color_types() -> list[dict]:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM personal_color_types ORDER BY type_id")
@@ -70,7 +69,7 @@ def get_or_create_user(user_name: str, gender: str = None, age: str = None) -> i
     return new_id
 
 
-def get_user(user_id: int) -> Optional[dict]:
+def get_user(user_id: int) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
@@ -79,7 +78,7 @@ def get_user(user_id: int) -> Optional[dict]:
     return dict(row) if row else None
 
 
-def get_all_users() -> List[dict]:
+def get_all_users() -> list[dict]:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users ORDER BY created_at DESC")
@@ -158,7 +157,7 @@ def add_diagnosis(
     return new_id
 
 
-def get_diagnosis(diagnosis_id: int) -> Optional[dict]:
+def get_diagnosis(diagnosis_id: int) -> dict | None:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM diagnosis WHERE diagnosis_id = ?", (diagnosis_id,))
@@ -167,7 +166,7 @@ def get_diagnosis(diagnosis_id: int) -> Optional[dict]:
     return dict(row) if row else None
 
 
-def get_diagnoses_by_user(user_id: int) -> List[dict]:
+def get_diagnoses_by_user(user_id: int) -> list[dict]:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -179,7 +178,7 @@ def get_diagnoses_by_user(user_id: int) -> List[dict]:
     return [dict(row) for row in rows]
 
 
-def get_diagnoses_by_month(user_id: int, year: int, month: int) -> List[dict]:
+def get_diagnoses_by_month(user_id: int, year: int, month: int) -> list[dict]:
     """달력 뷰용: 특정 월의 날짜별 최신 진단 1건씩 반환한다."""
     conn = get_connection()
     cursor = conn.cursor()
@@ -205,7 +204,7 @@ def get_diagnoses_by_month(user_id: int, year: int, month: int) -> List[dict]:
     return [dict(row) for row in rows]
 
 
-def get_diagnoses_last_7days(user_id: int) -> List[dict]:
+def get_diagnoses_last_7days(user_id: int) -> list[dict]:
     """주간 트렌드용: 최근 7일 날짜별 최신 진단 1건씩 반환한다."""
     conn = get_connection()
     cursor = conn.cursor()
@@ -269,7 +268,7 @@ def delete_user(user_id: int) -> None:
 
 # ── products / rec_products ───────────────────────────────────────────────────
 
-def get_recommended_products(tone_type: str) -> List[dict]:
+def get_recommended_products(tone_type: str) -> list[dict]:
     """퍼스널컬러 톤(웜/쿨)에 맞는 추천 제품 목록을 반환한다."""
     conn = get_connection()
     cursor = conn.cursor()
@@ -295,7 +294,7 @@ def add_rec_product(product_id: int, diagnosis_id: int, rec_reason: str = None) 
     return new_id
 
 
-def get_rec_products_by_diagnosis(diagnosis_id: int) -> List[dict]:
+def get_rec_products_by_diagnosis(diagnosis_id: int) -> list[dict]:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -309,3 +308,37 @@ def get_rec_products_by_diagnosis(diagnosis_id: int) -> List[dict]:
     rows = cursor.fetchall()
     conn.close()
     return [dict(row) for row in rows]
+
+
+def save_ai_recommendations(diagnosis_id: int, recommendations: list[dict]) -> list[dict]:
+    """AI 추천 결과를 products + rec_products에 저장. 저장된 레코드 리스트 반환."""
+    conn = get_connection()
+    saved = []
+    for item in recommendations:
+        cur = conn.execute(
+            """INSERT INTO products (product_url, product_name, keyword, category, tone_type)
+               VALUES (?, ?, ?, ?, ?)""",
+            (
+                item.get("product_url", ""),
+                item.get("product_name", ""),
+                item.get("keyword", ""),
+                item.get("category", ""),
+                item.get("tone_type", ""),
+            ),
+        )
+        product_id = cur.lastrowid
+        conn.execute(
+            """INSERT INTO rec_products (product_id, diagnosis_id, rec_reason)
+               VALUES (?, ?, ?)""",
+            (product_id, diagnosis_id, item.get("reason", "")),
+        )
+        saved.append({
+            "product_id": product_id,
+            "product_name": item.get("product_name", ""),
+            "product_url": item.get("product_url", ""),
+            "category": item.get("category", ""),
+            "reason": item.get("reason", ""),
+        })
+    conn.commit()
+    conn.close()
+    return saved
