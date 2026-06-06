@@ -142,15 +142,19 @@ def add_diagnosis(
     redness: int,
     type_id: int = None,
     note: str = None,
+    oily_status: str = None,   
+    oily_score: float = None,
 ) -> int:
     conn = get_connection()
     cursor = conn.cursor()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute("""
         INSERT INTO diagnosis
-            (diagnosis_at, lab_l, lab_a, lab_b, brightness, redness, note, type_id, user_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (now, lab_l, lab_a, lab_b, brightness, redness, note, type_id, user_id))
+            (diagnosis_at, lab_l, lab_a, lab_b, brightness, redness,
+             oily_status, oily_score, note, type_id, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (now, lab_l, lab_a, lab_b, brightness, redness,
+          oily_status, oily_score, note, type_id, user_id))
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()

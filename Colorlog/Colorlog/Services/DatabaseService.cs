@@ -295,13 +295,13 @@ namespace Colorlog.Services
             {
                 using var connection = OpenConnection();
                 using var cmd = new SqliteCommand(@"
-                    SELECT d.diagnosis_at, d.brightness, d.redness, pct.type_name
+                    SELECT d.diagnosis_at, d.brightness, d.redness, pct.type_name, d.type_id,
+                           d.oily_status, d.oily_score
                     FROM diagnosis d
                     LEFT JOIN personal_color_types pct ON d.type_id = pct.type_id
                     WHERE d.user_id = $userId
                     ORDER BY d.diagnosis_at DESC
                     LIMIT 1;", connection);
-                cmd.Parameters.AddWithValue("$userId", userId);
 
                 using var reader = cmd.ExecuteReader();
                 if (reader.Read())
@@ -311,7 +311,10 @@ namespace Colorlog.Services
                         DiagnosisAt = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
                         Brightness = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
                         Redness = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
-                        PersonalColorName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3)
+                        PersonalColorName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                        TypeId = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
+                        OilyStatus = reader.IsDBNull(5) ? null : reader.GetString(5),  // ✅
+                        OilyScore = reader.IsDBNull(6) ? null : reader.GetDouble(6),  // ✅
                     };
                 }
             }

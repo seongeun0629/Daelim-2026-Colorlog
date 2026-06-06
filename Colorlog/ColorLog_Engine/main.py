@@ -93,6 +93,11 @@ def main():
                             brightness_val = int(min(100, max(0, avg_L)))
                             redness_val = int(min(100, max(0, avg_a + 50)))
 
+                            # oily 데이터 추출
+                            oily_data = frame_data.get("oily", {})
+                            oily_status_val = oily_data.get("status") if oily_data else None
+                            oily_score_val = oily_data.get("score") if oily_data else None
+
                             diagnosis_id = add_diagnosis(
                                 user_id=user_id,
                                 lab_l=avg_L,
@@ -101,6 +106,8 @@ def main():
                                 brightness=brightness_val,
                                 redness=redness_val,
                                 type_id=type_id,
+                                oily_status=oily_status_val,   
+                                oily_score=oily_score_val,     
                             )
 
                             # AI 제품 추천 (실패 시 더미 시드 폴백)

@@ -75,6 +75,25 @@ def create_tables():
         )
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS diagnosis (
+        diagnosis_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+        diagnosis_at    TEXT    NOT NULL,
+        lab_l           REAL,
+        lab_a           REAL,
+        lab_b           REAL,
+        brightness      INTEGER,
+        redness         INTEGER,
+        oily_status     TEXT,
+        oily_score      REAL,
+        note            TEXT,
+        type_id         INTEGER,
+        user_id         INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(user_id),
+        FOREIGN KEY (type_id) REFERENCES personal_color_types(type_id)
+    )
+""")
+
     conn.commit()
     conn.close()
     _migrate()
@@ -131,6 +150,8 @@ def _migrate():
             ("lab_l",      "REAL"),
             ("lab_a",      "REAL"),
             ("lab_b",      "REAL"),
+            ("oily_status",  "TEXT"),    
+            ("oily_score",   "REAL"),    
         ]:
             if col not in diag_cols:
                 cursor.execute(f"ALTER TABLE diagnosis ADD COLUMN {col} {typedef}")
