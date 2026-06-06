@@ -54,7 +54,7 @@ namespace Colorlog.ViewModels
                 CurrentUserId = userId
             };
             HistoryViewModel = new HistoryViewModel(databaseService, userId);
-            BeautyLogViewModel = new BeautyLogViewModel();
+            BeautyLogViewModel = new BeautyLogViewModel(databaseService, userId);
 
             UpdateView();
 

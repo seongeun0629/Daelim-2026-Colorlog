@@ -348,5 +348,45 @@ namespace Colorlog.Services
             }
             return result;
         }
+
+        public List<RecommendedProduct> GetLatestRecommendations(int userId)
+        {
+            var result = new List<RecommendedProduct>();
+            try
+            {
+                using var connection = OpenConnection();
+                using var cmd = new SqliteCommand(@"
+                    SELECT p.product_name, p.category, p.product_url, r.rec_reason
+                    FROM rec_products r
+                    JOIN products p ON r.product_id = p.product_id
+                    WHERE r.diagnosis_id = (
+                        SELECT diagnosis_id FROM diagnosis
+                        WHERE user_id = $userId
+                        ORDER BY diagnosis_at DESC
+                        LIMIT 1
+                    )
+                    ORDER BY r.rec_id;", connection);
+                cmd.Parameters.AddWithValue("$userId", userId);
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    result.Add(new RecommendedProduct
+                    {
+                        ProductName = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
+                        Category = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                        ProductUrl = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                        RecReason = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DB] GetLatestRecommendations 오류: {ex.Message}");
+            }
+            return result;
+        }
     }
+
+
 }
