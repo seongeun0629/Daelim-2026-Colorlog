@@ -231,7 +231,7 @@
 
                                 <!-- 진단 중지 -->
                                 <Button Content="진단 중지" Width="120" Margin="8,0,0,0"
-            Command="{Binding StopAnalysisCommand}">
+                                        Command="{Binding StopAnalysisCommand}">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource AccentOutlinePillButtonStyle}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -246,7 +246,7 @@
 
                                 <!-- 다시 진단 -->
                                 <Button Content="다시 진단" Width="120" Margin="8,0,0,0"
-            Command="{Binding StartAnalysisCommand}">
+                                        Command="{Binding StartAnalysisCommand}">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource AccentPillButtonStyle}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -321,6 +321,7 @@
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -338,8 +339,61 @@
                             </ItemsControl>
                         </StackPanel>
                     </Border>
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="유분 상태" Style="{StaticResource AnalysisCardTitleStyle}"/>
+                            <TextBlock Text="실시간 피부 유분 감지 결과" Margin="0,4,0,12"
+                       Style="{StaticResource AnalysisCardSubTextStyle}"/>
 
-                    <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+                            <Border Padding="14,12" Style="{StaticResource LiquidGlassInsetStyle}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 상태 아이콘 -->
+                                    <Border Width="36" Height="36" CornerRadius="18"
+                                            Background="{Binding OilyStateBrush}"
+                                            Opacity="0.15"
+                                            Margin="0,0,12,0"/>
+                                    <Ellipse Width="36" Height="36"
+                                            Fill="{Binding OilyStateBrush}"
+                                            Opacity="0.15"
+                                            Margin="0,0,12,0"/>
+
+                                    <!-- 상태 텍스트 -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding OilyStatusText}"
+                                                FontSize="14" FontWeight="SemiBold"
+                                                Foreground="{StaticResource TitleTextBrush}"/>
+                                        <TextBlock Text="{Binding OilyScore, StringFormat=유분 지수: {0:F1}}"
+                                                    FontSize="11"
+                                                    Foreground="{StaticResource MutedTextBrush}"
+                                                    Margin="0,2,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- 상태 배지 -->
+                                    <Border Grid.Column="2" CornerRadius="12" Padding="10,4"
+                                        Background="{Binding OilyStateBrush}"
+                                        Opacity="0.15"
+                                        VerticalAlignment="Center"/>
+                                    <Border Grid.Column="2" CornerRadius="12" Padding="10,4"
+                                            VerticalAlignment="Center">
+                                        <Border.Background>
+                                            <SolidColorBrush Color="Transparent"/>
+                                        </Border.Background>
+                                        <TextBlock Text="{Binding OilyStatus}"
+                                            FontSize="11" FontWeight="SemiBold"
+                                            Foreground="{Binding OilyStateBrush}"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="2" Style="{StaticResource CardStyle}">
                         <StackPanel>
                             <TextBlock Text="실시간 결과 미리보기" Style="{StaticResource AnalysisCardTitleStyle}"/>
                             <TextBlock Text="분석 중 감지되는 얼굴 부위별 색상값" Margin="0,8,0,14" Style="{StaticResource AnalysisCardSubTextStyle}"/>

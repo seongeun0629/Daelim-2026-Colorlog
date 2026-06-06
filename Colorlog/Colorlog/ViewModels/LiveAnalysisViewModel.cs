@@ -48,6 +48,11 @@ namespace Colorlog.ViewModels
         [ObservableProperty] private BitmapSource? _cameraSource;
         [ObservableProperty] private bool _isAnalyzing;
 
+        [ObservableProperty] private string _oilyStatus = "-";
+        [ObservableProperty] private double _oilyScore = 0;
+        [ObservableProperty] private string _oilyStatusText = "유분 분석 대기 중";
+        [ObservableProperty] private Brush _oilyStateBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF6B7280"));
+
         private readonly SettingsViewModel? _settingsViewModel;
         private VideoCapture? _capture;
         private DispatcherTimer? _cameraTimer;
@@ -111,6 +116,27 @@ namespace Colorlog.ViewModels
                 var lightingStatus = json["lighting"]?["status"]?.ToString();
                 if (lightingStatus != null)
                     IsLightingGood = lightingStatus == "Good";
+
+                var oily = json["oily"];
+                if (oily != null)
+                {
+                    OilyStatus = oily["status"]?.ToString() ?? "-";
+                    OilyScore = oily["score"]?.Value<double>() ?? 0;
+                    OilyStatusText = OilyStatus switch
+                    {
+                        "Oily" => "유분 많음 🫧",
+                        "Normal" => "유분 정상 ✅",
+                        "Dry" => "건조함 💧",
+                        _ => "분석 중"
+                    };
+                    OilyStateBrush = OilyStatus switch
+                    {
+                        "Oily" => WarningStateBrush,
+                        "Normal" => HealthyStateBrush,
+                        "Dry" => DangerStateBrush,
+                        _ => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF6B7280"))
+                    };
+                }
 
                 if (IsFaceDetected)
                 {

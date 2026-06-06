@@ -24,25 +24,30 @@ def main():
     parser.add_argument("--user-name", default="사용자", help="사용자 이름")
     parser.add_argument("--age", default=None, help="나이대 예: 20대")
     parser.add_argument("--user-id", type=int, default=None, help="C#에서 전달하는 확정 user_id")
+    parser.add_argument("--video", default=None, help="테스트용 동영상 파일 경로")
     args = parser.parse_args()
 
     create_tables()
     seed_personal_color_types()
     seed_products()
 
-    # C#이 user_id를 넘겨주면 그대로 사용, 없으면 이름으로 find-or-create
     if args.user_id is not None:
         user_id = args.user_id
     else:
         user_id = get_or_create_user(args.user_name, age=args.age)
 
     options = build_landmarker_options()
-    cap = cv2.VideoCapture(0)
-    timestamp = 0
 
+    # 동영상 또는 카메라 선택
+    if args.video:
+        cap = cv2.VideoCapture(args.video)
+    else:
+        # cap = cv2.VideoCapture(0)  # 실제 카메라 사용 시 주석 해제
+        cap = cv2.VideoCapture(0)
+
+    timestamp = 0
     smoother = SkinToneSmoother(buffer_size=10)
     output = JsonOutputThrottler(interval_seconds=OUTPUT_INTERVAL_SECONDS)
-
     sample_buffer = []
     diagnosis_saved = False
 
@@ -58,7 +63,8 @@ def main():
                 timestamp += TIMESTAMP_STEP_MS
 
                 result = detect_face(landmarker, mp_image, timestamp, use_video_mode=True)
-                frame_data = process_frame(frame, result, timestamp, smoother) 
+                frame_data = process_frame(frame, result, timestamp, smoother)
+
                 if not diagnosis_saved:
                     pc = frame_data.get("personal_color")
                     if pc:
@@ -70,17 +76,16 @@ def main():
                             "b": lab.get("b", 0.0),
                         })
 
-                        # ✅ sample_buffer에 추가한 후에 진행률 계산
+                        # sample_buffer에 추가한 후에 진행률 계산
                         frame_data["diagnosis_progress"] = min(
                             int(len(sample_buffer) / DB_SAVE_THRESHOLD * 100), 95
                         )
 
                         if len(sample_buffer) >= DB_SAVE_THRESHOLD:
                             n = len(sample_buffer)
-                            avg_L = sum(s["L"] for s in sample_buffer) / n
-                            avg_a = sum(s["a"] for s in sample_buffer) / n
-                            avg_b = sum(s["b"] for s in sample_buffer) / n
-
+                            avg_L = float(sum(s["L"] for s in sample_buffer)) / n
+                            avg_a = float(sum(s["a"] for s in sample_buffer)) / n
+                            avg_b = float(sum(s["b"] for s in sample_buffer)) / n
                             best_type_name = Counter(s["type"] for s in sample_buffer).most_common(1)[0][0]
                             color_type = get_color_type_by_name(best_type_name)
                             type_id = color_type["type_id"] if color_type else None

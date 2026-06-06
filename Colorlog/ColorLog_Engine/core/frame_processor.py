@@ -13,7 +13,6 @@ def build_frame_payload(timestamp):
         "lighting": None,
         "lighting_debug": None,
         "oily": None,
-        "oily_debug": None,
         "skin_tone": None,
         "personal_color": None,
     }
@@ -29,7 +28,7 @@ def process_frame(frame, result, timestamp, smoother):
         ema_beta=0.8,
     )
     smoother._wb_prev_gain_rgb = np.array(wb_debug["gain_rgb"], dtype=np.float32)
-    frame_data["lighting_debug"] = wb_debug
+    # frame_data["lighting_debug"] = wb_debug
 
     if not result.face_landmarks:
         return frame_data
@@ -47,7 +46,6 @@ def process_frame(frame, result, timestamp, smoother):
     # 유분 분석
     oily_status, oily_score, oily_debug = analyze_oiliness(corrected_frame, face_landmarks, w, h)
     frame_data["oily"] = {"status": oily_status, "score": oily_score}
-    frame_data["oily_debug"] = oily_debug
 
     # 피부톤 스무딩 (전체 평균 — 버퍼 유지용)
     tone_rgb = smoother.update_and_get_smoothed_tone(corrected_frame, face_landmarks, w, h)
