@@ -178,6 +178,12 @@ def _migrate():
         cursor.execute("ALTER TABLE products ADD COLUMN tone_type TEXT")
         conn.commit()
 
+    cursor.execute("PRAGMA table_info(users)")
+    user_cols = {row["name"] for row in cursor.fetchall()}
+    if "preferred_style" not in user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN preferred_style TEXT")
+        conn.commit()
+
     conn.close()
 
 

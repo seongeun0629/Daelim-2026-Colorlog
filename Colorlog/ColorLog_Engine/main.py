@@ -100,6 +100,14 @@ def main():
                             oily_status_val = oily_data.get("status") if oily_data else None
                             oily_score_val = oily_data.get("score") if oily_data else None
 
+                            skin = frame_data.get("skin_tone", {})
+
+                            def get_zone(key):
+                                zone = skin.get(key)
+                                if zone and isinstance(zone, dict):
+                                    return (int(zone.get("r", 0)), int(zone.get("g", 0)), int(zone.get("b", 0)))
+                                return None
+
                             diagnosis_id = add_diagnosis(
                                 user_id=user_id,
                                 lab_l=avg_L, lab_a=avg_a, lab_b=avg_b,
@@ -110,8 +118,7 @@ def main():
                                 zone_lcheek=get_zone("left_cheek"),   
                                 zone_rcheek=get_zone("right_cheek"),  
                                 zone_nose=get_zone("nose"),           
-                                zone_chin=get_zone("chin"),
-                                
+                                zone_chin=get_zone("chin"),           
                             )
 
                             monthly_stats = get_monthly_stats(user_id)
