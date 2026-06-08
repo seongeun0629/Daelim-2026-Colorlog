@@ -25,3 +25,5 @@ from .repository import (
 )
 
 from .recommendation import get_ai_recommendation
+
+from .repository import update_preferred_style, get_preferred_style

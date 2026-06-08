@@ -284,6 +284,83 @@ namespace Colorlog.Services
             cmd.ExecuteNonQuery();
         }
 
+        public UserStatsDto GetUserStats(int userId)
+        {
+            try
+            {
+                using var connection = OpenConnection();
+
+                using var countCmd = new SqliteCommand(
+                    "SELECT COUNT(*) FROM diagnosis WHERE user_id = $userId;", connection);
+                countCmd.Parameters.AddWithValue("$userId", userId);
+                var count = Convert.ToInt32(countCmd.ExecuteScalar());
+
+                using var joinCmd = new SqliteCommand(
+                    "SELECT created_at FROM users WHERE user_id = $userId;", connection);
+                joinCmd.Parameters.AddWithValue("$userId", userId);
+                var joinDateStr = joinCmd.ExecuteScalar()?.ToString() ?? string.Empty;
+                var joinDate = string.Empty;
+                if (DateTime.TryParse(joinDateStr, out var dt))
+                    joinDate = dt.ToString("yyyy.MM.dd");
+
+                using var colorCmd = new SqliteCommand(@"
+                    SELECT pct.type_name
+                    FROM diagnosis d
+                    LEFT JOIN personal_color_types pct ON d.type_id = pct.type_id
+                    WHERE d.user_id = $userId
+                    ORDER BY d.diagnosis_at DESC
+                    LIMIT 1;", connection);
+                colorCmd.Parameters.AddWithValue("$userId", userId);
+                var latestColor = colorCmd.ExecuteScalar()?.ToString() ?? string.Empty;
+
+                return new UserStatsDto
+                {
+                    DiagnosisCount = count,
+                    JoinDate = joinDate,
+                    LatestColorType = latestColor,
+                };
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DB] GetUserStats 오류: {ex.Message}");
+                return new UserStatsDto();
+            }
+        }
+
+        public string GetPreferredStyle(int userId)
+        {
+            try
+            {
+                using var connection = OpenConnection();
+                using var cmd = new SqliteCommand(
+                    "SELECT preferred_style FROM users WHERE user_id = $userId;", connection);
+                cmd.Parameters.AddWithValue("$userId", userId);
+                return cmd.ExecuteScalar()?.ToString() ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DB] GetPreferredStyle 오류: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
+        public void UpdatePreferredStyle(int userId, string preferredStyle)
+        {
+            try
+            {
+                using var connection = OpenConnection();
+                using var cmd = new SqliteCommand(
+                    "UPDATE users SET preferred_style = $style WHERE user_id = $userId;", connection);
+                cmd.Parameters.AddWithValue("$style", preferredStyle);
+                cmd.Parameters.AddWithValue("$userId", userId);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DB] UpdatePreferredStyle 오류: {ex.Message}");
+            }
+        }
+
         //-------------------------------
         //대시보드용
         //-------------------------------

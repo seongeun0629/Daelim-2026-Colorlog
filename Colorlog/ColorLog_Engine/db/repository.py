@@ -144,6 +144,11 @@ def add_diagnosis(
     note: str = None,
     oily_status: str = None,   
     oily_score: float = None,
+    zone_forehead: tuple = None,
+    zone_lcheek: tuple = None,  
+    zone_rcheek: tuple = None,    
+    zone_nose: tuple = None,      
+    zone_chin: tuple = None,
 ) -> int:
     conn = get_connection()
     cursor = conn.cursor()
@@ -384,3 +389,25 @@ def get_monthly_stats(user_id: int) -> dict:
         "avg_oily": -1,
         "most_color_type": "",
     }
+
+# ── 추구미 ───────────────────────────────────────────────────
+
+def update_preferred_style(user_id: int, preferred_style: str) -> None:
+    """사용자 추구미 업데이트"""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE users SET preferred_style = ? WHERE user_id = ?",
+        (preferred_style, user_id)
+    )
+    conn.commit()
+    conn.close()
+
+def get_preferred_style(user_id: int) -> str:
+    """사용자 추구미 조회"""
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT preferred_style FROM users WHERE user_id = ?",
+        (user_id,)
+    ).fetchone()
+    conn.close()
+    return row["preferred_style"] or "" if row else ""

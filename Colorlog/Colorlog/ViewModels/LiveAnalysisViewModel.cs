@@ -38,9 +38,9 @@ namespace Colorlog.ViewModels
         [ObservableProperty] private string _analysisPhase = "캘리브레이션";
         [ObservableProperty] private string _analysisPhaseDetail = "카메라 밝기/노출 점검 중";
         [ObservableProperty] private string _guidanceMessage = "얼굴을 가이드 프레임 안에 맞춘 뒤 진단을 시작하세요.";
-        [ObservableProperty] private bool _hasCameraPermission = true;
-        [ObservableProperty] private bool _isFaceDetected = true;
-        [ObservableProperty] private bool _isLightingGood = true;
+        [ObservableProperty] private bool _hasCameraPermission = false;
+        [ObservableProperty] private bool _isFaceDetected = false;
+        [ObservableProperty] private bool _isLightingGood = false;
         [ObservableProperty] private string _bestType = "분석 중...";
         [ObservableProperty] private string _secondType = "-";
         [ObservableProperty] private string _worstType = "-";

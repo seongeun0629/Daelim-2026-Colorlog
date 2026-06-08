@@ -98,10 +98,31 @@ public partial class SettingsViewModel : ObservableObject
                     && File.Exists(user.ProfileImagePath))
                     ProfileImagePath = user.ProfileImagePath;
             }
+
+            var stats = _databaseService.GetUserStats(userId);
+            if (stats != null)
+            {
+                PersonalColorName = string.IsNullOrEmpty(stats.LatestColorType)
+                    ? "진단 미실시" : stats.LatestColorType;
+                DiagnosisCount = $"{stats.DiagnosisCount}회";
+                JoinDate = stats.JoinDate;
+            }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"초기 유저 정보 로드 실패: {ex.Message}");
+        }
+
+        //추구미 불러오기
+        var savedStyle = _databaseService.GetPreferredStyle(userId);
+        if (!string.IsNullOrEmpty(savedStyle))
+        {
+            var savedItems = savedStyle.Split(',').Select(s => s.Trim()).ToHashSet();
+            foreach (var item in MoodItems.Concat(SkinItems).Concat(ToneItems))
+            {
+                if (savedItems.Contains(item.Label))
+                    item.IsSelected = true;
+            }
         }
     }
 
@@ -189,6 +210,10 @@ public partial class SettingsViewModel : ObservableObject
         PreferenceSelectionSummary = picks.Count == 0
             ? "아직 선택된 항목이 없습니다."
             : $"선택 {picks.Count}개: {string.Join(" · ", picks)}{Environment.NewLine}다음 분석·추천에 반영됩니다.";
+
+        //DB 저장
+        if (_currentUserId > 0 && picks.Count > 0)
+            _databaseService.UpdatePreferredStyle(_currentUserId, string.Join(", ", picks));
     }
 
     [RelayCommand]

@@ -14,7 +14,8 @@ from db import (
     create_tables, seed_personal_color_types, seed_products,
     get_or_create_user, add_diagnosis, get_color_type_by_name,
     save_ai_recommendations, get_recommended_products, add_rec_product,
-    get_monthly_stats,  # ✅ 추가
+    get_monthly_stats,
+    get_user,
 )
 from db.recommendation import get_ai_recommendation
 
@@ -109,7 +110,8 @@ def main():
                                 zone_lcheek=get_zone("left_cheek"),   
                                 zone_rcheek=get_zone("right_cheek"),  
                                 zone_nose=get_zone("nose"),           
-                                zone_chin=get_zone("chin"),           
+                                zone_chin=get_zone("chin"),
+                                
                             )
 
                             monthly_stats = get_monthly_stats(user_id)
@@ -117,7 +119,11 @@ def main():
                             ai_brightness = monthly_stats["avg_brightness"] if monthly_stats["avg_brightness"] >= 0 else brightness_val
                             ai_redness = monthly_stats["avg_redness"] if monthly_stats["avg_redness"] >= 0 else redness_val
 
-                            preferred_style = color_type.get("keyword", "") if color_type else ""
+                            from db.repository import get_user
+                            user_info = get_user(user_id)
+                            user_preferred_style = user_info.get("preferred_style", "") if user_info else ""
+                            preferred_style = user_preferred_style or (color_type.get("keyword", "") if color_type else "")
+
                             ai_recs = get_ai_recommendation(
                                 ai_color_type,
                                 preferred_style,
