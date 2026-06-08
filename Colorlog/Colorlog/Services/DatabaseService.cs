@@ -178,7 +178,6 @@ namespace Colorlog.Services
         public List<HistoryDayRecord> GetDiagnosesLast7Days(int userId)
         {
             var result = new List<HistoryDayRecord>();
-
             try
             {
                 using var connection = OpenConnection();
@@ -191,7 +190,7 @@ namespace Colorlog.Services
                     FROM diagnosis d
                     LEFT JOIN personal_color_types pct ON d.type_id = pct.type_id
                     WHERE d.user_id = $userId
-                      AND d.diagnosis_at >= DATE('now', 'localtime', '-6 days')
+                        AND d.diagnosis_at >= DATE('now', 'localtime', '-6 days')
                     GROUP BY DATE(d.diagnosis_at)
                     HAVING d.diagnosis_id = MAX(d.diagnosis_id)
                     ORDER BY date ASC;", connection);
@@ -219,7 +218,6 @@ namespace Colorlog.Services
             {
                 Debug.WriteLine($"[DB] GetDiagnosesLast7Days 오류: {ex.Message}");
             }
-
             return result;
         }
 
@@ -332,8 +330,8 @@ namespace Colorlog.Services
             {
                 using var connection = OpenConnection();
                 using var cmd = new SqliteCommand(@"
-            SELECT colors FROM personal_color_types
-            WHERE type_id = $typeId;", connection);
+                    SELECT colors FROM personal_color_types
+                    WHERE type_id = $typeId;", connection);
                 cmd.Parameters.AddWithValue("$typeId", typeId);
 
                 var colors = cmd.ExecuteScalar()?.ToString();
@@ -371,12 +369,18 @@ namespace Colorlog.Services
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
+                    var recReason = reader.IsDBNull(3) ? string.Empty : reader.GetString(3);
+                    var parts = recReason.Split('|');
+                    var reason = parts[0];
+                    var rating = parts.Length > 1 ? parts[1] : "-";
+
                     result.Add(new RecommendedProduct
                     {
                         ProductName = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
                         Category = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
                         ProductUrl = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
-                        RecReason = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                        RecReason = reason,
+                        Rating = rating,
                     });
                 }
             }

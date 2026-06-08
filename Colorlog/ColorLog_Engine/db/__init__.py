@@ -21,6 +21,7 @@ from .repository import (
     add_rec_product,
     get_rec_products_by_diagnosis,
     save_ai_recommendations,
+    get_monthly_stats,  
 )
 
 from .recommendation import get_ai_recommendation

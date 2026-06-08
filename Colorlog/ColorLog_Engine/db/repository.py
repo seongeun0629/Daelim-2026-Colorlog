@@ -334,7 +334,7 @@ def save_ai_recommendations(diagnosis_id: int, recommendations: list[dict]) -> l
         conn.execute(
             """INSERT INTO rec_products (product_id, diagnosis_id, rec_reason)
                VALUES (?, ?, ?)""",
-            (product_id, diagnosis_id, item.get("reason", "")),
+            (product_id, diagnosis_id, f"{item.get('reason', '')}|{item.get('rating', '-')}"),
         )
         saved.append({
             "product_id": product_id,
@@ -346,3 +346,41 @@ def save_ai_recommendations(diagnosis_id: int, recommendations: list[dict]) -> l
     conn.commit()
     conn.close()
     return saved
+
+def get_monthly_stats(user_id: int) -> dict:
+    """최근 30일 누적 데이터 평균 및 가장 많이 나온 퍼스널컬러 반환"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT 
+            AVG(d.brightness) as avg_brightness,
+            AVG(d.redness) as avg_redness,
+            AVG(d.oily_score) as avg_oily,
+            pct.type_name,
+            COUNT(*) as cnt
+        FROM diagnosis d
+        LEFT JOIN personal_color_types pct ON d.type_id = pct.type_id
+        WHERE d.user_id = ?
+          AND d.diagnosis_at >= DATE('now', 'localtime', '-30 days')
+        GROUP BY pct.type_name
+        ORDER BY cnt DESC
+        LIMIT 1
+    """, (user_id,))
+    
+    row = cursor.fetchone()
+    conn.close()
+    
+    if row:
+        return {
+            "avg_brightness": round(row["avg_brightness"] or 0),
+            "avg_redness": round(row["avg_redness"] or 0),
+            "avg_oily": round(row["avg_oily"] or 0),
+            "most_color_type": row["type_name"] or "",
+        }
+    return {
+        "avg_brightness": -1,
+        "avg_redness": -1,
+        "avg_oily": -1,
+        "most_color_type": "",
+    }

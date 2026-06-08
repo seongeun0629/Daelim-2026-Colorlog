@@ -14,6 +14,7 @@ from db import (
     create_tables, seed_personal_color_types, seed_products,
     get_or_create_user, add_diagnosis, get_color_type_by_name,
     save_ai_recommendations, get_recommended_products, add_rec_product,
+    get_monthly_stats,  # ✅ 추가
 )
 from db.recommendation import get_ai_recommendation
 
@@ -106,16 +107,22 @@ def main():
                                 brightness=brightness_val,
                                 redness=redness_val,
                                 type_id=type_id,
-                                oily_status=oily_status_val,   
-                                oily_score=oily_score_val,     
+                                oily_status=oily_status_val,
+                                oily_score=oily_score_val,
                             )
 
-                            # AI 제품 추천 (실패 시 더미 시드 폴백)
+                            # ✅ 누적 데이터 기반 AI 추천
+                            monthly_stats = get_monthly_stats(user_id)
+                            ai_color_type = monthly_stats["most_color_type"] or best_type_name
+                            ai_brightness = monthly_stats["avg_brightness"] if monthly_stats["avg_brightness"] >= 0 else brightness_val
+                            ai_redness = monthly_stats["avg_redness"] if monthly_stats["avg_redness"] >= 0 else redness_val
+
                             preferred_style = color_type.get("keyword", "") if color_type else ""
                             ai_recs = get_ai_recommendation(
-                                best_type_name, preferred_style,
-                                brightness=brightness_val,
-                                redness=redness_val,
+                                ai_color_type,
+                                preferred_style,
+                                brightness=ai_brightness,
+                                redness=ai_redness,
                             )
 
                             if ai_recs:

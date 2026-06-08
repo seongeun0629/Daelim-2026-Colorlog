@@ -125,15 +125,17 @@ namespace Colorlog.ViewModels
                     OilyStatusText = OilyStatus switch
                     {
                         "Oily" => "유분 많음 🫧",
+                        "Possibly Oily" => "유분 약간 🫧",  
                         "Normal" => "유분 정상 ✅",
-                        "Dry" => "건조함 💧",
+                        "Not Oily" => "건조함 💧",
                         _ => "분석 중"
                     };
                     OilyStateBrush = OilyStatus switch
                     {
                         "Oily" => WarningStateBrush,
+                        "Possibly Oily" => WarningStateBrush,  
                         "Normal" => HealthyStateBrush,
-                        "Dry" => DangerStateBrush,
+                        "Not Oily" => DangerStateBrush,
                         _ => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF6B7280"))
                     };
                 }

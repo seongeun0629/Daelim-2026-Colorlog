@@ -12,5 +12,6 @@ namespace Colorlog.Models
         public string Category { get; set; } = string.Empty;
         public string ProductUrl { get; set; } = string.Empty;
         public string RecReason { get; set; } = string.Empty;
+        public string Rating { get; set; } = "-";
     }
 }
