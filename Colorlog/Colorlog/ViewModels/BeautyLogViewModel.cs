@@ -55,10 +55,27 @@ namespace Colorlog.ViewModels
 
                 // 최근 진단 요약
                 var diagnosis = _databaseService.GetLatestDiagnosis(_userId);
+                Debug.WriteLine($"[BeautyLog] userId={_userId}, diagnosis={diagnosis?.PersonalColorName ?? "null"}");
+
                 // FocusKeywords 업데이트
                 FocusKeywords.Clear();
                 if (diagnosis != null)
                 {
+                    ToneSummary = string.IsNullOrEmpty(diagnosis.PersonalColorName)
+                        ? "진단 미실시" : diagnosis.PersonalColorName;
+
+                    var oilyText = diagnosis.OilyStatus switch
+                    {
+                        "Oily" => "유분 많음",
+                        "Possibly Oily" => "유분 약간",
+                        "Normal" => "유분 정상",
+                        "Not Oily" => "건조",
+                        _ => "-"
+                    };
+                    SkinConditionSummary = $"밝기 {diagnosis.Brightness} · 붉은기 {diagnosis.Redness} · {oilyText}"; 
+
+                    if (diagnosis.Brightness >= 70) FocusKeywords.Add("밝기 양호");
+
                     if (diagnosis.Brightness >= 70) FocusKeywords.Add("밝기 양호");
                     else FocusKeywords.Add("밝기 보정 필요");
 

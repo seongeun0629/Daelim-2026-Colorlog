@@ -301,6 +301,8 @@ namespace Colorlog.Services
                     ORDER BY d.diagnosis_at DESC
                     LIMIT 1;", connection);
 
+                cmd.Parameters.AddWithValue("$userId", userId);
+
                 using var reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
