@@ -15,5 +15,11 @@ namespace Colorlog.Models
         public string PersonalColorName { get; set; } = string.Empty;
         public string? OilyStatus { get; set; }
         public double? OilyScore { get; set; }
+
+        public (int R, int G, int B)? ZoneForehead { get; set; }
+        public (int R, int G, int B)? ZoneLCheek { get; set; }
+        public (int R, int G, int B)? ZoneRCheek { get; set; }
+        public (int R, int G, int B)? ZoneNose { get; set; }
+        public (int R, int G, int B)? ZoneChin { get; set; }
     }
 }

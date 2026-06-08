@@ -47,13 +47,7 @@ namespace Colorlog.ViewModels
             //    new("밝기 지수", 71, 100, "좋음", "#FF22C55E")
             //};
 
-            //FaceZoneTones = new ObservableCollection<FaceZoneTone>
-            //{
-            //    new("이마", "#FFDAB9A5"),
-            //    new("양 볼", "#FFD8AE9A"),
-            //    new("코 주변", "#FFE6C5AF"),
-            //    new("턱", "#FFD4B49F")
-            //};
+            FaceZoneTones = new ObservableCollection<FaceZoneTone>();
 
             LoadFromDatabase();
         }
@@ -155,6 +149,22 @@ namespace Colorlog.ViewModels
                     {
                         BestColors.Add(new ColorChip(PersonalColorName, "#FFDAB9A5"));
                     }
+
+                    FaceZoneTones.Clear();
+                    void AddZone(string name, (int R, int G, int B)? zone)
+                    {
+                        if (zone.HasValue)
+                            FaceZoneTones.Add(new FaceZoneTone(name,
+                                $"#FF{zone.Value.R:X2}{zone.Value.G:X2}{zone.Value.B:X2}"));
+                    }
+                    AddZone("이마", diagnosis.ZoneForehead);
+                    AddZone("왼쪽 볼", diagnosis.ZoneLCheek);
+                    AddZone("오른쪽 볼", diagnosis.ZoneRCheek);
+                    AddZone("코 주변", diagnosis.ZoneNose);
+                    AddZone("턱", diagnosis.ZoneChin);
+
+                    if (FaceZoneTones.Count == 0)
+                        FaceZoneTones.Add(new FaceZoneTone("진단 후 표시됩니다", "#FFDAB9A5"));
                 }
                 else
                 {
@@ -166,6 +176,7 @@ namespace Colorlog.ViewModels
                     SkinMetrics.Add(new SkinMetric("밝기 지수", 0, 100, "-", "#FF22C55E"));
                     SkinMetrics.Add(new SkinMetric("유분 지수", 0, 100, "-", "#FF8B5CF6"));
                 }
+
                 var recs = _databaseService.GetLatestRecommendations(_userId);
                 RecentRecommendations.Clear();
                 foreach (var rec in recs.Take(3))

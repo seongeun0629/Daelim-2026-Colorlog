@@ -101,17 +101,17 @@ def main():
 
                             diagnosis_id = add_diagnosis(
                                 user_id=user_id,
-                                lab_l=avg_L,
-                                lab_a=avg_a,
-                                lab_b=avg_b,
-                                brightness=brightness_val,
-                                redness=redness_val,
+                                lab_l=avg_L, lab_a=avg_a, lab_b=avg_b,
+                                brightness=brightness_val, redness=redness_val,
                                 type_id=type_id,
-                                oily_status=oily_status_val,
-                                oily_score=oily_score_val,
+                                oily_status=oily_status_val, oily_score=oily_score_val,
+                                zone_forehead=get_zone("forehead"),   
+                                zone_lcheek=get_zone("left_cheek"),   
+                                zone_rcheek=get_zone("right_cheek"),  
+                                zone_nose=get_zone("nose"),           
+                                zone_chin=get_zone("chin"),           
                             )
 
-                            # ✅ 누적 데이터 기반 AI 추천
                             monthly_stats = get_monthly_stats(user_id)
                             ai_color_type = monthly_stats["most_color_type"] or best_type_name
                             ai_brightness = monthly_stats["avg_brightness"] if monthly_stats["avg_brightness"] >= 0 else brightness_val

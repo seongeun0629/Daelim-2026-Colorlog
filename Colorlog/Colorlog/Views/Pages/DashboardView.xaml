@@ -137,7 +137,7 @@
                 <Expander IsExpanded="False" Background="Transparent" BorderThickness="0">
                     <Expander.Header>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="피부톤 진단 결과 (Beta)" FontWeight="SemiBold" FontSize="15" Foreground="{StaticResource TitleTextBrush}"/>
+                            <TextBlock Text="피부톤 진단 결과" FontWeight="SemiBold" FontSize="15" Foreground="{StaticResource TitleTextBrush}"/>
                             <TextBlock Text="  얼굴 부위별 평균 색상 인사이트" Style="{StaticResource DashboardCardSubTextStyle}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Expander.Header>

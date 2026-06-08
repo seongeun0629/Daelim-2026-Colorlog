@@ -294,7 +294,12 @@ namespace Colorlog.Services
                 using var connection = OpenConnection();
                 using var cmd = new SqliteCommand(@"
                     SELECT d.diagnosis_at, d.brightness, d.redness, pct.type_name, d.type_id,
-                           d.oily_status, d.oily_score
+                           d.oily_status, d.oily_score,
+                           d.zone_forehead_r, d.zone_forehead_g, d.zone_forehead_b,
+                           d.zone_lcheek_r,   d.zone_lcheek_g,   d.zone_lcheek_b,
+                           d.zone_rcheek_r,   d.zone_rcheek_g,   d.zone_rcheek_b,
+                           d.zone_nose_r,     d.zone_nose_g,     d.zone_nose_b,
+                           d.zone_chin_r,     d.zone_chin_g,     d.zone_chin_b
                     FROM diagnosis d
                     LEFT JOIN personal_color_types pct ON d.type_id = pct.type_id
                     WHERE d.user_id = $userId
@@ -306,6 +311,9 @@ namespace Colorlog.Services
                 using var reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
+                    static (int, int, int)? ReadZone(SqliteDataReader r, int ri, int gi, int bi)
+                        => r.IsDBNull(ri) ? null : (r.GetInt32(ri), r.GetInt32(gi), r.GetInt32(bi));
+
                     return new DiagnosisSummary
                     {
                         DiagnosisAt = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
@@ -313,8 +321,13 @@ namespace Colorlog.Services
                         Redness = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
                         PersonalColorName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
                         TypeId = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
-                        OilyStatus = reader.IsDBNull(5) ? null : reader.GetString(5),  
-                        OilyScore = reader.IsDBNull(6) ? null : reader.GetDouble(6),  
+                        OilyStatus = reader.IsDBNull(5) ? null : reader.GetString(5),
+                        OilyScore = reader.IsDBNull(6) ? null : reader.GetDouble(6),
+                        ZoneForehead = ReadZone(reader, 7, 8, 9),
+                        ZoneLCheek = ReadZone(reader, 10, 11, 12),
+                        ZoneRCheek = ReadZone(reader, 13, 14, 15),
+                        ZoneNose = ReadZone(reader, 16, 17, 18),
+                        ZoneChin = ReadZone(reader, 19, 20, 21),
                     };
                 }
             }

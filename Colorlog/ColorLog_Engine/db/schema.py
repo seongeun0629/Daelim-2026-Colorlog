@@ -151,7 +151,22 @@ def _migrate():
             ("lab_a",      "REAL"),
             ("lab_b",      "REAL"),
             ("oily_status",  "TEXT"),    
-            ("oily_score",   "REAL"),    
+            ("oily_score",   "REAL"),
+            ("zone_forehead_r", "INTEGER"),  
+            ("zone_forehead_g", "INTEGER"),  
+            ("zone_forehead_b", "INTEGER"),  
+            ("zone_lcheek_r",   "INTEGER"), 
+            ("zone_lcheek_g",   "INTEGER"),  
+            ("zone_lcheek_b",   "INTEGER"),  
+            ("zone_rcheek_r",   "INTEGER"), 
+            ("zone_rcheek_g",   "INTEGER"),
+            ("zone_rcheek_b",   "INTEGER"), 
+            ("zone_nose_r",     "INTEGER"), 
+            ("zone_nose_g",     "INTEGER"),
+            ("zone_nose_b",     "INTEGER"),  
+            ("zone_chin_r",     "INTEGER"),  
+            ("zone_chin_g",     "INTEGER"),  
+            ("zone_chin_b",     "INTEGER"),  
         ]:
             if col not in diag_cols:
                 cursor.execute(f"ALTER TABLE diagnosis ADD COLUMN {col} {typedef}")
