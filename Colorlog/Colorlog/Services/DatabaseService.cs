@@ -124,6 +124,22 @@ namespace Colorlog.Services
             return result;
         }
 
+        public void DeleteAllRecordsByUser(int userId)
+        {
+            using var connection = OpenConnection();
+            using var cmd1 = new SqliteCommand(@"
+                DELETE FROM rec_products
+                WHERE diagnosis_id IN (
+                    SELECT diagnosis_id FROM diagnosis WHERE user_id = $userId
+                );", connection);
+            cmd1.Parameters.AddWithValue("$userId", userId);
+            cmd1.ExecuteNonQuery();
+
+            using var cmd2 = new SqliteCommand(
+                "DELETE FROM diagnosis WHERE user_id = $userId;", connection);
+            cmd2.Parameters.AddWithValue("$userId", userId);
+            cmd2.ExecuteNonQuery();
+        }
 
         public User? GetLatestUser()
         {

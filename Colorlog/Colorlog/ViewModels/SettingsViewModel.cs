@@ -1,7 +1,9 @@
 using Colorlog.Models;
+using Colorlog.Services;
 using Colorlog.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
@@ -11,7 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Messaging;
 
 namespace Colorlog.ViewModels;
 
@@ -35,6 +36,7 @@ public partial class SettingsViewModel : ObservableObject
 
     private readonly Services.DatabaseService _databaseService;
 
+    private readonly PythonEngineService _pythonService;
     public ObservableCollection<string> CameraNames { get; } = new();
 
     public ICommand ChangeProfileImageCommand => new RelayCommand(ExecuteChangeProfileImage);
@@ -60,10 +62,11 @@ public partial class SettingsViewModel : ObservableObject
     public ObservableCollection<SelectablePreferenceItem> SkinItems { get; } = new();
     public ObservableCollection<SelectablePreferenceItem> ToneItems { get; } = new();
 
-    public SettingsViewModel(Services.DatabaseService databaseService, int userId)
+    public SettingsViewModel(Services.DatabaseService databaseService, int userId, PythonEngineService pythonService)
     {
         _databaseService = databaseService;
         _currentUserId = userId;
+        _pythonService = pythonService;
 
         foreach (var label in new[] { "청순", "화려", "스모키", "러블리", "시크", "데일리" })
         {
@@ -124,6 +127,47 @@ public partial class SettingsViewModel : ObservableObject
                     item.IsSelected = true;
             }
         }
+    }
+
+    [RelayCommand]
+    private async Task RegenRecommendations()
+    {
+        _databaseService.UpdatePreferredStyle(_currentUserId,
+            string.Join(", ", MoodItems.Concat(SkinItems).Concat(ToneItems)
+                .Where(x => x.IsSelected).Select(x => x.Label)));
+
+        var engineDir = System.IO.Path.GetFullPath(
+            System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            @"..\..\..\..\ColorLog_Engine"));
+
+        // conda 환경의 python 경로 직접 지정
+        var pythonPath = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            @"anaconda3\envs\colorlog\python.exe");
+
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = pythonPath,
+            Arguments = $"regen_recs.py --user-id {_currentUserId}",
+            WorkingDirectory = engineDir,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+
+        using var process = System.Diagnostics.Process.Start(psi);
+        if (process != null)
+        {
+            var output = await process.StandardOutput.ReadToEndAsync();
+            await process.WaitForExitAsync();
+            Debug.WriteLine($"[RegenRecs] {output}");
+        }
+
+        WeakReferenceMessenger.Default.Send(new ProfileSwitchedMessage(_currentUserId));
+
+        MessageBox.Show("추천이 업데이트됐습니다! 뷰티 로그를 확인해보세요.",
+            "추천 업데이트 완료", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void SyncUserAgeFromBirthDate()
@@ -220,21 +264,22 @@ public partial class SettingsViewModel : ObservableObject
     private void ResetAllRecords()
     {
         var result = MessageBox.Show(
-            "진단 기록과 추천 내역이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.\n계속하시겠습니까?",
-            "기록 초기화",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
+        "진단 기록과 추천 내역이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.\n계속하시겠습니까?",
+        "기록 초기화",
+        MessageBoxButton.YesNo,
+        MessageBoxImage.Warning);
 
-        if (result != MessageBoxResult.Yes)
+        if (result != MessageBoxResult.Yes) return;
+
+        try
         {
-            return;
+            _databaseService.DeleteAllRecordsByUser(_currentUserId);
+            MessageBox.Show("초기화를 완료했습니다.", "안내", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-
-        _ = MessageBox.Show(
-            "초기화를 완료했습니다.",
-            "안내",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        catch (Exception ex)
+        {
+            MessageBox.Show($"초기화 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     [RelayCommand]

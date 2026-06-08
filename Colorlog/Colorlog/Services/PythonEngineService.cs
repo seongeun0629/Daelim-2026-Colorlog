@@ -114,5 +114,23 @@ namespace Colorlog.Services
                 _process = null;
             }
         }
+
+        public void RegenRecommendations(int userId)
+        {
+            var engineDir = Path.GetFullPath(
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                @"..\..\..\..\ColorLog_Engine"));
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c conda activate colorlog && python regen_recs.py --user-id {userId}",
+                WorkingDirectory = engineDir,
+                UseShellExecute = true,
+                CreateNoWindow = false,
+            };
+
+            Process.Start(psi);
+        }
     }
 }

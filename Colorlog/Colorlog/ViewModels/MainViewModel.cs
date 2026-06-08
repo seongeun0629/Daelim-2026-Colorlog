@@ -21,7 +21,7 @@ namespace Colorlog.ViewModels
 
         [ObservableProperty]
         private string _selectedMenuTag = "Dashboard";
-        
+       
 
         [ObservableProperty]
         private bool _isSidebarExpanded = true;
@@ -43,16 +43,13 @@ namespace Colorlog.ViewModels
         
         public MainViewModel(Services.DatabaseService databaseService, int userId)
         {
-            
-
-            //var databaseService = new Services.DatabaseService();
-
             DashboardViewModel = new DashboardViewModel(databaseService, userId);
-            SettingsViewModel = new SettingsViewModel(databaseService, userId);
-            LiveAnalysisViewModel = new LiveAnalysisViewModel(new PythonEngineService(), SettingsViewModel)
+            var pythonEngineService = new PythonEngineService(); 
+            LiveAnalysisViewModel = new LiveAnalysisViewModel(pythonEngineService, null)
             {
                 CurrentUserId = userId
             };
+            SettingsViewModel = new SettingsViewModel(databaseService, userId, pythonEngineService);  
             HistoryViewModel = new HistoryViewModel(databaseService, userId);
             BeautyLogViewModel = new BeautyLogViewModel(databaseService, userId);
 
@@ -66,15 +63,6 @@ namespace Colorlog.ViewModels
 
             _ = LoadUserStatsAsync(userId);
 
-            WeakReferenceMessenger.Default.Register<ProfileSwitchedMessage>(this, (r, m) =>
-            {
-                var newUserId = m.Value;
-                LiveAnalysisViewModel.CurrentUserId = newUserId;
-                HistoryViewModel.UpdateUserId(newUserId);
-                DashboardViewModel.UpdateUserId(newUserId);
-                _ = LoadUserStatsAsync(newUserId);
-            });
-
             WeakReferenceMessenger.Default.Unregister<ProfileSwitchedMessage>(this);
             WeakReferenceMessenger.Default.Register<ProfileSwitchedMessage>(this, (r, m) =>
             {
@@ -86,6 +74,7 @@ namespace Colorlog.ViewModels
                     LiveAnalysisViewModel.CurrentUserId = newUserId;
                     HistoryViewModel.UpdateUserId(newUserId);
                     DashboardViewModel.UpdateUserId(newUserId);
+                    BeautyLogViewModel.UpdateUserId(newUserId);
                     _ = LoadUserStatsAsync(newUserId);
                 });
             });

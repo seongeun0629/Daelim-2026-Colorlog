@@ -176,7 +176,7 @@
                             <TextBlock Text="&#xE722;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                        FontSize="16" Foreground="{StaticResource PrimaryBrush}"
                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="카메라 / 조명 설정" Style="{StaticResource SettingsGlassCardTitleStyle}"/>
+                            <TextBlock Text="카메라 설정" Style="{StaticResource SettingsGlassCardTitleStyle}"/>
                         </StackPanel>
                         <TextBlock Text="촬영 장치와 밝기를 맞추면 분석 결과가 더 안정적입니다."
                                    Style="{StaticResource SettingsGlassCardSubTextStyle}" Margin="0,6,0,0"/>
@@ -269,6 +269,13 @@
                                               Visibility="{Binding HasCameras, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                 </Grid>
 
+                                <Border Style="{StaticResource SettingsGlassInsetStyle}" Padding="2" Margin="0,14,0,0">
+                                    <TextBlock Text="카메라를 선택한 뒤 실시간 컬러 진단 페이지에서 분석을 시작하세요."
+                                           FontSize="12" Foreground="{StaticResource CaptionTextBrush}"
+                                           TextWrapping="Wrap"/>
+                                </Border>
+
+                                <!--
                                 <Grid Margin="0,14,0,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="80"/>
@@ -286,6 +293,7 @@
                                                    VerticalAlignment="Center" TextAlignment="Center" MinWidth="22"/>
                                     </Border>
                                 </Grid>
+                                -->
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -355,6 +363,12 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <Button Content="내 추구미로 추천 업데이트"
+                                Style="{StaticResource AccentPillButtonStyle}"
+                                Margin="0,16,0,0"
+                                HorizontalAlignment="Left"
+                                Command="{Binding RegenRecommendationsCommand}"/>
                     </StackPanel>
                 </Border>
 
@@ -369,9 +383,10 @@
                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <TextBlock Text="데이터 관리" Style="{StaticResource SettingsGlassCardTitleStyle}"/>
                         </StackPanel>
-                        <TextBlock Text="기록을 초기화하거나 안전하게 보관하세요."
+                        <TextBlock Text="진단 기록과 추천 내역을 초기화할 수 있습니다."
                                    Style="{StaticResource SettingsGlassCardSubTextStyle}" Margin="0,6,0,0"/>
 
+                        <!--
                         <Border Style="{StaticResource SettingsGlassInsetStyle}" Padding="18,16" Margin="0,20,0,0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -390,6 +405,7 @@
                                         ToolTip="백업 파일 저장 위치를 선택합니다."/>
                             </Grid>
                         </Border>
+                        -->
 
                         <Border Style="{StaticResource SettingsGlassInsetStyle}" Padding="18,16" Margin="0,14,0,0"
                                 BorderBrush="{StaticResource DangerSubtleSectionBorderBrush}"
