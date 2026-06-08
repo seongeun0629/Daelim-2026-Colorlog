@@ -31,34 +31,29 @@ namespace Colorlog.ViewModels
             _userId = userId;
 
             //더비 데이터 유지 (나중에 교체)!!!
-            BestColors = new ObservableCollection<ColorChip>
-            {
-                new("Peach Coral", "#FFEEA39A"),
-                new("Warm Ivory", "#FFF2DFC8"),
-                new("Soft Apricot", "#FFF4C9A8"),
-                new("Rose Beige", "#FFDAB7A0"),
-            };
+            //BestColors = new ObservableCollection<ColorChip>
+            //{
+            //    new("Peach Coral", "#FFEEA39A"),
+            //    new("Warm Ivory", "#FFF2DFC8"),
+            //    new("Soft Apricot", "#FFF4C9A8"),
+            //    new("Rose Beige", "#FFDAB7A0"),
+            //};
 
-            RecentRecommendations = new ObservableCollection<ProductRecommendation>
-            {
-                new("데일리 수분 톤업 선크림", "건조 + 톤 다운 개선", "4.7"),
-                new("저자극 코랄 무드 블러셔", "홍조 커버 + 웜톤 정리", "4.6"),
-                new("광채 세럼 쿠션 21N", "밝기 보정 + 밀착력", "4.5")
-            };
+            RecentRecommendations = new ObservableCollection<ProductRecommendation>();
 
-            SkinMetrics = new ObservableCollection<SkinMetric>
-            {
-                new("홍조 지수", 42, 100, "보통", "#FFFB923C"),
-                new("밝기 지수", 71, 100, "좋음", "#FF22C55E")
-            };
+            //SkinMetrics = new ObservableCollection<SkinMetric>
+            //{
+            //    new("홍조 지수", 42, 100, "보통", "#FFFB923C"),
+            //    new("밝기 지수", 71, 100, "좋음", "#FF22C55E")
+            //};
 
-            FaceZoneTones = new ObservableCollection<FaceZoneTone>
-            {
-                new("이마", "#FFDAB9A5"),
-                new("양 볼", "#FFD8AE9A"),
-                new("코 주변", "#FFE6C5AF"),
-                new("턱", "#FFD4B49F")
-            };
+            //FaceZoneTones = new ObservableCollection<FaceZoneTone>
+            //{
+            //    new("이마", "#FFDAB9A5"),
+            //    new("양 볼", "#FFD8AE9A"),
+            //    new("코 주변", "#FFE6C5AF"),
+            //    new("턱", "#FFD4B49F")
+            //};
 
             LoadFromDatabase();
         }
@@ -170,6 +165,16 @@ namespace Colorlog.ViewModels
                     SkinMetrics.Add(new SkinMetric("홍조 지수", 0, 100, "-", "#FFFB923C"));
                     SkinMetrics.Add(new SkinMetric("밝기 지수", 0, 100, "-", "#FF22C55E"));
                     SkinMetrics.Add(new SkinMetric("유분 지수", 0, 100, "-", "#FF8B5CF6"));
+                }
+                var recs = _databaseService.GetLatestRecommendations(_userId);
+                RecentRecommendations.Clear();
+                foreach (var rec in recs.Take(3))
+                {
+                    RecentRecommendations.Add(new ProductRecommendation(
+                        rec.ProductName,
+                        rec.RecReason,
+                        rec.Rating
+                    ));
                 }
             }
             catch (Exception ex)
