@@ -111,5 +111,6 @@ def get_ai_recommendation(
 
         return recs
 
-    except Exception:
+    except Exception as e:
+        print(f"AI 추천 오류: {e}")
         return []

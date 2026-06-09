@@ -140,10 +140,7 @@ public partial class SettingsViewModel : ObservableObject
             System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
             @"..\..\..\..\ColorLog_Engine"));
 
-        // conda 환경의 python 경로 직접 지정
-        var pythonPath = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            @"anaconda3\envs\colorlog\python.exe");
+        var pythonPath = FindPythonPath();  // ✅ 동적으로 찾기
 
         var psi = new System.Diagnostics.ProcessStartInfo
         {
@@ -160,14 +157,35 @@ public partial class SettingsViewModel : ObservableObject
         if (process != null)
         {
             var output = await process.StandardOutput.ReadToEndAsync();
+            var error = await process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync();
-            Debug.WriteLine($"[RegenRecs] {output}");
+            Debug.WriteLine($"[RegenRecs] output: {output}");
+            Debug.WriteLine($"[RegenRecs] error: {error}");
         }
 
         WeakReferenceMessenger.Default.Send(new ProfileSwitchedMessage(_currentUserId));
 
         MessageBox.Show("추천이 업데이트됐습니다! 뷰티 로그를 확인해보세요.",
             "추천 업데이트 완료", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private string FindPythonPath()
+    {
+        var username = Environment.UserName;
+        var candidates = new[]
+        {
+        $@"C:\Users\{username}\anaconda3\envs\colorlog\python.exe",
+        $@"C:\Users\{username}\Anaconda3\envs\colorlog\python.exe",
+        $@"C:\ProgramData\anaconda3\envs\colorlog\python.exe",
+        $@"C:\ProgramData\Anaconda3\envs\colorlog\python.exe",
+    };
+
+        foreach (var candidate in candidates)
+        {
+            if (System.IO.File.Exists(candidate))
+                return candidate;
+        }
+        return "python";
     }
 
     private void SyncUserAgeFromBirthDate()
